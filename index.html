@@ -201,7 +201,6 @@
             <div class="nav-buttons">
                 <button class="menu-btn active" onclick="app.navigate('home')">Inicio</button>
                 <button class="menu-btn" onclick="app.navigate('quiz')">Test</button>
-                <button class="menu-btn" onclick="app.navigate('add')">➕ Añadir</button>
                 <button class="menu-btn" onclick="app.navigate('search')">🔍 Buscar</button>
             </div>
         </div>
@@ -548,62 +547,7 @@
                             <button class="btn" onclick="app.startQuiz()">
                                 📝 Comenzar Test
                             </button>
-                            <button class="btn btn-secondary" onclick="app.navigate('add')">
-                                ➕ Crear Pregunta
-                            </button>
-                        </div>
-                    </div>
-                `;
-            },
-
-            renderAdd: (container) => {
-                container.innerHTML = `
-                    <div class="card">
-                        <h2>➕ Añadir Nueva Pregunta</h2>
-                        <p style="font-size:0.9rem; color:#64748b; margin-bottom:2rem;">
-                            Esta pregunta se guardará en tu navegador y podrás usarla en los tests.
-                        </p>
-
-                        <form onsubmit="event.preventDefault(); app.handleFormSubmit();">
-                            <div class="form-group">
-                                <label class="form-label">Asignatura</label>
-                                <input type="text" id="new-subject" class="form-input" list="subject-list" value="${app.currentSubject}" placeholder="Ej: Historia, Matemáticas..." required>
-                                <datalist id="subject-list">
-                                    ${app.subjects.map(s => `<option value="${s}">`).join('')}
-                                </datalist>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Unidad / Tema (Número)</label>
-                                <input type="number" id="new-unit" class="form-input" value="1" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Pregunta</label>
-                                <textarea id="new-question" class="form-input" placeholder="Escribe el enunciado aquí..." required></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" style="color:var(--success)">✅ Respuesta Correcta</label>
-                                <input type="text" id="new-correct" class="form-input" placeholder="La respuesta buena" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" style="color:var(--error)">❌ Opción Incorrecta 1</label>
-                                <input type="text" class="form-input distractor" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" style="color:var(--error)">❌ Opción Incorrecta 2</label>
-                                <input type="text" class="form-input distractor" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" style="color:var(--error)">❌ Opción Incorrecta 3</label>
-                                <input type="text" class="form-input distractor" required>
-                            </div>
-
-                            <button type="submit" class="btn btn-success" style="margin-top:1rem;">Guardar Pregunta</button>
-                            <button type="button" class="btn btn-outline" style="margin-top:0.5rem;" onclick="app.navigate('home')">Cancelar</button>
-                        </form>
+                          </div>
                     </div>
                 `;
             },
@@ -700,27 +644,6 @@
             changeSubject: (newSubject) => {
                 app.currentSubject = newSubject;
                 app.navigate('home');
-            },
-
-            handleFormSubmit: () => {
-                const subject = document.getElementById('new-subject').value.trim();
-                const unit = document.getElementById('new-unit').value;
-                const question = document.getElementById('new-question').value.trim();
-                const correct = document.getElementById('new-correct').value.trim();
-                const distractors = Array.from(document.querySelectorAll('.distractor')).map(i => i.value.trim());
-                
-                if(!subject || !question || !correct) return;
-
-                const newQ = {
-                    id: "CUSTOM_" + Date.now(),
-                    subject: subject,
-                    unit: unit,
-                    question: question,
-                    answer: correct,
-                    options: [correct, ...distractors]
-                };
-
-                app.saveQuestion(newQ);
             },
 
             checkAnswer: (btn, selectedOpt) => {
