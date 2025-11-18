@@ -154,6 +154,14 @@
         .detail-correct {
             background-color: #dcfce7; border-color: var(--success); color: #065f46; font-weight: bold;
         }
+        /* ESTILO PARA RESALTAR TEXTO DE BÚSQUEDA */
+        .highlight {
+            background-color: var(--accent); /* Color ámbar */
+            color: #1e293b;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
         /* --- UTILIDADES --- */
         .hidden { display: none; }
         .text-center { text-align: center; }
@@ -395,7 +403,7 @@
             { id: "U3_Q77", subject: DEFAULT_SUBJECT, unit: 3, question: "¿Cuál de los siguientes puntos NO es un Objetivo de Desarrollo Sostenible (ODS) de la Agenda 2030?", options: ["Paz, justicia e instituciones sólidas", "Fin de la pobreza", "Parentalidad positiva", "Educación de calidad"], answer: "Parentalidad positiva" }
         ];
 
-       // --- LÓGICA DE LA APP ---
+        // --- LÓGICA DE LA APP ---
         const app = {
             allQuestions: [],
             filteredQuestions: [], // Preguntas de la asignatura actual
@@ -405,6 +413,9 @@
             
             // Estado del Quiz
             quiz: { index: 0, score: 0, answered: false },
+            
+            // NUEVO: Estado para persistir la búsqueda
+            searchState: { term: '', resultsHTML: '' }, 
             
             init: () => {
                 app.loadData();
@@ -431,6 +442,11 @@
                 // Actualizar menú
                 document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
                 
+                // Limpiar estado de búsqueda si no vamos a la vista de búsqueda o detalle
+                if (viewId !== 'search' && viewId !== 'detail') {
+                    app.searchState = { term: '', resultsHTML: '' };
+                }
+
                 // Lógica segura para encontrar el botón activo
                 let activeBtn = null;
                 try {
@@ -438,6 +454,10 @@
                 } catch(e) { console.log("Botón no encontrado en menú"); }
 
                 if (activeBtn) activeBtn.classList.add('active');
+                if (viewId === 'search') { 
+                    // Asegurar que el botón "Buscar" se mantenga activo
+                    document.querySelector(`button[onclick="app.navigate('search')"]`).classList.add('active');
+                }
 
                 const container = document.getElementById('app-container');
                 container.innerHTML = '';
@@ -542,12 +562,19 @@
                 `;
             },
             renderSearch: (container) => {
+                // Usar el estado de búsqueda guardado
+                const initialTerm = app.searchState.term;
+                const initialResults = app.searchState.resultsHTML || '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar...</p>';
+
                 container.innerHTML = `
                     <div class="card">
                         <h2>🔍 Buscador Global</h2>
-                        <input type="text" class="form-input" placeholder="Busca en todas las asignaturas..." oninput="app.handleSearch(this.value)">
+                        <input type="text" id="search-input" class="form-input" 
+                                placeholder="Busca en todas las asignaturas..." 
+                                oninput="app.handleSearch(this.value)"
+                                value="${initialTerm}">
                         <div id="search-results" style="margin-top:1rem;">
-                            <p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar...</p>
+                            ${initialResults}
                         </div>
                     </div>
                 `;
@@ -557,6 +584,7 @@
                 if (!q) return app.navigate('search');
                 container.innerHTML = `
                     <div class="card">
+                        <!-- Botón de retorno que vuelve a la vista de búsqueda (manteniendo el estado) -->
                         <button class="btn btn-outline" style="width:auto; margin-bottom:1rem;" onclick="app.navigate('search')">⬅ Volver al Buscador</button>
                         <div style="margin-bottom:1rem;">
                             <span class="tag tag-subject">${q.subject}</span>
@@ -662,8 +690,12 @@
             },
             handleSearch: (term) => {
                 const resultsDiv = document.getElementById('search-results');
+                
                 if (term.length < 2) {
                     resultsDiv.innerHTML = '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar...</p>';
+                    // Actualizar el estado con búsqueda vacía
+                    app.searchState.term = term;
+                    app.searchState.resultsHTML = resultsDiv.innerHTML;
                     return;
                 }
                 
@@ -677,21 +709,35 @@
                     // pero insertando la clase de resaltado.
                     return text.replace(regex, match => `<span class="highlight">${match}</span>`);
                 };
-               
+
                 const found = app.allQuestions.filter(q => 
-                    q.question.toLowerCase().includes(term.toLowerCase()) || 
-                    q.answer.toLowerCase().includes(term.toLowerCase())
+                    q.question.toLowerCase().includes(termLower) || 
+                    q.answer.toLowerCase().includes(termLower)
                 );
+                
+                let resultsHTML;
+                
                 if (found.length === 0) {
-                    resultsDiv.innerHTML = '<p style="color:var(--error); text-align:center;">No encontrado.</p>';
-                    return;
+                    resultsHTML = '<p style="color:var(--error); text-align:center;">No encontrado.</p>';
+                } else {
+                    resultsHTML = found.map(q => {
+                        // Resaltar el texto de la pregunta
+                        const highlightedQuestion = highlightText(q.question.substring(0, 100) + (q.question.length > 100 ? '...' : ''), term);
+
+                        return `
+                            <div class="result-item" onclick="app.navigate('detail', '${q.id}')">
+                                <small style="color:#64748b; font-weight:600;">${q.subject} (U${q.unit})</small>
+                                <div style="font-weight: 500;">${highlightedQuestion}</div>
+                            </div>
+                        `;
+                    }).join('');
                 }
-                resultsDiv.innerHTML = found.map(q => `
-                    <div class="result-item" onclick="app.navigate('detail', '${q.id}')">
-                        <small style="color:#64748b; font-weight:600;">${q.subject} (U${q.unit})</small>
-                        <div style="font-weight: 500;">${q.question.substring(0, 80)}...</div>
-                    </div>
-                `).join('');
+                
+                resultsDiv.innerHTML = resultsHTML;
+
+                // ACTUALIZAR ESTADO DE BÚSQUEDA
+                app.searchState.term = term;
+                app.searchState.resultsHTML = resultsHTML;
             },
             shuffle: (array) => {
                 for (let i = array.length - 1; i > 0; i--) {
