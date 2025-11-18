@@ -666,6 +666,18 @@
                     resultsDiv.innerHTML = '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar...</p>';
                     return;
                 }
+                
+                const termLower = term.toLowerCase();
+                
+                // Función auxiliar para insertar el resaltado
+                const highlightText = (text, keyword) => {
+                    if (!keyword) return text;
+                    const regex = new RegExp(keyword, 'gi');
+                    // Usamos una función de reemplazo para mantener las mayúsculas/minúsculas del texto original,
+                    // pero insertando la clase de resaltado.
+                    return text.replace(regex, match => `<span class="highlight">${match}</span>`);
+                };
+               
                 const found = app.allQuestions.filter(q => 
                     q.question.toLowerCase().includes(term.toLowerCase()) || 
                     q.answer.toLowerCase().includes(term.toLowerCase())
