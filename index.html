@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aula Virtual: Multi-Asignatura</title>
+    <title>VIU estudio examenes</title>
     <style>
         :root {
             --primary: #4f46e5;    /* Índigo vibrante */
@@ -143,8 +143,14 @@
         .option-btn:hover { border-color: var(--primary); background: #eef2ff; color: var(--primary); }
         .option-btn.correct { background: #dcfce7; border-color: var(--success); color: #065f46; font-weight: 600; }
         .option-btn.incorrect { background: #fee2e2; border-color: var(--error); color: #991b1b; }
-        /* --- BUSCADOR Y DETALLE --- */
-        .result-item { padding: 1rem; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.2s; }
+        
+        /* --- ESTILOS DE LA BÚSQUEDA (ACTUALIZADO) --- */
+        .result-item { 
+            padding: 1rem; 
+            border-bottom: 1px solid #e2e8f0; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+        }
         .result-item:hover { background: #f1f5f9; }
         .tag { font-size: 0.75rem; background: #e2e8f0; padding: 4px 8px; border-radius: 6px; color: #475569; margin-right: 8px; font-weight: 600; }
         .tag-subject { background: #e0e7ff; color: #4338ca; }
@@ -154,6 +160,7 @@
         .detail-correct {
             background-color: #dcfce7; border-color: var(--success); color: #065f46; font-weight: bold;
         }
+
         /* ESTILO PARA RESALTAR TEXTO DE BÚSQUEDA */
         .highlight {
             background-color: var(--accent); /* Color ámbar */
@@ -162,6 +169,29 @@
             border-radius: 4px;
             font-weight: 700;
         }
+        
+        /* SNIPPET STYLES - NUEVOS ESTILOS PARA LA LÍNEA DE COLOR */
+        .snippet-container { margin-top: 10px; }
+        .search-snippet {
+            margin-top: 5px; 
+            font-size: 0.9rem; 
+            padding: 8px 10px; 
+            border-radius: 4px;
+            line-height: 1.4;
+            margin-bottom: 8px; 
+            font-weight: 500;
+        }
+        .snippet-correct {
+            border-left: 3px solid var(--success); /* Línea verde */
+            background: #dcfce7; /* Fondo verde claro */
+            color: #065f46;
+        }
+        .snippet-incorrect {
+            border-left: 3px solid var(--error); /* Línea roja */
+            background: #fee2e2; /* Fondo rojo claro */
+            color: #991b1b;
+        }
+
         /* --- UTILIDADES --- */
         .hidden { display: none; }
         .text-center { text-align: center; }
@@ -184,7 +214,8 @@
 <body>
     <nav>
         <div class="nav-content">
-            <div class="logo">🎓 Aula Virtual</div>
+            <!-- Título de navegación actualizado -->
+            <div class="logo">VIU - Master Profesor</div>
             <div class="nav-buttons">
                 <button class="menu-btn active" onclick="app.navigate('home')">Inicio</button>
                 <button class="menu-btn" onclick="app.navigate('quiz')">Test</button>
@@ -414,7 +445,7 @@
             // Estado del Quiz
             quiz: { index: 0, score: 0, answered: false },
             
-            // NUEVO: Estado para persistir la búsqueda
+            // Estado para persistir la búsqueda
             searchState: { term: '', resultsHTML: '' }, 
             
             init: () => {
@@ -450,14 +481,12 @@
                 // Lógica segura para encontrar el botón activo
                 let activeBtn = null;
                 try {
-                    activeBtn = document.querySelector(`button[onclick="app.navigate('${viewId}')"]`);
+                    // Si navegamos a 'detail', el botón activo sigue siendo 'search'
+                    const targetView = viewId === 'detail' ? 'search' : viewId;
+                    activeBtn = document.querySelector(`button[onclick="app.navigate('${targetView}')"]`);
                 } catch(e) { console.log("Botón no encontrado en menú"); }
 
                 if (activeBtn) activeBtn.classList.add('active');
-                if (viewId === 'search') { 
-                    // Asegurar que el botón "Buscar" se mantenga activo
-                    document.querySelector(`button[onclick="app.navigate('search')"]`).classList.add('active');
-                }
 
                 const container = document.getElementById('app-container');
                 container.innerHTML = '';
@@ -486,7 +515,8 @@
                 container.innerHTML = `
                     <div class="card text-center">
                         <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
-                        <h1>Panel de Control</h1>
+                        <!-- Título principal actualizado -->
+                        <h1>ZONA DE ESTUDIO</h1>
                         
                         <div style="max-width:400px; margin: 2rem auto; text-align:left;">
                             <div class="form-group">
@@ -564,7 +594,7 @@
             renderSearch: (container) => {
                 // Usar el estado de búsqueda guardado
                 const initialTerm = app.searchState.term;
-                const initialResults = app.searchState.resultsHTML || '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar...</p>';
+                const initialResults = app.searchState.resultsHTML || '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar en preguntas y respuestas.</p>';
 
                 container.innerHTML = `
                     <div class="card">
@@ -598,7 +628,7 @@
                                 const isCorrect = opt === q.answer;
                                 return `
                                     <div class="detail-option ${isCorrect ? 'detail-correct' : ''}">
-                                        ${opt} ${isCorrect ? '✅' : ''}
+                                        ${opt} ${isCorrect ? '✅ (Correcta)' : ''}
                                     </div>
                                 `;
                             }).join('')}
@@ -688,11 +718,20 @@
                     </div>
                 `;
             },
+            
+            // Función auxiliar para insertar el resaltado
+            highlightText: (text, keyword) => {
+                if (!keyword) return text;
+                const regex = new RegExp(keyword, 'gi');
+                // Usa una función de reemplazo para mantener las mayúsculas/minúsculas del texto original
+                return text.replace(regex, match => `<span class="highlight">${match}</span>`);
+            },
+
             handleSearch: (term) => {
                 const resultsDiv = document.getElementById('search-results');
                 
                 if (term.length < 2) {
-                    resultsDiv.innerHTML = '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar...</p>';
+                    resultsDiv.innerHTML = '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar en preguntas y respuestas.</p>';
                     // Actualizar el estado con búsqueda vacía
                     app.searchState.term = term;
                     app.searchState.resultsHTML = resultsDiv.innerHTML;
@@ -701,33 +740,60 @@
                 
                 const termLower = term.toLowerCase();
                 
-                // Función auxiliar para insertar el resaltado
-                const highlightText = (text, keyword) => {
-                    if (!keyword) return text;
-                    const regex = new RegExp(keyword, 'gi');
-                    // Usamos una función de reemplazo para mantener las mayúsculas/minúsculas del texto original,
-                    // pero insertando la clase de resaltado.
-                    return text.replace(regex, match => `<span class="highlight">${match}</span>`);
-                };
-
-                const found = app.allQuestions.filter(q => 
-                    q.question.toLowerCase().includes(termLower) || 
-                    q.answer.toLowerCase().includes(termLower)
-                );
+                const found = app.allQuestions.filter(q => {
+                    // Criterio de búsqueda: en pregunta O en cualquier opción
+                    if (q.question.toLowerCase().includes(termLower)) return true;
+                    return q.options.some(opt => opt.toLowerCase().includes(termLower));
+                });
                 
                 let resultsHTML;
                 
                 if (found.length === 0) {
-                    resultsHTML = '<p style="color:var(--error); text-align:center;">No encontrado.</p>';
+                    resultsHTML = '<p style="color:var(--error); text-align:center;">No se encontraron resultados que coincidan con la pregunta o alguna de sus opciones.</p>';
                 } else {
                     resultsHTML = found.map(q => {
-                        // Resaltar el texto de la pregunta
-                        const highlightedQuestion = highlightText(q.question.substring(0, 100) + (q.question.length > 100 ? '...' : ''), term);
+                        const isTermInQuestion = q.question.toLowerCase().includes(termLower);
+                        
+                        // 1. Pregunta (siempre se muestra, se resalta si la contiene)
+                        const highlightedQuestion = app.highlightText(q.question, isTermInQuestion ? term : null);
+                        
+                        let snippetsHTML = '<div class="snippet-container">';
+                        
+                        // 2. Respuesta Correcta (siempre se muestra, con estilo verde)
+                        const isTermInCorrectAnswer = q.answer.toLowerCase().includes(termLower);
+                        const highlightedCorrectAnswer = app.highlightText(q.answer, isTermInCorrectAnswer ? term : null);
+                        
+                        snippetsHTML += `
+                            <div class="search-snippet snippet-correct">
+                                <small style="font-weight:700;">✅ Respuesta Correcta:</small> ${highlightedCorrectAnswer}
+                            </div>
+                        `;
+                        
+                        // 3. Respuestas Incorrectas (solo se muestran si contienen el término)
+                        q.options.forEach(opt => {
+                            if (opt !== q.answer) { // Si es una opción incorrecta
+                                const isTermInIncorrectAnswer = opt.toLowerCase().includes(termLower);
+                                
+                                if (isTermInIncorrectAnswer) {
+                                    const highlightedIncorrectAnswer = app.highlightText(opt, term); // Resaltado garantizado
+                                    
+                                    snippetsHTML += `
+                                        <div class="search-snippet snippet-incorrect">
+                                            <small style="font-weight:700;">❌ Respuesta Incorrecta:</small> ${highlightedIncorrectAnswer}
+                                        </div>
+                                    `;
+                                }
+                            }
+                        });
+                        
+                        snippetsHTML += '</div>';
 
+                        // FINAL RESULT CARD RENDERING
                         return `
                             <div class="result-item" onclick="app.navigate('detail', '${q.id}')">
                                 <small style="color:#64748b; font-weight:600;">${q.subject} (U${q.unit})</small>
-                                <div style="font-weight: 500;">${highlightedQuestion}</div>
+                                <div style="font-weight: 500; margin-top: 5px; margin-bottom: 5px;">${highlightedQuestion}</div>
+                                ${snippetsHTML}
                             </div>
                         `;
                     }).join('');
