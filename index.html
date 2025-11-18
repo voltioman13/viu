@@ -15,7 +15,6 @@
             --bg: #f8fafc;         /* Fondo muy claro */
             --card: #ffffff;
         }
-
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg);
@@ -25,7 +24,6 @@
             flex-direction: column;
             min-height: 100vh;
         }
-
         /* --- NAVEGACIÓN --- */
         nav {
             background-color: var(--secondary);
@@ -36,7 +34,6 @@
             z-index: 100;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-
         .nav-content {
             max-width: 900px;
             margin: 0 auto;
@@ -46,11 +43,8 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-
         .logo { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;}
-
         .nav-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap;}
-
         .menu-btn {
             background: rgba(255,255,255,0.1);
             border: none;
@@ -62,12 +56,10 @@
             font-size: 0.9rem;
             font-weight: 500;
         }
-
         .menu-btn:hover, .menu-btn.active {
             background-color: var(--primary);
             transform: translateY(-1px);
         }
-
         /* --- CONTENEDOR CENTRAL --- */
         main {
             flex: 1;
@@ -77,7 +69,6 @@
             padding: 0 1rem;
             box-sizing: border-box;
         }
-
         /* --- TARJETAS --- */
         .card {
             background: var(--card);
@@ -88,11 +79,8 @@
             animation: fadeIn 0.3s ease-out;
             border: 1px solid #e2e8f0;
         }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
         h1, h2, h3 { margin-top: 0; color: var(--secondary); }
-
         /* --- FORMULARIOS --- */
         .form-group { margin-bottom: 1.2rem; text-align: left;}
         .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569; font-size: 0.95rem;}
@@ -108,7 +96,6 @@
         }
         .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary); }
         textarea.form-input { min-height: 100px; resize: vertical; }
-
         /* --- BOTONES --- */
         .btn {
             background-color: var(--primary);
@@ -135,7 +122,6 @@
         .btn-warning:hover { background-color: #d97706; }
         .btn-outline { background: transparent; border: 2px solid #cbd5e1; color: #64748b; }
         .btn-outline:hover { border-color: var(--secondary); color: var(--secondary); background: transparent; }
-
         /* --- ESTILOS DEL TEST --- */
         .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; color: #64748b; font-size: 0.9rem; }
         
@@ -147,9 +133,7 @@
             overflow: hidden;
         }
         .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.4s ease; }
-
         .question-text { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; line-height: 1.5; color: #1e293b; }
-
         .option-btn {
             width: 100%; text-align: left; padding: 1.2rem; margin-bottom: 0.8rem;
             background: white; border: 2px solid #e2e8f0; border-radius: 10px;
@@ -159,20 +143,17 @@
         .option-btn:hover { border-color: var(--primary); background: #eef2ff; color: var(--primary); }
         .option-btn.correct { background: #dcfce7; border-color: var(--success); color: #065f46; font-weight: 600; }
         .option-btn.incorrect { background: #fee2e2; border-color: var(--error); color: #991b1b; }
-
         /* --- BUSCADOR Y DETALLE --- */
         .result-item { padding: 1rem; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.2s; }
         .result-item:hover { background: #f1f5f9; }
         .tag { font-size: 0.75rem; background: #e2e8f0; padding: 4px 8px; border-radius: 6px; color: #475569; margin-right: 8px; font-weight: 600; }
         .tag-subject { background: #e0e7ff; color: #4338ca; }
-
         .detail-option {
             padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; border: 1px solid #e2e8f0; background: white;
         }
         .detail-correct {
             background-color: #dcfce7; border-color: var(--success); color: #065f46; font-weight: bold;
         }
-
         /* --- UTILIDADES --- */
         .hidden { display: none; }
         .text-center { text-align: center; }
@@ -185,7 +166,6 @@
             transform: translateX(-50%); opacity: 0; transition: opacity 0.3s, bottom 0.3s;
         }
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
-
         @media (max-width: 600px) {
             .nav-content { justify-content: center; }
             .card { padding: 1.5rem; }
@@ -194,7 +174,6 @@
     </style>
 </head>
 <body>
-
     <nav>
         <div class="nav-content">
             <div class="logo">🎓 Aula Virtual</div>
@@ -205,17 +184,14 @@
             </div>
         </div>
     </nav>
-
     <main id="app-container">
         <div class="loading-box">
             <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
             <p>Cargando sistema...</p>
         </div>
     </main>
-
     <!-- Notificación Flotante -->
     <div id="toast">Mensaje</div>
-
     <script>
         // --- BASE DE DATOS INICIAL ---
         const DEFAULT_SUBJECT = "Aprendizaje y Desarrollo";
@@ -419,7 +395,7 @@
             { id: "U3_Q77", subject: DEFAULT_SUBJECT, unit: 3, question: "¿Cuál de los siguientes puntos NO es un Objetivo de Desarrollo Sostenible (ODS) de la Agenda 2030?", options: ["Paz, justicia e instituciones sólidas", "Fin de la pobreza", "Parentalidad positiva", "Educación de calidad"], answer: "Parentalidad positiva" }
         ];
 
-        // --- LÓGICA DE LA APP ---
+       // --- LÓGICA DE LA APP ---
         const app = {
             allQuestions: [],
             filteredQuestions: [], // Preguntas de la asignatura actual
@@ -429,30 +405,19 @@
             
             // Estado del Quiz
             quiz: { index: 0, score: 0, answered: false },
-
+            
             init: () => {
                 app.loadData();
                 app.navigate('home');
             },
 
-            // Cargar y fusionar datos
+            // Cargar datos (solo de la base de datos FALLBACK)
             loadData: () => {
-                // 1. Cargar preguntas base
-                let combined = [...FALLBACK_QUESTIONS];
+                // Cargar preguntas base
+                app.allQuestions = [...FALLBACK_QUESTIONS];
 
-                // 2. Cargar preguntas personalizadas del usuario
-                const stored = localStorage.getItem('custom_questions');
-                if (stored) {
-                    try {
-                        const custom = JSON.parse(stored);
-                        combined = [...combined, ...custom];
-                    } catch (e) { console.error("Error leyendo localStorage", e); }
-                }
-
-                app.allQuestions = combined;
-
-                // 3. Extraer lista única de asignaturas
-                const subjectsSet = new Set(combined.map(q => q.subject || "General"));
+                // Extraer lista única de asignaturas
+                const subjectsSet = new Set(app.allQuestions.map(q => q.subject || "General"));
                 app.subjects = Array.from(subjectsSet);
                 
                 // Seleccionar la primera por defecto si no hay una seleccionada
@@ -460,33 +425,19 @@
                     app.currentSubject = app.subjects[0];
                 }
             },
-
-            // Guardar nueva pregunta
-            saveQuestion: (newQ) => {
-                let custom = [];
-                const stored = localStorage.getItem('custom_questions');
-                if (stored) custom = JSON.parse(stored);
-                
-                custom.push(newQ);
-                localStorage.setItem('custom_questions', JSON.stringify(custom));
-                
-                app.showToast("✅ Pregunta guardada correctamente");
-                app.loadData();
-                app.currentSubject = newQ.subject;
-                app.navigate('home');
-            },
-
+            
             // Navegación
             navigate: (viewId, param = null) => {
                 // Actualizar menú
                 document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-                let activeBtn;
-                if (viewId === 'home') activeBtn = document.querySelector("button[onclick=\"app.navigate('home')\"]");
-                else if (viewId === 'quiz') activeBtn = document.querySelector("button[onclick=\"app.navigate('quiz')\"]");
-                else if (viewId === 'add') activeBtn = document.querySelector("button[onclick=\"app.navigate('add')\"]");
-                else activeBtn = document.querySelector("button[onclick=\"app.navigate('search')\"]");
                 
-                if(activeBtn) activeBtn.classList.add('active');
+                // Lógica segura para encontrar el botón activo
+                let activeBtn = null;
+                try {
+                    activeBtn = document.querySelector(`button[onclick="app.navigate('${viewId}')"]`);
+                } catch(e) { console.log("Botón no encontrado en menú"); }
+
+                if (activeBtn) activeBtn.classList.add('active');
 
                 const container = document.getElementById('app-container');
                 container.innerHTML = '';
@@ -497,24 +448,21 @@
                 switch(viewId) {
                     case 'home': app.renderHome(container); break;
                     case 'quiz': app.renderQuiz(container); break;
-                    case 'add': app.renderAdd(container); break;
                     case 'search': app.renderSearch(container); break;
                     case 'detail': app.renderDetail(container, param); break;
+                    default: app.renderHome(container);
                 }
             },
 
             // --- VISTAS ---
-
             renderHome: (container) => {
                 const subjectOptions = app.subjects.map(s => 
                     `<option value="${s}" ${s === app.currentSubject ? 'selected' : ''}>${s}</option>`
                 ).join('');
-
                 // Calcular unidades disponibles para esta asignatura
                 const unitsSet = new Set(app.filteredQuestions.map(q => q.unit));
                 const units = Array.from(unitsSet).sort((a,b) => a - b);
                 const unitOptions = units.map(u => `<option value="${u}">Tema ${u}</option>`).join('');
-
                 container.innerHTML = `
                     <div class="card text-center">
                         <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
@@ -536,7 +484,6 @@
                                 </select>
                             </div>
                         </div>
-
                         <div style="background:#f1f5f9; padding:1rem; border-radius:8px; margin-bottom:2rem;">
                             <p style="margin:0">
                                 Total preguntas disponibles: <b>${app.filteredQuestions.length}</b>
@@ -547,28 +494,27 @@
                             <button class="btn" onclick="app.startQuiz()">
                                 📝 Comenzar Test
                             </button>
-                          </div>
+                        </div>
                     </div>
                 `;
             },
-
+            
             renderQuiz: (container) => {
+                // FIX: Aseguramos que al renderizar una nueva pregunta, no está marcada como respondida.
+                app.quiz.answered = false; 
+
                 // Usamos activeQuizQuestions en lugar de filteredQuestions
                 const questions = app.activeQuizQuestions;
-
                 if (!questions || questions.length === 0) {
                     container.innerHTML = `<div class="card text-center"><h3>⚠️ No hay preguntas activas.</h3><p>Ve al inicio para configurar el test.</p><button class="btn" onclick="app.navigate('home')">Ir al Inicio</button></div>`;
                     return;
                 }
-
                 if (app.quiz.index >= questions.length) {
                     app.renderQuizResult(container);
                     return;
                 }
-
                 const q = questions[app.quiz.index];
                 const progress = ((app.quiz.index) / questions.length) * 100;
-
                 container.innerHTML = `
                     <div class="card">
                         <div class="quiz-header">
@@ -586,9 +532,7 @@
                                 </button>
                             `).join('')}
                         </div>
-
                         <div id="feedback-area" class="hidden" style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px; background: #f1f5f9;"></div>
-
                         <div style="margin-top: 1.5rem; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
                              ${!app.quiz.answered ? `<button class="btn btn-warning" style="width: auto;" onclick="app.skipQuestion()">Saltar ↷</button>` : ''}
                             <button id="next-btn" class="btn hidden" style="width: auto;" onclick="app.nextQuestion()">Siguiente ➜</button>
@@ -596,9 +540,7 @@
                     </div>
                     <div class="text-center"><button class="btn-outline" style="border:none; font-size:0.8rem;" onclick="app.navigate('home')">Salir del test</button></div>
                 `;
-                app.quiz.answered = false;
             },
-
             renderSearch: (container) => {
                 container.innerHTML = `
                     <div class="card">
@@ -610,11 +552,9 @@
                     </div>
                 `;
             },
-
             renderDetail: (container, questionId) => {
                 const q = app.allQuestions.find(item => item.id === questionId);
                 if (!q) return app.navigate('search');
-
                 container.innerHTML = `
                     <div class="card">
                         <button class="btn btn-outline" style="width:auto; margin-bottom:1rem;" onclick="app.navigate('search')">⬅ Volver al Buscador</button>
@@ -638,14 +578,11 @@
                     </div>
                 `;
             },
-
             // --- MANEJADORES DE EVENTOS ---
-
             changeSubject: (newSubject) => {
                 app.currentSubject = newSubject;
                 app.navigate('home');
             },
-
             checkAnswer: (btn, selectedOpt) => {
                 if (app.quiz.answered) return;
                 app.quiz.answered = true;
@@ -654,11 +591,9 @@
                 const isCorrect = selectedOpt === q.answer;
                 const feedback = document.getElementById('feedback-area');
                 const nextBtn = document.getElementById('next-btn');
-
                 // Ocultar botón saltar al responder
                 const skipBtn = document.querySelector('.btn-warning');
                 if(skipBtn) skipBtn.style.display = 'none';
-
                 if (isCorrect) {
                     btn.classList.add('correct');
                     app.quiz.score++;
@@ -670,11 +605,9 @@
                         if (b.innerText.trim() === q.answer) b.classList.add('correct');
                     });
                 }
-
                 feedback.classList.remove('hidden');
                 nextBtn.classList.remove('hidden');
             },
-
             skipQuestion: () => {
                 const currentQ = app.activeQuizQuestions[app.quiz.index];
                 app.activeQuizQuestions.splice(app.quiz.index, 1);
@@ -683,42 +616,36 @@
                 app.renderQuiz(document.getElementById('app-container'));
                 app.showToast("Pregunta saltada ↷");
             },
-
             nextQuestion: () => {
                 app.quiz.index++;
                 app.navigate('quiz');
             },
-
             startQuiz: () => {
                 // Obtener selección de unidad
                 const unitSelector = document.getElementById('unit-selector');
                 const selectedUnit = unitSelector ? unitSelector.value : 'all';
-
                 // Filtrar preguntas para el test
                 let questionsForQuiz = [...app.filteredQuestions];
                 
                 if (selectedUnit !== 'all') {
                     questionsForQuiz = questionsForQuiz.filter(q => q.unit == selectedUnit);
                 }
-
                 if(questionsForQuiz.length === 0) {
-                    alert("No hay preguntas para esta selección.");
+                    // Usar modal o notificación en lugar de alert()
+                    app.showToast("No hay preguntas para esta selección.");
                     return;
                 }
-
                 // Configurar test
                 app.activeQuizQuestions = app.shuffle(questionsForQuiz);
                 app.quiz.index = 0;
                 app.quiz.score = 0;
                 app.navigate('quiz');
             },
-
             renderQuizResult: (container) => {
                 const total = app.activeQuizQuestions.length;
                 const percent = Math.round((app.quiz.score / total) * 100);
                 let msg = percent >= 50 ? "¡Buen trabajo! 👍" : "A seguir repasando 💪";
                 if(percent === 100) msg = "¡Impecable! 🏆";
-
                 container.innerHTML = `
                     <div class="card text-center">
                         <h1>Resultados</h1>
@@ -733,36 +660,27 @@
                     </div>
                 `;
             },
-
             handleSearch: (term) => {
                 const resultsDiv = document.getElementById('search-results');
                 if (term.length < 2) {
-                    resultsDiv.innerHTML = '';
+                    resultsDiv.innerHTML = '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar...</p>';
                     return;
                 }
-
                 const found = app.allQuestions.filter(q => 
                     q.question.toLowerCase().includes(term.toLowerCase()) || 
                     q.answer.toLowerCase().includes(term.toLowerCase())
                 );
-
                 if (found.length === 0) {
                     resultsDiv.innerHTML = '<p style="color:var(--error); text-align:center;">No encontrado.</p>';
                     return;
                 }
-
                 resultsDiv.innerHTML = found.map(q => `
                     <div class="result-item" onclick="app.navigate('detail', '${q.id}')">
-                        <div style="margin-bottom:5px;">
-                            <span class="tag tag-subject">${q.subject}</span>
-                            <span class="tag">U${q.unit}</span>
-                        </div>
-                        <div style="font-weight:500;">${q.question}</div>
+                        <small style="color:#64748b; font-weight:600;">${q.subject} (U${q.unit})</small>
+                        <div style="font-weight: 500;">${q.question.substring(0, 80)}...</div>
                     </div>
                 `).join('');
             },
-
-            // Utilidades
             shuffle: (array) => {
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
@@ -770,7 +688,6 @@
                 }
                 return array;
             },
-
             showToast: (text) => {
                 const toast = document.getElementById("toast");
                 toast.innerText = text;
