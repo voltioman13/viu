@@ -1,1 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula Virtual: Gestor de Archivos</title>
+    <style>
+        :root {
+            --primary: #4f46e5;    /* Índigo vibrante */
+            --primary-dark: #4338ca;
+            --secondary: #1e293b;  /* Gris pizarra */
+            --accent: #f59e0b;     /* Ámbar */
+            --success: #10b981;    /* Esmeralda */
+            --error: #ef4444;      /* Rojo */
+            --bg: #f8fafc;         /* Fondo muy claro */
+            --card: #ffffff;
+        }
 
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: #334155;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- NAVEGACIÓN --- */
+        nav {
+            background-color: var(--secondary);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logo { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;}
+
+        .nav-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap;}
+
+        .menu-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .menu-btn:hover, .menu-btn.active {
+            background-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        /* --- CONTENEDOR CENTRAL --- */
+        main {
+            flex: 1;
+            max-width: 800px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            box-sizing: border-box;
+        }
+
+        /* --- TARJETAS --- */
+        .card {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.3s ease-out;
+            border: 1px solid #e2e8f0;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1, h2, h3 { margin-top: 0; color: var(--secondary); }
+
+        /* --- FORMULARIOS --- */
+        .form-group { margin-bottom: 1.2rem; text-align: left;}
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569; font-size: 0.95rem;}
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary); }
+        textarea.form-input { min-height: 100px; resize: vertical; }
+
+        /* --- BOTONES --- */
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.9rem 1.5rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { background-color: var(--primary-dark); transform: translateY(-2px); shadow: 0 4px 6px rgba(79, 70, 229, 0.3); }
+        .btn-secondary { background-color: #64748b; }
+        .btn-secondary:hover { background-color: #475569; }
+        .btn-success { background-color: var(--success); }
+        .btn-success:hover { background-color: #059669; }
+        .btn-warning { background-color: var(--accent); color: #fff; }
+        .btn-warning:hover { background-color: #d97706; }
+        .btn-outline { background: transparent; border: 2px solid #cbd5e1; color: #64748b; }
+        .btn-outline:hover { border-color: var(--secondary); color: var(--secondary); background: transparent; }
+
+        /* --- ESTILOS DEL TEST --- */
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; color: #64748b; font-size: 0.9rem; }
+        
+        .quiz-progress {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.4s ease; }
+
+        .question-text { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; line-height: 1.5; color: #1e293b; }
+
+        .option-btn {
+            width: 100%; text-align: left; padding: 1.2rem; margin-bottom: 0.8rem;
+            background: white; border: 2px solid #e2e8f0; border-radius: 10px;
+            cursor: pointer; transition: all 0.2s; font-size: 1rem; color: #475569;
+            position: relative;
+        }
+        .option-btn:hover { border-color: var(--primary); background: #eef2ff; color: var(--primary); }
+        .option-btn.correct { background: #dcfce7; border-color: var(--success); color: #065f46; font-weight: 600; }
+        .option-btn.incorrect { background: #fee2e2; border-color: var(--error); color: #991b1b; }
+
+        /* --- BUSCADOR Y DETALLE --- */
+        .result-item { padding: 1rem; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background 0.2s; }
+        .result-item:hover { background: #f1f5f9; }
+        .tag { font-size: 0.75rem; background: #e2e8f0; padding: 4px 8px; border-radius: 6px; color: #475569; margin-right: 8px; font-weight: 600; }
+        .tag-subject { background: #e0e7ff; color: #4338ca; }
+
+        .detail-option {
+            padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; border: 1px solid #e2e8f0; background: white;
+        }
+        .detail-correct {
+            background-color: #dcfce7; border-color: var(--success); color: #065f46; font-weight: bold;
+        }
+
+        /* --- UTILIDADES --- */
+        .hidden { display: none; }
+        .text-center { text-align: center; }
+        .loading-box { text-align: center; padding: 3rem; color: #94a3b8; }
+        
+        /* ZONA DE ARCHIVOS */
+        .file-drop-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            color: #64748b;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+        .file-drop-zone:hover {
+            border-color: var(--primary);
+            background: #eef2ff;
+            color: var(--primary);
+        }
+        
+        /* Toast Notification */
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center;
+            border-radius: 8px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px;
+            transform: translateX(-50%); opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+        }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+        @media (max-width: 600px) {
+            .nav-content { justify-content: center; }
+            .card { padding: 1.5rem; }
+            .btn { padding: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-content">
+            <div class="logo">🎓 Aula Virtual</div>
+            <div class="nav-buttons">
+                <button class="menu-btn active" onclick="app.navigate('home')">Inicio</button>
+                <button class="menu-btn" onclick="app.navigate('quiz')">Test</button>
+                <button class="menu-btn" onclick="app.navigate('add')">➕ Añadir</button>
+                <button class="menu-btn" onclick="app.navigate('files')">📂 Archivos</button>
+                <button class="menu-btn" onclick="app.navigate('search')">🔍 Buscar</button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="app-container">
+        <div class="loading-box">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
+            <p>Cargando sistema...</p>
+        </div>
+    </main>
+
+    <!-- Notificación Flotante -->
+    <div id="toast">Mensaje</div>
+
+    <!-- Input invisible para cargar archivos -->
+    <input type="file" id="file-input" accept=".json" style="display: none;" onchange="app.handleFileSelect(this)">
+
+    <script>
+        // --- BASE DE DATOS INICIAL (Respaldo) ---
+        // Se cargarán solo si el usuario no tiene datos guardados o reinicia.
+        const DEFAULT_SUBJECT = "Aprendizaje y Desarrollo";
+        const FALLBACK_QUESTIONS = [
+            { id: "U1_Q01", subject: DEFAULT_SUBJECT, unit: 1, question: "El término Aprendizaje puede ser entendido como:", options: ["Un cambio más o menos permanente en la conducta de las personas...", "Aquella situación que se produce exclusivamente en las aulas...", "Se ha establecido una definición consensuada...", "Aquella situación que se sustenta exclusivamente en los conocimientos..."], answer: "Un cambio más o menos permanente en la conducta de las personas..." },
+            // ... (Para no hacer este archivo eterno, se cargan las preguntas completas si no hay datos externos)
+            // NOTA: Aquí iría la lista completa de 200 preguntas que generamos antes. 
+            // Para que el archivo sea manejable, las inicializamos vacías y tú cargas tu archivo JSON.
+        ];
+
+        // --- LÓGICA DE LA APP ---
+        const app = {
+            allQuestions: [],
+            filteredQuestions: [], 
+            activeQuizQuestions: [],
+            subjects: [],
+            currentSubject: "",
+            
+            quiz: { index: 0, score: 0, answered: false },
+
+            init: () => {
+                // Intentar cargar de localStorage primero
+                const storedData = localStorage.getItem('app_database');
+                if (storedData) {
+                    app.allQuestions = JSON.parse(storedData);
+                    app.showToast("Datos recuperados de la memoria");
+                } else {
+                    // Si no hay nada, usar algunas de ejemplo o pedir carga
+                    // (Aquí podrías pegar las 200 preguntas como FALLBACK si quisieras que estén por defecto)
+                    app.allQuestions = []; 
+                    app.showToast("Base de datos vacía. Carga un archivo.");
+                }
+                
+                app.refreshSubjects();
+                app.navigate('home');
+            },
+
+            refreshSubjects: () => {
+                const subjectsSet = new Set(app.allQuestions.map(q => q.subject || "General"));
+                app.subjects = Array.from(subjectsSet);
+                if (!app.currentSubject && app.subjects.length > 0) {
+                    app.currentSubject = app.subjects[0];
+                }
+            },
+
+            // Guardar estado actual en navegador
+            persistData: () => {
+                localStorage.setItem('app_database', JSON.stringify(app.allQuestions));
+            },
+
+            // --- GESTIÓN DE ARCHIVOS ---
+            
+            downloadData: () => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app.allQuestions));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", "mis_preguntas.json");
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            },
+
+            triggerFileUpload: () => {
+                document.getElementById('file-input').click();
+            },
+
+            handleFileSelect: (input) => {
+                const file = input.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        if (Array.isArray(json)) {
+                            // Fusionar o reemplazar (aquí elegimos reemplazar para limpiar)
+                            // Si quieres fusionar: app.allQuestions = [...app.allQuestions, ...json];
+                            if(confirm("¿Quieres reemplazar las preguntas actuales por las del archivo (Aceptar) o añadirlas (Cancelar)?")) {
+                                app.allQuestions = json;
+                            } else {
+                                app.allQuestions = [...app.allQuestions, ...json];
+                            }
+                            
+                            app.persistData();
+                            app.refreshSubjects();
+                            app.showToast(`✅ Cargadas ${json.length} preguntas.`);
+                            app.navigate('home');
+                        } else {
+                            alert("El archivo no tiene el formato correcto (debe ser una lista de preguntas).");
+                        }
+                    } catch (err) {
+                        alert("Error al leer el archivo JSON.");
+                    }
+                };
+                reader.readAsText(file);
+                input.value = ''; // Reset
+            },
+
+            // --- NAVEGACIÓN ---
+            navigate: (viewId, param = null) => {
+                document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+                let activeBtn = document.querySelector(`button[onclick="app.navigate('${viewId}')"]`);
+                if (!activeBtn && (viewId === 'quiz' || viewId === 'detail')) activeBtn = null; 
+                if (activeBtn) activeBtn.classList.add('active');
+
+                const container = document.getElementById('app-container');
+                container.innerHTML = '';
+
+                app.filteredQuestions = app.allQuestions.filter(q => q.subject === app.currentSubject);
+
+                switch(viewId) {
+                    case 'home': app.renderHome(container); break;
+                    case 'quiz': app.renderQuiz(container); break;
+                    case 'add': app.renderAdd(container); break;
+                    case 'files': app.renderFiles(container); break; // NUEVA VISTA
+                    case 'search': app.renderSearch(container); break;
+                    case 'detail': app.renderDetail(container, param); break;
+                }
+            },
+
+            // --- VISTAS ---
+
+            renderHome: (container) => {
+                if (app.allQuestions.length === 0) {
+                    container.innerHTML = `
+                        <div class="card text-center">
+                            <h1>👋 Bienvenid@</h1>
+                            <p>No hay preguntas cargadas.</p>
+                            <button class="btn" onclick="app.navigate('files')">📂 Cargar Archivo de Preguntas</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const subjectOptions = app.subjects.map(s => 
+                    `<option value="${s}" ${s === app.currentSubject ? 'selected' : ''}>${s}</option>`
+                ).join('');
+
+                const unitsSet = new Set(app.filteredQuestions.map(q => q.unit));
+                const units = Array.from(unitsSet).sort((a,b) => a - b);
+                const unitOptions = units.map(u => `<option value="${u}">Tema ${u}</option>`).join('');
+
+                container.innerHTML = `
+                    <div class="card text-center">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
+                        <h1>Panel de Control</h1>
+                        
+                        <div style="max-width:400px; margin: 2rem auto; text-align:left;">
+                            <div class="form-group">
+                                <label class="form-label">Asignatura:</label>
+                                <select id="subject-selector" class="form-select" onchange="app.changeSubject(this.value)">
+                                    ${subjectOptions}
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Modo de Test:</label>
+                                <select id="unit-selector" class="form-select">
+                                    <option value="all">Todos los temas</option>
+                                    ${unitOptions}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="background:#f1f5f9; padding:1rem; border-radius:8px; margin-bottom:2rem;">
+                            <p style="margin:0">
+                                Total preguntas disponibles: <b>${app.filteredQuestions.length}</b>
+                            </p>
+                        </div>
+                        
+                        <div style="display: grid; gap: 1rem; max-width: 300px; margin: 0 auto;">
+                            <button class="btn" onclick="app.startQuiz()">📝 Comenzar Test</button>
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderFiles: (container) => {
+                container.innerHTML = `
+                    <div class="card text-center">
+                        <h1>📂 Gestión de Archivos</h1>
+                        <p style="color:#64748b; margin-bottom:2rem;">
+                            Aquí puedes guardar tus preguntas en tu ordenador o cargar asignaturas nuevas.
+                        </p>
+
+                        <div class="file-drop-zone" onclick="app.triggerFileUpload()">
+                            <div style="font-size:2rem">📥</div>
+                            <h3>Importar JSON</h3>
+                            <p>Haz clic para cargar un archivo de preguntas</p>
+                        </div>
+
+                        <div class="file-drop-zone" onclick="app.downloadData()" style="border-color:var(--success); color:var(--success); background:#f0fdf4;">
+                            <div style="font-size:2rem">💾</div>
+                            <h3>Exportar Copia de Seguridad</h3>
+                            <p>Descargar todas las preguntas actuales</p>
+                        </div>
+
+                        <div style="margin-top:2rem; padding:1rem; background:#fff7ed; border-radius:8px; font-size:0.9rem; text-align:left;">
+                            <strong>💡 Consejo:</strong> 
+                            Si quieres tener una asignatura por archivo, carga las preguntas de una asignatura, dale a "Exportar" y guarda el archivo como <em>historia.json</em>. Luego borra todo, carga las de matemáticas y guarda como <em>mates.json</em>.
+                        </div>
+                        
+                         <button class="btn btn-outline" style="margin-top:1rem; color: var(--error); border-color:var(--error);" onclick="if(confirm('¿Borrar todas las preguntas de la memoria?')) { app.allQuestions=[]; app.persistData(); app.init(); }">🗑️ Borrar Todo (Reset)</button>
+                    </div>
+                `;
+            },
+
+            renderAdd: (container) => {
+                container.innerHTML = `
+                    <div class="card">
+                        <h2>➕ Añadir Nueva Pregunta</h2>
+                        <form onsubmit="event.preventDefault(); app.handleFormSubmit();">
+                            <div class="form-group">
+                                <label class="form-label">Asignatura</label>
+                                <input type="text" id="new-subject" class="form-input" list="subject-list" value="${app.currentSubject}" required>
+                                <datalist id="subject-list">${app.subjects.map(s => `<option value="${s}">`).join('')}</datalist>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Unidad</label>
+                                <input type="number" id="new-unit" class="form-input" value="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Pregunta</label>
+                                <textarea id="new-question" class="form-input" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" style="color:var(--success)">✅ Respuesta Correcta</label>
+                                <input type="text" id="new-correct" class="form-input" required>
+                            </div>
+                            <div class="form-group"><input type="text" class="form-input distractor" placeholder="Opción Incorrecta 1" required></div>
+                            <div class="form-group"><input type="text" class="form-input distractor" placeholder="Opción Incorrecta 2" required></div>
+                            <div class="form-group"><input type="text" class="form-input distractor" placeholder="Opción Incorrecta 3" required></div>
+                            <button type="submit" class="btn btn-success">Guardar</button>
+                        </form>
+                    </div>
+                `;
+            },
+
+            renderQuiz: (container) => {
+                const questions = app.activeQuizQuestions;
+                if (!questions || questions.length === 0) {
+                    container.innerHTML = `<div class="card text-center"><h3>⚠️ No hay preguntas activas.</h3><button class="btn" onclick="app.navigate('home')">Ir al Inicio</button></div>`;
+                    return;
+                }
+                if (app.quiz.index >= questions.length) {
+                    app.renderQuizResult(container);
+                    return;
+                }
+                const q = questions[app.quiz.index];
+                const progress = ((app.quiz.index) / questions.length) * 100;
+
+                container.innerHTML = `
+                    <div class="card">
+                        <div class="quiz-header">
+                            <span>Pregunta ${app.quiz.index + 1} de ${questions.length}</span>
+                            <span class="tag tag-subject">${q.subject} - U${q.unit}</span>
+                        </div>
+                        <div class="quiz-progress"><div class="progress-bar" style="width: ${progress}%"></div></div>
+                        <div class="question-text">${q.question}</div>
+                        <div id="options-container">
+                            ${app.shuffle([...q.options]).map(opt => `
+                                <button class="option-btn" onclick="app.checkAnswer(this, '${opt.replace(/'/g, "\\'")}')">${opt}</button>
+                            `).join('')}
+                        </div>
+                        <div id="feedback-area" class="hidden" style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px; background: #f1f5f9;"></div>
+                        <div style="margin-top: 1.5rem; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
+                             ${!app.quiz.answered ? `<button class="btn btn-warning" style="width: auto;" onclick="app.skipQuestion()">Saltar ↷</button>` : ''}
+                            <button id="next-btn" class="btn hidden" style="width: auto;" onclick="app.nextQuestion()">Siguiente ➜</button>
+                        </div>
+                    </div>
+                    <div class="text-center"><button class="btn-outline" style="border:none; font-size:0.8rem;" onclick="app.navigate('home')">Salir del test</button></div>
+                `;
+                app.quiz.answered = false;
+            },
+
+            renderSearch: (container) => {
+                container.innerHTML = `
+                    <div class="card">
+                        <h2>🔍 Buscador Global</h2>
+                        <input type="text" class="form-input" placeholder="Busca en todas las asignaturas..." oninput="app.handleSearch(this.value)">
+                        <div id="search-results" style="margin-top:1rem;"></div>
+                    </div>
+                `;
+            },
+
+            renderDetail: (container, questionId) => {
+                const q = app.allQuestions.find(item => item.id === questionId);
+                if (!q) return app.navigate('search');
+                container.innerHTML = `
+                    <div class="card">
+                        <button class="btn btn-outline" style="width:auto; margin-bottom:1rem;" onclick="app.navigate('search')">⬅ Volver</button>
+                        <span class="tag tag-subject">${q.subject}</span> <span class="tag">U${q.unit}</span>
+                        <h2 style="margin-top:1rem;">${q.question}</h2>
+                        <div>
+                            ${q.options.map(opt => `
+                                <div class="detail-option ${opt === q.answer ? 'detail-correct' : ''}">
+                                    ${opt} ${opt === q.answer ? '✅' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            },
+
+            // --- FUNCIONES ---
+            changeSubject: (newSubject) => { app.currentSubject = newSubject; app.navigate('home'); },
+            
+            handleFormSubmit: () => {
+                const newQ = {
+                    id: "C_" + Date.now(),
+                    subject: document.getElementById('new-subject').value.trim(),
+                    unit: document.getElementById('new-unit').value,
+                    question: document.getElementById('new-question').value.trim(),
+                    answer: document.getElementById('new-correct').value.trim(),
+                    options: [
+                        document.getElementById('new-correct').value.trim(),
+                        ...Array.from(document.querySelectorAll('.distractor')).map(i => i.value.trim())
+                    ]
+                };
+                app.allQuestions.push(newQ);
+                app.persistData();
+                app.refreshSubjects();
+                app.currentSubject = newQ.subject;
+                app.showToast("Pregunta añadida");
+                app.navigate('home');
+            },
+
+            checkAnswer: (btn, selectedOpt) => {
+                if (app.quiz.answered) return;
+                app.quiz.answered = true;
+                const q = app.activeQuizQuestions[app.quiz.index];
+                const isCorrect = selectedOpt === q.answer;
+                const feedback = document.getElementById('feedback-area');
+                
+                if (isCorrect) {
+                    btn.classList.add('correct');
+                    app.quiz.score++;
+                    feedback.innerHTML = `<b style="color:var(--success)">¡Correcto! 🎉</b>`;
+                } else {
+                    btn.classList.add('incorrect');
+                    feedback.innerHTML = `<b style="color:var(--error)">Incorrecto.</b><br>Respuesta: <b>${q.answer}</b>`;
+                    document.querySelectorAll('.option-btn').forEach(b => {
+                        if (b.innerText.trim() === q.answer) b.classList.add('correct');
+                    });
+                }
+                feedback.classList.remove('hidden');
+                document.getElementById('next-btn').classList.remove('hidden');
+                const skipBtn = document.querySelector('.btn-warning');
+                if(skipBtn) skipBtn.style.display = 'none';
+            },
+
+            skipQuestion: () => {
+                const currentQ = app.activeQuizQuestions[app.quiz.index];
+                app.activeQuizQuestions.splice(app.quiz.index, 1);
+                app.activeQuizQuestions.push(currentQ);
+                app.renderQuiz(document.getElementById('app-container'));
+                app.showToast("Pregunta saltada ↷");
+            },
+
+            nextQuestion: () => { app.quiz.index++; app.navigate('quiz'); },
+
+            startQuiz: () => {
+                const unitSelector = document.getElementById('unit-selector');
+                const selectedUnit = unitSelector ? unitSelector.value : 'all';
+                let questionsForQuiz = [...app.filteredQuestions];
+                if (selectedUnit !== 'all') questionsForQuiz = questionsForQuiz.filter(q => q.unit == selectedUnit);
+                
+                if(questionsForQuiz.length === 0) { alert("No hay preguntas."); return; }
+                app.activeQuizQuestions = app.shuffle(questionsForQuiz);
+                app.quiz.index = 0; app.quiz.score = 0;
+                app.navigate('quiz');
+            },
+
+            renderQuizResult: (container) => {
+                const total = app.activeQuizQuestions.length;
+                const percent = Math.round((app.quiz.score / total) * 100);
+                container.innerHTML = `
+                    <div class="card text-center">
+                        <h1>Resultados</h1>
+                        <div style="font-size: 4rem; color: var(--primary);">${app.quiz.score} / ${total}</div>
+                        <p>${percent}% aciertos</p>
+                        <button class="btn" onclick="app.startQuiz()">Repetir Test</button>
+                        <button class="btn btn-outline" style="margin-top:1rem;" onclick="app.navigate('home')">Volver</button>
+                    </div>
+                `;
+            },
+
+            handleSearch: (term) => {
+                const resultsDiv = document.getElementById('search-results');
+                if (term.length < 2) { resultsDiv.innerHTML = ''; return; }
+                const found = app.allQuestions.filter(q => q.question.toLowerCase().includes(term.toLowerCase()));
+                if (found.length === 0) { resultsDiv.innerHTML = '<p>No encontrado.</p>'; return; }
+                resultsDiv.innerHTML = found.map(q => `
+                    <div class="result-item" onclick="app.navigate('detail', '${q.id}')">
+                        <small>${q.subject}</small>
+                        <div>${q.question}</div>
+                    </div>
+                `).join('');
+            },
+
+            shuffle: (array) => {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            },
+
+            showToast: (text) => {
+                const toast = document.getElementById("toast");
+                toast.innerText = text;
+                toast.className = "show";
+                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+            }
+        };
+
+        window.onload = app.init;
+    </script>
+</body>
+</html>
