@@ -1,0 +1,2190 @@
+{
+  "asignatura": "Aprendizaje y desarrollo de la personalidad",
+  "tipo": "obligatoria",
+  "temas": [
+    {
+      "numero": 1,
+      "nombre": "Tema 1",
+      "preguntas": [
+        {
+          "id": "U1_Q01",
+          "pregunta": "El término Aprendizaje puede ser entendido como:",
+          "opciones": [
+            "Un cambio más o menos permanente en la conducta de las personas. Como resultado de las diferentes experiencias del individuo.",
+            "Aquella situación que se produce exclusivamente en las aulas. Fruto del proceso enseñanza/aprendizaje y que provoca un cambio permanente en la conducta de las personas.",
+            "Se ha establecido una definición consensuada y universal sobre lo que puede entenderse por aprendizaje.",
+            "Aquella situación que se sustenta exclusivamente en los conocimientos, produce un cambio más o menos permanente en la conducta del alumnado."
+          ],
+          "respuesta_correcta": "Un cambio más o menos permanente en la conducta de las personas. Como resultado de las diferentes experiencias del individuo."
+        },
+        {
+          "id": "U1_Q02",
+          "pregunta": "Podemos entender por Aprendizaje. Señala la respuesta correcta:",
+          "opciones": [
+            "Un cambio en las capacidades del ser humano, con carácter relativamente permanente y que no solo debe ser atribuido al propio proceso de desarrollo humano. Gagné.",
+            "Cualquier proceso que modifica un sistema para mejorar, de forma más o menos irreversible, su rendimiento posterior en la misma tarea o en tareas extraídas de la misma población. Langley y Simon.",
+            "Un proceso permanente, en mayor o menor medida, en la conducta generado por la experiencia práctica o también por la observación de los otros. El aprendizaje en sí no se puede observar si no es a través de los resultados productos de este. Feldman y Schunk mezclados.",
+            "Todas las respuestas del aprendizaje anteriores son correctas."
+          ],
+          "respuesta_correcta": "Todas las respuestas del aprendizaje anteriores son correctas."
+        },
+        {
+          "id": "U1_Q03",
+          "pregunta": "Para Gagné (1987) una posible definición sobre Aprendizaje será (señala lo correcto)",
+          "opciones": [
+            "El aprendizaje supone un cambio en las capacidades del ser humano, con carácter relativamente permanente, y que no solo debe ser atribuido al propio proceso de desarrollo humano.",
+            "El aprendizaje puede ser entendido como un cambio en la conducta, como resultado de la práctica o la experiencia. Schunk.",
+            "Aprendizaje como un proceso permanente, en mayor o menor medida, en la conducta, generado por la experiencia práctica o también por la observación de los otros. Feldman",
+            "Cualquier proceso que modifica un sistema para mejorar, de forma más o menos irreversible, su rendimiento"
+          ],
+          "respuesta_correcta": "El aprendizaje supone un cambio en las capacidades del ser humano, con carácter relativamente permanente, y que no solo debe ser atribuido al propio proceso de desarrollo humano."
+        },
+        {
+          "id": "U1_Q04",
+          "pregunta": "Según Langley y Simon (1981) el Aprendizaje será (señala lo correcto):",
+          "opciones": [
+            "Cualquier proceso que modifica un sistema para mejorar, de forma más o menos irreversible, su rendimiento posterior en la misma tarea o en tareas extraídas de la misma población.",
+            "El aprendizaje en sí no se puede observar si no es a través de los resultados o productos de este. Schunk.",
+            "Supone un cambio en las capacidades del ser humano, con carácter relativamente permanente, y que no solo debe ser atribuido al propio proceso de desarrollo humano. Gagné.",
+            "Ninguna es correcta."
+          ],
+          "respuesta_correcta": "Cualquier proceso que modifica un sistema para mejorar, de forma más o menos irreversible, su rendimiento posterior en la misma tarea o en tareas extraídas de la misma población."
+        },
+        {
+          "id": "U1_Q05",
+          "pregunta": "¿Quién acuñó el concepto de aprendizaje para toda la vida = A LO LARGO DE LA VIDA?",
+          "opciones": [
+            "Feldman.",
+            "Langley y Simon.",
+            "UNESCO.",
+            "Gagné."
+          ],
+          "respuesta_correcta": "UNESCO."
+        },
+        {
+          "id": "U1_Q06",
+          "pregunta": "¿En qué documento sumamente importante se define el aprendizaje como \"Aprendizaje a lo largo de la vida\"?",
+          "opciones": [
+            "Informe Delors (1996).",
+            "Educación Integral (LOMCE, 2013).",
+            "Educación Integral (LOMLOE, 2020).",
+            "Informe UNESCO."
+          ],
+          "respuesta_correcta": "Informe Delors (1996)."
+        },
+        {
+          "id": "U1_Q07",
+          "pregunta": "En el acto de Enseñar:",
+          "opciones": [
+            "Es fundamental centrarse únicamente en lo que nuestros alumnos deben \"saber\" y \"saber hacer\".",
+            "Perseguimos transmitir de forma intencionada un conjunto de conocimientos y procedimentales. Además, también es primordial favorecer el desarrollo de actitudes, valores, emociones en nuestro alumnado.",
+            "En el aula, nos centraremos especialmente en profundizar en aquellos conocimientos teóricos que sustentan nuestra asignatura.",
+            "No estamos obligados a tener presentes las diferentes necesidades de nuestro alumnado."
+          ],
+          "respuesta_correcta": "Perseguimos transmitir de forma intencionada un conjunto de conocimientos y procedimentales. Además, también es primordial favorecer el desarrollo de actitudes, valores, emociones en nuestro alumnado."
+        },
+        {
+          "id": "U1_Q08",
+          "pregunta": "Enseñar es:",
+          "opciones": [
+            "Un acto de comunicación en el que un emisor pretende que un receptor aprenda algo.",
+            "Un acto de incomunicación en el que un emisor no pretende que un receptor aprenda algo.",
+            "Un acto de socialización en el que un emisor pretende que un receptor observe.",
+            "Un acto de socialización en el que el emisor y el receptor se comunican."
+          ],
+          "respuesta_correcta": "Un acto de comunicación en el que un emisor pretende que un receptor aprenda algo."
+        },
+        {
+          "id": "U1_Q09",
+          "pregunta": "Si consideramos establecer una definición de Enseñanza, mayormente podríamos estar de acuerdo en que enseñar es:",
+          "opciones": [
+            "Enseñar supone dar instrucción (conjunto de saberes, conocimientos, principios) a través de una serie de reglas, métodos a alguien (educando).",
+            "Podemos entender por enseñar al conjunto de actividades de los miembros de una comunidad o grupo social encaminados a transmitir conocimientos culturales a otros miembros de esta cultura.",
+            "Supone realizar un acto de comunicación entre emisor (Profesor/a) y un receptor (Alumno/a) entendiendo que en dicho acto existe una finalidad (que aprenda algo) y además hay un objetivo de comunicación.",
+            "Todas son correctas."
+          ],
+          "respuesta_correcta": "Todas son correctas."
+        },
+        {
+          "id": "U1_Q10",
+          "pregunta": "Los actores y elementos que conforman el proceso de enseñanza -aprendizaje en el contexto de la educación formal son:",
+          "opciones": [
+            "El alumnado, el profesorado, las estrategias metodológicas y el objeto de aprendizaje.",
+            "Las estrategias curriculares del profesorado, marcando la diferencia entre discentes y docentes.",
+            "Los discentes y los docentes.",
+            "El conjunto de deberes que cada profesor debe asumir (objeto de aprendizaje)."
+          ],
+          "respuesta_correcta": "El alumnado, el profesorado, las estrategias metodológicas y el objeto de aprendizaje."
+        },
+        {
+          "id": "U1_Q11",
+          "pregunta": "Los diferentes contextos en los que el denominado Proceso A/E puede tener lugar, son:",
+          "opciones": [
+            "Formal.",
+            "No formal.",
+            "Informal.",
+            "Las anteriores respuestas son todas correctas."
+          ],
+          "respuesta_correcta": "Las anteriores respuestas son todas correctas."
+        },
+        {
+          "id": "U1_Q12",
+          "pregunta": "En el contexto del Proceso A/E, \"formal\" se hace referencia a:",
+          "opciones": [
+            "Acción intencional que la Educación de los Estados o Naciones para la educación de sus ciudadanos establecen.",
+            "Se corresponde con las ofertas de formación dirigidas a complementar las ofertas sistemáticas de educación inicial.",
+            "Contempla todas aquellas acciones que, sin darse con intencionalidad educativa, de hecho, tienen consecuencias educacionales sobre las personas.",
+            "Todas son correctas"
+          ],
+          "respuesta_correcta": "Acción intencional que la Educación de los Estados o Naciones para la educación de sus ciudadanos establecen."
+        },
+        {
+          "id": "U1_Q13",
+          "pregunta": "En educación podemos entender por un contexto Formal, aquel en el que:",
+          "opciones": [
+            "Se incluyen la organización de acciones educativas o formativas que realizan entidades públicas o privadas, dirigidas a la capacitación o formación específica de las personas, bien para el mundo laboral -profesional, bien para su mejora individual.",
+            "Ninguna de las anteriores respuestas es correcta.",
+            "Se contemplan todas aquellas acciones que, sin darse con intencionalidad educativa, tienen consecuencias",
+            "Hace referencia a la acción intencional de la Educación que los Estados o Naciones para la educación de sus ciudadanos."
+          ],
+          "respuesta_correcta": "Hace referencia a la acción intencional de la Educación que los Estados o Naciones para la educación de sus ciudadanos."
+        },
+        {
+          "id": "U1_Q14",
+          "pregunta": "Señala la respuesta correcta:",
+          "opciones": [
+            "La educación informal son hechos educativos no organizados que pueden darse en diferentes escenarios (sociedad, familia, grupos desiguales...).",
+            "La educación informal se corresponde con las ofertas de formación dirigidas a complementar las ofertas sistemáticas de educación inicial.",
+            "La educación informal incluye la organización de acciones educativas o formativas que realizan entidades públicas o privadas, dirigidas a la capacitación o formación específica de las personas, bien para el mundo laboral -profesional, bien para su mejora in dividual.",
+            "La educación no formal incluye la organización de la educación en diversos subsistemas regulados por los Estados o Naciones (Educación Primaria, Educación Secundaria, y Educación Superior o universitaria...)."
+          ],
+          "respuesta_correcta": "La educación informal son hechos educativos no organizados que pueden darse en diferentes escenarios (sociedad, familia, grupos desiguales...)."
+        },
+        {
+          "id": "U1_Q15",
+          "pregunta": "En el espacio formal de la educación, los actores que lo conforman son:",
+          "opciones": [
+            "Alumnado (Discentes) y Profesorado (Docentes).",
+            "Estrategias curriculares del Profesorado, para marcar la diferencia entre discentes y docentes.",
+            "Ninguna es correcta.",
+            "El objeto de Aprendizaje será el conjunto de los deberes que cada profesor debe asumir."
+          ],
+          "respuesta_correcta": "Alumnado (Discentes) y Profesorado (Docentes)."
+        },
+        {
+          "id": "U1_Q16",
+          "pregunta": "En el espacio formal de la educación, los actores y elementos que lo conforman son:",
+          "opciones": [
+            "Ninguna es correcta.",
+            "Estrategias curriculares del profesorado, para marcar la diferencia entre discentes y docentes.",
+            "Los políticos.",
+            "El objeto de Aprendizaje será el conjunto de los deberes que cada profesor debe asumir."
+          ],
+          "respuesta_correcta": "Ninguna es correcta."
+        },
+        {
+          "id": "U1_Q17",
+          "pregunta": "En el contexto del Proceso A/E \"formal\" se hace referencia a:",
+          "opciones": [
+            "Acción intencional de la Educación que los Estados o Naciones para la educación de sus ciudadanos establecen",
+            "Se corresponde con las ofertas de formación dirigidas a complementar las ofertas sistemáticas de educación infantil",
+            "Contempla todas aquellas acciones que, sin darse con intencionalidad educativa, de hecho, tienen consecuencias educacionales sobre las personas",
+            "Todas son correctas"
+          ],
+          "respuesta_correcta": "Acción intencional de la Educación que los Estados o Naciones para la educación de sus ciudadanos establecen"
+        },
+        {
+          "id": "U1_Q18",
+          "pregunta": "¿Cuál de los siguientes elementos no forman parte del proceso de enseñanza y aprendizaje?",
+          "opciones": [
+            "El objeto del aprendizaje.",
+            "Equipo de mediación educativa.",
+            "Docente.",
+            "Alumnado."
+          ],
+          "respuesta_correcta": "Equipo de mediación educativa."
+        },
+        {
+          "id": "U1_Q19",
+          "pregunta": "Según los actores y elementos que conforman el proceso de A/E, ¿A qué corresponde \"lo que hay que saber y lo que hay que saber hacer\"?",
+          "opciones": [
+            "Estrategias metodológicas y organizativas para el aula.",
+            "Alumnado.",
+            "Objeto de aprendizaje.",
+            "Docentes."
+          ],
+          "respuesta_correcta": "Objeto de aprendizaje."
+        },
+        {
+          "id": "U1_Q20",
+          "pregunta": "¿Cuál es la función del profesorado?",
+          "opciones": [
+            "No preocuparse por el cambio de actitud.",
+            "No influir en el aprendizaje.",
+            "Solo instruir.",
+            "Unir instrucción y educación."
+          ],
+          "respuesta_correcta": "Unir instrucción y educación."
+        },
+        {
+          "id": "U1_Q21",
+          "pregunta": "Una serie de diferencias individuales que constituyen a una persona y que la diferencian, por tanto, de otra. Nos estamos refiriendo al término:",
+          "opciones": [
+            "Inteligencia emocional.",
+            "Proceso E/A",
+            "Personalidad.",
+            "Atención a la diversidad."
+          ],
+          "respuesta_correcta": "Personalidad."
+        },
+        {
+          "id": "U1_Q22",
+          "pregunta": "Cuando hablamos de las particularidades individuales que diferencian a una persona de otra, nos estamos refiriendo a:",
+          "opciones": [
+            "La personalidad.",
+            "El proceso de enseñanza -aprendizaje.",
+            "La atención a la diversidad.",
+            "La inteligencia emocional."
+          ],
+          "respuesta_correcta": "La personalidad."
+        },
+        {
+          "id": "U1_Q23",
+          "pregunta": "Señala la respuesta incorrecta en cuanto a la definición de personalidad:",
+          "opciones": [
+            "La personalidad supone aceptar que no existen diferencias individuales.",
+            "La personalidad es la organización relativamente estable de aquellas características estructurales y funcionales, innatas y adquiridas bajo las especiales condiciones del desarrollo de una persona.",
+            "La personalidad puede ser entendida como una serie de cualidades psicológicas duraderas, que conforman en sí un patrón individual de la persona.",
+            "La personalidad es la diferencia individual que constituye a cada persona y la distingue de otra."
+          ],
+          "respuesta_correcta": "La personalidad supone aceptar que no existen diferencias individuales."
+        },
+        {
+          "id": "U1_Q24",
+          "pregunta": "Señala lo INCORRECTO:",
+          "opciones": [
+            "La personalidad NO supone aceptar la existencia de una serie de diferencias individuales que constituyen a una persona y que la diferencian, por tanto, de otra, porque cambia a lo largo del tiempo.",
+            "La personalidad es la diferencia individual que constituye a cada persona y la distingue de otra.",
+            "La personalidad puede ser entendida como una serie de cualidades psicológicas duraderas, que conforman en sí un patrón individual de la persona.",
+            "La personalidad es la organización relativamente estable de aquellas características estructurales y funcionales, innatas y adquiridas bajo las especiales condiciones del desarrollo de una persona."
+          ],
+          "respuesta_correcta": "La personalidad NO supone aceptar la existencia de una serie de diferencias individuales que constituyen a una persona y que la diferencian, por tanto, de otra, porque cambia a lo largo del tiempo."
+        },
+        {
+          "id": "U1_Q25",
+          "pregunta": "Señala lo CORRECTO:",
+          "opciones": [
+            "Como futuros docentes debemos pasar por alto nuestra influencia en el proceso de desarrollo de la persona que van a experimentar nuestros discentes en el contexto del proceso de Aprendizaje y Enseñanza.",
+            "La educación no es el medio más adecuado para construir su personalidad.",
+            "La personalidad puede ser entendida como una serie de cualidades psicológicas duraderas, que conforman en sí un patrón individual de la persona.",
+            "El paso por una institución educativa tiene como fin último el preparar instrumentalmente a un alumno/a para que adquiera el mayor número posible de saberes técnicos y prácticos"
+          ],
+          "respuesta_correcta": "La personalidad puede ser entendida como una serie de cualidades psicológicas duraderas, que conforman en sí un patrón individual de la persona."
+        },
+        {
+          "id": "U1_Q26",
+          "pregunta": "A lo largo del proceso de desarrollo de la personalidad de un alumno/a y en nuestra labor como docentes:",
+          "opciones": [
+            "El diseño de las experiencias de aprendizaje apenas afectará al desarrollo de la personalidad de nuestro alumnado.",
+            "El diseño de las experiencias de aprendizaje deberá n ser uniformes y estandarizadas para todo nuestro alumnado.Sin tener presentes sus particularidades o diferencias en la personalidad de cada uno de ellos/as",
+            "Debemos tener en cuenta que dicho desarrollo de la personalidad estará influenciado tanto por la propia genética del individuo, como por las experiencias que éste experimente a lo largo de su vida. Por tanto, nuestros diseños de situaciones de aprendizaje deberán contemplar dichas particularidades en nuestro alumnado.",
+            "Es primordial que nos centremos únicamente en el diseño de las experiencias de aprendizaje. Obviando aquellas particularidades propias de cada individuo o alumno/a."
+          ],
+          "respuesta_correcta": "Debemos tener en cuenta que dicho desarrollo de la personalidad estará influenciado tanto por la propia genética del individuo, como por las experiencias que éste experimente a lo largo de su vida. Por tanto, nuestros diseños de situaciones de aprendizaje deberán contemplar dichas particularidades en nuestro alumnado."
+        },
+        {
+          "id": "U1_Q27",
+          "pregunta": "La Institución Educativa influye en el desarrollo de la personalidad de los adolescentes:",
+          "opciones": [
+            "De una manera íntegra, teniendo en cuenta su rendimiento inicial y su situación social, cultural y económica.",
+            "De una manera universal y sin contextualizar.",
+            "Únicamente es en cuanto a su formación académica.",
+            "De manera que adoctrina a los educandos sin tener en cuenta su origen social y económico."
+          ],
+          "respuesta_correcta": "De una manera íntegra, teniendo en cuenta su rendimiento inicial y su situación social, cultural y económica."
+        },
+        {
+          "id": "U1_Q28",
+          "pregunta": "¿Qué autor propone que la personalidad es \"una organización compleja de cogniciones y conductas, que da orientaciones y pautas a la vida de una persona y refleja tanto la naturaleza (genes) como el aprendizaje (experiencia)\"?",
+          "opciones": [
+            "Cervone y Pervin (2009).",
+            "RAE (2023).",
+            "Bermúdez (1985).",
+            "Pervin (2002)."
+          ],
+          "respuesta_correcta": "Pervin (2002)."
+        },
+        {
+          "id": "U1_Q29",
+          "pregunta": "¿Qué es la personalidad según Cervone y Pervin (2009)?",
+          "opciones": [
+            "Un patrón individual de cualidades psicológicas duraderas.",
+            "Un estado de ánimo temporal.",
+            "Una serie de eventos aleatorios.",
+            "Una respuesta automática."
+          ],
+          "respuesta_correcta": "Un patrón individual de cualidades psicológicas duraderas."
+        },
+        {
+          "id": "U1_Q30",
+          "pregunta": "En el diseño de las situaciones de aprendizaje, durante nuestra labor como docentes, debemos:",
+          "opciones": [
+            "Centrarnos en el diseño de las experiencias de aprendizaje, obviando aquellas particularidades propias de cada alumno o alumna.",
+            "Tener en cuenta las particularidades de nuestro alumnado en cuanto a su desarrollo de la personalidad (influenciado tanto por su genética como por las experiencias vividas).",
+            "Diseñar experiencias de aprendizaje uniformes y estandarizadas para todo nuestro alumnado sin tener presentes sus particularidades o diferencias de personalidad.",
+            "Ser conscientes de que las experiencias de aprendizaje apenas afectarán en el desarrollo de la personalidad de nuestro alumnado."
+          ],
+          "respuesta_correcta": "Tener en cuenta las particularidades de nuestro alumnado en cuanto a su desarrollo de la personalidad (influenciado tanto por su genética como por las experiencias vividas)."
+        },
+        {
+          "id": "U1_Q31",
+          "pregunta": "¿En qué normativa educativa se refleja que \"la educación es el medio más adecuado para desarrollar al máximo sus capacidades, construir su personalidad, conformar su propia identidad y configurar su comprensión de la realidad, integrando la dimensión cog noscitiva, la afectiva y la axiológica\"?",
+          "opciones": [
+            "Ley Orgánica 3/2020 de 29 de diciembre, por la que se modifica la Ley Orgánica 2/2006, de 3 de mayo, de Educación.",
+            "Artículo 27.2 de la Constitución española.",
+            "Ley Orgánica 2/2006 de 3 de mayo, de Educación.",
+            "Ley Orgánica 8/2013, de 9 de diciembre, para la mejora de la calidad educativa."
+          ],
+          "respuesta_correcta": "Ley Orgánica 3/2020 de 29 de diciembre, por la que se modifica la Ley Orgánica 2/2006, de 3 de mayo, de Educación."
+        },
+        {
+          "id": "U1_Q32",
+          "pregunta": "¿Cuál es la importancia de las funciones ejecutivas en el aprendizaje?",
+          "opciones": [
+            "irrelevantes para desarrollo cognitivo.",
+            "No tienen relevancia.",
+            "No influyen en el proceso de aprendizaje.",
+            "Facilitan la organización y planificación."
+          ],
+          "respuesta_correcta": "Facilitan la organización y planificación."
+        },
+        {
+          "id": "U1_Q33",
+          "pregunta": "La UNESCO en 2022 insiste en que la cultura",
+          "opciones": [
+            "Comprende el conjunto de rasgos distintivos, espirituales, materiales, intelectuales y afectivos que caracterizan a una sociedad o grupo social",
+            "Comprende un conjunto de 4 rasgos distintivos comunes",
+            "Comprende el conjunto de rasgos similares, inmateriales, intelectuales y ansiosos que caracterizan a una sociedad o grupo social",
+            "No comprende el conjunto de rasgos distintivos, espirituales, materiales, intelectuales y afectivos que caracterizan a una sociedad o grupo social, sino más bien unos rasgos originales de cada raza."
+          ],
+          "respuesta_correcta": "Comprende el conjunto de rasgos distintivos, espirituales, materiales, intelectuales y afectivos que caracterizan a una sociedad o grupo social"
+        },
+        {
+          "id": "U1_Q34",
+          "pregunta": "Feldman (2005) habla del aprendizaje como:",
+          "opciones": [
+            "un proceso intermitente, en mayor o menor medida, en la conducta",
+            "un proceso permanente, en mayor o menor medida, en las emociones",
+            "un proceso permanente, en mayor o menor medida, en la conducta",
+            "un proceso permanente, intermitente e itinerante, en mayor o menor medida, en la conducta"
+          ],
+          "respuesta_correcta": "un proceso permanente, en mayor o menor medida, en la conducta"
+        },
+        {
+          "id": "U1_Q35",
+          "pregunta": "Señala lo CORRECTO:",
+          "opciones": [
+            "Como futuros docentes debemos pasar por alto nuestra influencia en el proceso de desarrollo de la persona que van a experimentar nuestros discentes en el contexto del proceso de Aprendizaje y Enseñanza.",
+            "La personalidad puede ser entendida como una serie de cualidades psicológicas duraderas, que conforman en sí un patrón individual de la persona.",
+            "La educación no es el medio más adecuado para construir su personalidad.",
+            "El paso por una institución educativa tiene como fin último el preparar instrumentalmente a un alumno/a para que adquiera el mayor número posible de saberes técnicos y prácticos"
+          ],
+          "respuesta_correcta": "La personalidad puede ser entendida como una serie de cualidades psicológicas duraderas, que conforman en sí un patrón individual de la persona."
+        }
+      ]
+    },
+    {
+      "numero": 2,
+      "nombre": "Tema 2",
+      "preguntas": [
+        {
+          "id": "U2_Q01",
+          "pregunta": "Participa en la regulación del sueño y los estados emocionales. Este neurotransmisor se denomina:",
+          "opciones": [
+            "Serotonina",
+            "Acetilcolina",
+            "Glutamato",
+            "Adrenalina"
+          ],
+          "respuesta_correcta": "Serotonina"
+        },
+        {
+          "id": "U2_Q02",
+          "pregunta": "Acetilcolina, Dopamina, Noradrenalina, Serotonina...son:",
+          "opciones": [
+            "Célula Gliales",
+            "Dendrita",
+            "Neurotransmisores",
+            "Axón lo"
+          ],
+          "respuesta_correcta": "Neurotransmisores"
+        },
+        {
+          "id": "U2_Q03",
+          "pregunta": "Es la capacidad de almacenar, recuperar y evocar algún tipo de información, experiencia que haya acontecido con anterioridad. Nos referimos a:",
+          "opciones": [
+            "Atención fásica",
+            "Atención tónica",
+            "Memoria",
+            "Atención"
+          ],
+          "respuesta_correcta": "Memoria"
+        },
+        {
+          "id": "U2_Q04",
+          "pregunta": "Desde un punto de vista neurobiológico, memoria que se adquiere gradualmente y a través de la práctica:",
+          "opciones": [
+            "Memoria explícita.",
+            "Memoria sensorial.",
+            "Memoria retrógrada.",
+            "Memoria implícita."
+          ],
+          "respuesta_correcta": "Memoria implícita."
+        },
+        {
+          "id": "U2_Q05",
+          "pregunta": "Suelen ser personas curiosas, creativas, imaginativas, suelen buscar experiencias nuevas. McCrae y Costa denominan a este factor de la personalidad:",
+          "opciones": [
+            "Apertura a la experiencia.",
+            "Extraversión.",
+            "Neuroticismo.",
+            "Responsabilidad."
+          ],
+          "respuesta_correcta": "Apertura a la experiencia."
+        },
+        {
+          "id": "U2_Q06",
+          "pregunta": "Es la encargada de retener la información necesaria mientras se está ejecutando una tarea y a su vez estamos recopilando información nueva. Nos referimos a la memoria:",
+          "opciones": [
+            "Sensorial.",
+            "De trabajo.",
+            "A largo plazo.",
+            "A corto plazo."
+          ],
+          "respuesta_correcta": "De trabajo."
+        },
+        {
+          "id": "U2_Q07",
+          "pregunta": "Por ejemplo, recordar la hora a la que hemos quedado; contar la trama de la película que hemos ido a ver al cine, etc., requiere de un tipo de memoria denominada:",
+          "opciones": [
+            "Explícita.",
+            "Implícita.",
+            "Sensorial y operativa.",
+            "a corto plazo"
+          ],
+          "respuesta_correcta": "Explícita."
+        },
+        {
+          "id": "U2_Q08",
+          "pregunta": "Se trata de seleccionar entre todos los estímulos sensoriales que llegan al cerebro a través de la médula espinal y neuronas aferentes, aquellos que son relevantes en un momento dado y así producir una respuesta mental y/o motórica. Nos referimos a:",
+          "opciones": [
+            "Motivación intrínseca",
+            "Atención.",
+            "Pensamiento deductivo.",
+            "Motivación extrínseca."
+          ],
+          "respuesta_correcta": "Atención."
+        },
+        {
+          "id": "U2_Q09",
+          "pregunta": "Carl Jung entendía la Conciencia como:",
+          "opciones": [
+            "Uno de los niveles de la mente humana en la que el Yo no forma parte de ella.",
+            "Aquel nivel de la mente humana que únicamente engloba las experiencias reprimidas de un individuo.",
+            "El conjunto de percepciones (ideas y afectos) que puede percibir el Yo. Siendo el Yo el centro de la Conciencia y de la personalidad.",
+            "El conjunto de percepciones (ideas y afectos) que puede percibir el Yo. Siendo el Yo el centro de la Conciencia, pero no de la personalidad."
+          ],
+          "respuesta_correcta": "El conjunto de percepciones (ideas y afectos) que puede percibir el Yo. Siendo el Yo el centro de la Conciencia, pero no de la personalidad."
+        },
+        {
+          "id": "U2_Q10",
+          "pregunta": "Durante la adolescencia son varios los aspectos clave que debemos tener presentes como educadores. Por ello es necesario saber que:",
+          "opciones": [
+            "En un contexto formal de la educación, no es primordial tener en cuenta el autoconcepto y la autoestima.",
+            "En el proceso de desarrollo del \"sí mismo\" el autoconcepto comprende el factor emocional y la autoestima el factor cognitivo.",
+            "La pieza fundamental en el proceso de desarrollo del \"sí mismo\" es el autoconcepto.",
+            "En el proceso de desarrollo del \"sí mismo\" el Autoconcepto y la autoestima son clave."
+          ],
+          "respuesta_correcta": "En el proceso de desarrollo del \"sí mismo\" el Autoconcepto y la autoestima son clave."
+        },
+        {
+          "id": "U2_Q11",
+          "pregunta": "Según Costa y McCrae, a qué factor corresponde la siguiente aseveración: \"aquellas personas que puntúen alto en este factor tenderán a poseer una personalidad impulsiva, temperamental, ansiosa y estresada ante cualquier situación vital. Y aquellas que puntúen bajo serán más tranquilas, pacientes, sosegadas y estables\".",
+          "opciones": [
+            "Amabilidad.",
+            "Introversión.",
+            "Neuroticismo",
+            "Apertura."
+          ],
+          "respuesta_correcta": "Neuroticismo"
+        },
+        {
+          "id": "U2_Q12",
+          "pregunta": "Cuando la posibilidad de realizar una tarea está determinada por la obtención de algún tipo de producto o recompensa y no por la propia realización de la tarea, hablamos de un tipo de motivación:",
+          "opciones": [
+            "Intrínseca, orientada al aprendizaje.",
+            "Extrínseca, orientada al logro.",
+            "Intrínseca, orientada al logro.",
+            "Extrínseca, orientada al aprendizaje."
+          ],
+          "respuesta_correcta": "Extrínseca, orientada al logro."
+        },
+        {
+          "id": "U2_Q13",
+          "pregunta": "Ciertas personas, sin necesidad de atravesar un proceso de crisis de identidad, se decantan por un determinado compromiso personal en la construcción de su identidad. No lo hacen desde la base de la búsqueda o la exploración personal, sino en base a lo que otros deciden o esperan de ellos/as. James Marcia en 1980, Jane Kroger en 2000 y 2006 o los de Kathleen Berger 2007, entre otros, dirán que se trata de una identidad:",
+          "opciones": [
+            "En moratoria.",
+            "Negativa.",
+            "Difusa.",
+            "Hipotecada."
+          ],
+          "respuesta_correcta": "Hipotecada."
+        },
+        {
+          "id": "U2_Q14",
+          "pregunta": "¿Qué sustancia química del cerebro se relaciona con la motivación y los sistemas de recompensa?",
+          "opciones": [
+            "El glutamato.",
+            "La dopamina.",
+            "Las neuronas aferentestónica.",
+            "El lóbulo frontal."
+          ],
+          "respuesta_correcta": "La dopamina."
+        },
+        {
+          "id": "U2_Q15",
+          "pregunta": "Según Marcia y Josselson (2013), aquellos adolescentes que han asumido su propia crisis de identidad y son capaces de comprometerse y mantener esa identidad en los diferentes roles o contextos de su vida, corresponde con:",
+          "opciones": [
+            "El logro de identidad.",
+            "La identidad esclarecida.",
+            "La identidad en moratoria.",
+            "La identidad hipotecada."
+          ],
+          "respuesta_correcta": "El logro de identidad."
+        },
+        {
+          "id": "U2_Q16",
+          "pregunta": "La atención tónica:",
+          "opciones": [
+            "Únicamente implica la participación neuronal del lóbulo temporal.",
+            "Únicamente implica la participación neuronal del lóbulo occipital.",
+            "Es un tipo de atención involuntaria.",
+            "Es un tipo de atención voluntaria."
+          ],
+          "respuesta_correcta": "Es un tipo de atención voluntaria."
+        },
+        {
+          "id": "U2_Q17",
+          "pregunta": "A través de esta memoria somos capaces de almacenar información, hechos y experiencias, que después recuperaremos y podremos contar, etc. Nos referimos a:",
+          "opciones": [
+            "La memoria implícita.",
+            "La memoria de trabajo.",
+            "La memoria explícita.",
+            "La memoria histórica."
+          ],
+          "respuesta_correcta": "La memoria explícita."
+        },
+        {
+          "id": "U2_Q18",
+          "pregunta": "Kelly presenta 11 Corolarios que dan explicación a su teoría de los constructos personales. A qué corolario corresponde la siguiente afirmación: cada vez que una persona utiliza experiencias similares a las de otras personas, nuestros constructos perso nales se asemejan y se acercan a los de los demás.",
+          "opciones": [
+            "Corolario de experiencia.",
+            "Corolario de elección.",
+            "Corolario de sociabilidad.",
+            "Corolario de comunidad."
+          ],
+          "respuesta_correcta": "Corolario de comunidad."
+        },
+        {
+          "id": "U2_Q19",
+          "pregunta": "Capacidad del encéfalo de cambiar sus conexiones entre neuronas en respuesta a las experiencias, drogas, hormonas o lesiones. Nos referimos a:",
+          "opciones": [
+            "Plasticidad neuronal.",
+            "Plasticidad occipital.",
+            "Plasticidad muscular.",
+            "Plasticidad cerebral."
+          ],
+          "respuesta_correcta": "Plasticidad cerebral."
+        },
+        {
+          "id": "U2_Q20",
+          "pregunta": "Un individuo percibe y entiende el mundo exterior siempre con relación a su mundo interior. Jung dirá que su actitud será de:",
+          "opciones": [
+            "Extroversión.",
+            "Empatía.",
+            "Rechazo.",
+            "Introversión."
+          ],
+          "respuesta_correcta": "Introversión."
+        },
+        {
+          "id": "U2_Q21",
+          "pregunta": "Kelly presenta 11 Corolarios que dan explicación a su teoría de los constructos personales. A qué corolario corresponde la siguiente afirmación: un individuo elegirá aquella opción que considera que posibilita a futuro mayores posibilidades de experiencia.",
+          "opciones": [
+            "Corolario de comunidad.",
+            "Corolario de dicotomía.",
+            "Corolario de elección.",
+            "Corolario de organización."
+          ],
+          "respuesta_correcta": "Corolario de elección."
+        },
+        {
+          "id": "U2_Q22",
+          "pregunta": "El individuo ante los diferentes contextos o roles en los que puede identificarse a sí mismo no adopta un compromiso ni una escala de valores hacia ninguno de ellos. James Marcia en 1980, Jane Kroger en 2000 y 2006 o los de Kathleen Berger 2007, entre otros, dirán que se trata de una identidad:",
+          "opciones": [
+            "Difusa.",
+            "Hipotecada.",
+            "Negativa.",
+            "Logro de identidad."
+          ],
+          "respuesta_correcta": "Difusa."
+        },
+        {
+          "id": "U2_Q23",
+          "pregunta": "Kelly presenta 11 Corolarios que dan explicación a su teoría de los constructos personales. A qué corolario corresponde la siguiente afirmación: a medida que una persona es capaz de reconocer eventos repetitivos, se torna más capaz de predecir y antici parse a un hecho en sí.",
+          "opciones": [
+            "Corolario de construcción.",
+            "Corolario de organización.",
+            "Corolario de elección",
+            "Corolario de individualidad."
+          ],
+          "respuesta_correcta": "Corolario de construcción."
+        },
+        {
+          "id": "U2_Q24",
+          "pregunta": "En qué etapa dirá Jung que los individuos tratan de encontrar su lugar en el mundo, desarrollar su propia identidad. Es el momento en el que se produce la separación tanto física como psicológica de su entorno familiar y se deposita sumáximo interés e n el grupo de iguales y en las relaciones sociales con éstos.",
+          "opciones": [
+            "Infancia.",
+            "Juventud.",
+            "Vejez.",
+            "Madurez."
+          ],
+          "respuesta_correcta": "Juventud."
+        },
+        {
+          "id": "U2_Q25",
+          "pregunta": "A pesar de que el individuo observa y analiza pros y contras en la asunción de los diferentes roles personales y sociales, no será capaz de afrontar una crisis de identidad. Y no son capaces de tomar una decisión o posición que les conduzca a definir s u identidad. James Marcia en 1980, Jane Kroger en 2000 y 2006 o los de Kathleen Berger 2007, entre otros, dirán que se trata de una:",
+          "opciones": [
+            "Negativa.",
+            "Difusa.",
+            "Hipotecada.",
+            "Identidad en moratoria."
+          ],
+          "respuesta_correcta": "Identidad en moratoria."
+        },
+        {
+          "id": "U2_Q26",
+          "pregunta": "Monitoriza las áreas del habla en la mayoría de las personas diestras y se encarga de la interpretación literal de las palabras, y reconoce las palabras, las letras y los números escritos en forma de palabras\". Se trata del hemisferio:",
+          "opciones": [
+            "Derecho.",
+            "Izquierdo.",
+            "Temporal.",
+            "Parietal."
+          ],
+          "respuesta_correcta": "Izquierdo."
+        },
+        {
+          "id": "U2_Q27",
+          "pregunta": "La atención fásica:",
+          "opciones": [
+            "Es un tipo de atención involuntaria.",
+            "Es un tipo de atención voluntaria.",
+            "Únicamente implica la participación neuronal del lóbulo occipital.",
+            "Implica la participación neuronal del lóbulo temporal únicamente."
+          ],
+          "respuesta_correcta": "Es un tipo de atención involuntaria."
+        },
+        {
+          "id": "U2_Q28",
+          "pregunta": "Se encarga de procesar y transmitir la información por todo el Sistema Nervioso y un tipo de ellas se encargará de conducir la información desde la piel y los órganos sensitivos a la médula espinal y el cerebro. Se denominan:",
+          "opciones": [
+            "Neuronas aferentes.",
+            "Neuronas deferentes.",
+            "Neuronas conectoras.",
+            "Neuronas eferentes."
+          ],
+          "respuesta_correcta": "Neuronas aferentes."
+        },
+        {
+          "id": "U2_Q29",
+          "pregunta": "Una tendencia al alza en este factor determinará a una persona compasiva, generosa, bondadosa, confiada, complaciente. Por el contrario, un bajo puntaje en este factor tendrá como resultado a personas crueles, hostiles, desconfiadas, irritable, crítica McCrae y Costa denominan a este factor de la personalidad:",
+          "opciones": [
+            "Neuroticismo.",
+            "Amabilidad.",
+            "Extraversión.",
+            "Pesimismo."
+          ],
+          "respuesta_correcta": "Amabilidad."
+        },
+        {
+          "id": "U2_Q30",
+          "pregunta": "Participar en el procesamiento de las emociones, se trata de:",
+          "opciones": [
+            "La Corteza Orbitofrontal.",
+            "Axón.",
+            "Neuronas.",
+            "Dendrita."
+          ],
+          "respuesta_correcta": "La Corteza Orbitofrontal."
+        },
+        {
+          "id": "U2_Q31",
+          "pregunta": "Memoria sensorial:",
+          "opciones": [
+            "Esta memoria es toda aquella información que hemos consolidado a lo largo de toda la vida. Esta memoria queda en el inconsciente de forma ilimitada hasta ser recuperada en un momento dado.",
+            "Ninguna respuesta es correcta.",
+            "Se trata de aquella información que nos llega a través de los órganos sensoriales como es el oído, vista, gusto, tacto, olfato.",
+            "Esta memoria posibilita recuperar aquella información que fue almacenada rápidamente a través de los sentidos y que se hizo consciente a través de la atención."
+          ],
+          "respuesta_correcta": "Se trata de aquella información que nos llega a través de los órganos sensoriales como es el oído, vista, gusto, tacto, olfato."
+        },
+        {
+          "id": "U2_Q32",
+          "pregunta": "Procesa la información espacial y visual, memoria visual y funciones no verbales. Se trata del hemisferio",
+          "opciones": [
+            "Derecho",
+            "izquierdo",
+            "Periférico.",
+            "Frontal."
+          ],
+          "respuesta_correcta": "Derecho"
+        },
+        {
+          "id": "U2_Q33",
+          "pregunta": "Sobre la etapa de adolescencia:",
+          "opciones": [
+            "En la actualidad es claro el momento en el que dicha etapa inicia y finaliza.",
+            "En la actualidad no existe un consenso claro sobre el momento en que inicia y finaliza.",
+            "En un contexto informal de la educación, no es primordial tener en cuenta la etapa de la adolescencia.",
+            "La OMS deja claro el inicio y el final de dicha etapa en un individuo. Existe una adolescencia inicial y final como únicas etapas delimitadas por la OMS."
+          ],
+          "respuesta_correcta": "En la actualidad no existe un consenso claro sobre el momento en que inicia y finaliza."
+        },
+        {
+          "id": "U2_Q34",
+          "pregunta": "Durante la adolescencia el modo en el que cada individuo va a lograr construir su identidad:",
+          "opciones": [
+            "No resultará tarea fácil. Y el aula, entre otros contextos, ofrece una gran oportunidad para ayudarles en dicho proceso.",
+            "El logro de la identidad en la etapa de la adolescencia no resultará tarea fácil. Sin embargo, no debemos considerarla como uno de los objetivos más importantes en este momento del desarrollo de nuestro alumnado.",
+            "Se desarrollará durante la etapa de la adolescencia temprana.",
+            "Es una tarea relativamente sencilla que concluye de forma innata al finalizar la adolescencia."
+          ],
+          "respuesta_correcta": "No resultará tarea fácil. Y el aula, entre otros contextos, ofrece una gran oportunidad para ayudarles en dicho proceso."
+        },
+        {
+          "id": "U2_Q35",
+          "pregunta": "Jung explica el desarrollo de la psique humana como un proceso en el que el individuo debe lograr el equilibrio entre dos tipos de actitud opuestas, a saber:",
+          "opciones": [
+            "Inconsciente personal e inconsciente colectivo.",
+            "Empatía y motivación.",
+            "Simpatía y Antipatía.",
+            "Introversión y Extroversión."
+          ],
+          "respuesta_correcta": "Introversión y Extroversión."
+        },
+        {
+          "id": "U2_Q36",
+          "pregunta": "Es aquella que nos hace recordar eventos, momentos que hemos vivido en un tiempo y un lugar dado. Nos referimos",
+          "opciones": [
+            "Memoria de trabajo.",
+            "Memoria operativa.",
+            "Memoria declarativa",
+            "Memoria episódica"
+          ],
+          "respuesta_correcta": "Memoria episódica"
+        },
+        {
+          "id": "U2_Q37",
+          "pregunta": "Según la OMS etapa en la que se consolidan los cambios fisiológicos y toma mayor relevancia la individualidad del sujeto. Se denomina:",
+          "opciones": [
+            "Proceso de mielinización.",
+            "Maduración neuronal.",
+            "Senectud.",
+            "Adolescencia tardía."
+          ],
+          "respuesta_correcta": "Adolescencia tardía."
+        },
+        {
+          "id": "U2_Q38",
+          "pregunta": "Se refiere a la capacidad que poseen las neuronas de formar redes neuronales que luego persisten Nos referimos a:",
+          "opciones": [
+            "Plasticidad muscular.",
+            "Plasticidad neuronal.",
+            "Plasticidad axional.",
+            "Plasticidad cerebral."
+          ],
+          "respuesta_correcta": "Plasticidad neuronal."
+        },
+        {
+          "id": "U2_Q39",
+          "pregunta": "Para Jung las personas guían sus acciones más por un razonamiento práctico. Dirigen sus vidas teniendo en cuenta mayormente las condiciones y exigencias del entorno y menos por su mundo interior. Son personas cuya actitud es:",
+          "opciones": [
+            "Reticencia.",
+            "Extroversión.",
+            "Introversión.",
+            "Desconfianza."
+          ],
+          "respuesta_correcta": "Extroversión."
+        },
+        {
+          "id": "U2_Q40",
+          "pregunta": "Es responsable de la experimentación emocional y en la expresión de nuestras emociones, se trata de:",
+          "opciones": [
+            "La Corteza Anterior Cingulada",
+            "Neuronas.",
+            "Lóbulo occipital.",
+            "dentrita"
+          ],
+          "respuesta_correcta": "La Corteza Anterior Cingulada"
+        },
+        {
+          "id": "U2_Q41",
+          "pregunta": "Se encargan de procesar y transmitir la información por todo el Sistema Nervioso. Nos referimos a:",
+          "opciones": [
+            "Neuronas.",
+            "Memoria.",
+            "Lóbulo.",
+            "Amígdala."
+          ],
+          "respuesta_correcta": "Neuronas."
+        },
+        {
+          "id": "U2_Q42",
+          "pregunta": "La memoria declarativa:",
+          "opciones": [
+            "Responde a \"saber hacer\", almacena habilidades y destrezas que se pondrán en marcha en una acción determinada.",
+            "Responde a \"ser y convivir\", nos hace recordar momentos vividos con anterioridad.",
+            "Se corresponde con el \"saber\", almacena la información y el conocimiento en sí de hechos, acontecimientos, datos, etc.",
+            "Almacena lo referido al lenguaje, ideas, hechos y normas"
+          ],
+          "respuesta_correcta": "Se corresponde con el \"saber\", almacena la información y el conocimiento en sí de hechos, acontecimientos, datos, etc."
+        },
+        {
+          "id": "U2_Q43",
+          "pregunta": "Bisquerra propone algunos objetivos en los que todo programa de formación emocional dirigido a docentes debería centrarse. A saber:",
+          "opciones": [
+            "Ayudar a que todo docente comprenda la relevancia que las emociones poseen no solo en la esfera de la educación sino en todos los ámbitos de la vida.",
+            "Tomar conciencia de las propias emociones y las de los demás. Especialmente las del alumnado.",
+            "Lograr establecer mejores relaciones interpersonales, en el lugar del trabajo, la familia, etc.",
+            "Todas las propuestas anteriores son correctas y deberían, entre otras, estar presentes en el diseño de toda acción formativa enfocada a los docentes en materia de educación emocional."
+          ],
+          "respuesta_correcta": "Todas las propuestas anteriores son correctas y deberían, entre otras, estar presentes en el diseño de toda acción formativa enfocada a los docentes en materia de educación emocional."
+        },
+        {
+          "id": "U2_Q44",
+          "pregunta": "El desarrollo de la moral ha sido estudiado entre otros autores por Jean Piaget y Lawrence Kohlberg. Y queda por tanto patente como su desarrollo se produce a lo largo de las diferentes etapas que un individuo experimentará en su vida. La etapa educativa se constituye como una de ellas. En este sentido, qué acciones podemos tener en cuenta desde la institución educativa para favorecer dicho desarrollo moral. Señala la opción correcta:",
+          "opciones": [
+            "Procurar situaciones en las que se deban asumir diferentes roles y/o puntos de vista que son distintos a los nuestros.",
+            "Tener presente y utilizar diferentes momentos como los espacios lúdicos o extracurriculares en la educación como momento en el que la interrelación social es su máximo exponente.",
+            "Plantear situaciones prácticas en el aula donde el alumnado deba resolver, por ejemplo, un dilema moral y por tanto ejercitar la habilidad para la toma de decisiones. Este aspecto es fundamental a la hora de poner en práctica los principios individuales y poder contrastarlos con los de los demás.",
+            "Todas las acciones anteriores son una oportunidad para favorecer el desarrollo moral en nuestro alumnado."
+          ],
+          "respuesta_correcta": "Todas las acciones anteriores son una oportunidad para favorecer el desarrollo moral en nuestro alumnado."
+        },
+        {
+          "id": "U2_Q45",
+          "pregunta": "El estudio de las diferentes Teorías de la Personalidad nos puede ayudar en nuestra labor como docentes. Señala aquella teoría y autor que mejor puede ser incluida en el diseño de nuestras situaciones de aprendizaje, dado que es recomendable que todo profesional de la educación se posicione en una teoría determinada:",
+          "opciones": [
+            "Teoría de Carl Rogers.",
+            "Teoría 'Big Five' de Robert McCrae y Paul Costa.",
+            "Teoría de Carl Jung.",
+            "Todas las teorías que aparecen a continuación, y otras, pueden ayudarnos en nuestra labor como docentes. Pues, en nuestra futura labor como docentes, no es recomendable centrarse exclusivamente en una."
+          ],
+          "respuesta_correcta": "Todas las teorías que aparecen a continuación, y otras, pueden ayudarnos en nuestra labor como docentes. Pues, en nuestra futura labor como docentes, no es recomendable centrarse exclusivamente en una."
+        },
+        {
+          "id": "U2_Q46",
+          "pregunta": "Kelly presenta 11 Corolarios que dan explicación a su teoría de los constructos personales, ¿a qué corolario corresponde la siguiente afirmación? \"Cada persona organiza y jerarquiza sus constructos personales de un modo particular y conveniente a sí mismo. Unos constructos predominan sobre otros de tal manera que las incoherencias entre ellos se minimizan\".",
+          "opciones": [
+            "Corolario de elección.",
+            "Corolario de experiencia.",
+            "Corolario de organización.",
+            "Corolario de sociabilidad."
+          ],
+          "respuesta_correcta": "Corolario de organización."
+        },
+        {
+          "id": "U2_Q47",
+          "pregunta": "La relevancia de la motivación, atención y la memoria como unas funciones ejecutivas primordiales en el aula es un hecho. En qué medida podemos como docentes procurar el desarrollo de dichas funciones en nuestro alumnado. Señala la respuesta correcta.",
+          "opciones": [
+            "Tener presentes los conocimientos previos de nuestro alumnado. De tal manera que estos supongan un punto de partida para poder generar nuevos aprendizajes además de una mayor profundidad o complejidad sobre los que ya poseían.",
+            "Practicar con aquellas informaciones o saberes que no sean especialmente significativos para el alumnado. A través de la toma de contacto regular y supervisada con nuevos conocimientos el alumno ampliará sus conocimientos previos.",
+            "Plantear la acción educativa en base a la cuestión, interrogante o reto en el aula.",
+            "Todas las recomendaciones anteriores son correctas."
+          ],
+          "respuesta_correcta": "Todas las recomendaciones anteriores son correctas."
+        },
+        {
+          "id": "U2_Q48",
+          "pregunta": "Kelly presenta 11 Corolarios que dan explicación a su teoría de los constructos personales. A qué corolario corresponde la siguiente afirmación: las personas en la medida que son capaces de interpretar o comprender los constructos personales de otras personas, se hace más posible la relación social entre ellos.",
+          "opciones": [
+            "colorario de sociabilidad",
+            "Corolario de comunidad.",
+            "corolario de organización",
+            "corolario de elección"
+          ],
+          "respuesta_correcta": "colorario de sociabilidad"
+        },
+        {
+          "id": "U2_Q49",
+          "pregunta": "Para qué autor el desarrollo moral es entendido como el conjunto de sucesivos cambios que acontecen en el individuo y que están estrechamente ligados a la edad. Por tanto, a medida que el sujeto se desarrolle estará en disposición de poder construir su propia moral.",
+          "opciones": [
+            "Rogers.",
+            "Freud.",
+            "Skinner.",
+            "Piaget."
+          ],
+          "respuesta_correcta": "Piaget."
+        },
+        {
+          "id": "U2_Q50",
+          "pregunta": "Es una de las claves explicativas más importantes de la conducta humana, determina que la persona inicie una acción (activación), se dirija hacia un objetivo (dirección) y persista en alcanzarlo (mantenerlo). Lo denominamos:",
+          "opciones": [
+            "Motivación.",
+            "Pensamiento inductivo.",
+            "Empatía.",
+            "Creatividad."
+          ],
+          "respuesta_correcta": "Motivación."
+        },
+        {
+          "id": "U2_Q51",
+          "pregunta": "Aquella memoria que se desvanece con gran rapidez si no se aplican procesos atencionales, pero que es la base de nuestra memoria. Nos referimos a la memoria:",
+          "opciones": [
+            "Manual.",
+            "Largo plazo.",
+            "Corto plazo.",
+            "Sensorial."
+          ],
+          "respuesta_correcta": "Sensorial."
+        },
+        {
+          "id": "U2_Q52",
+          "pregunta": "Según la OMS, la etapa comprendida entre los 10 y los 13 años se denomina:",
+          "opciones": [
+            "Adolescencia difuminada",
+            "Adolescencia",
+            "Juventud media.",
+            "Adolescencia temprana."
+          ],
+          "respuesta_correcta": "Adolescencia temprana."
+        },
+        {
+          "id": "U2_Q53",
+          "pregunta": "Cuando un individuo realiza una acción determinada por la obtención de algún tipo de producto o recompensa. Lo denominamos motivación:",
+          "opciones": [
+            "Intrínseca.",
+            "Productiva.",
+            "Desinteresada.",
+            "Extrínseca."
+          ],
+          "respuesta_correcta": "Extrínseca."
+        },
+        {
+          "id": "U2_Q54",
+          "pregunta": "El sistema nervioso central, como encargado de organizar la información que proviene de la piel y los órganos sensitivos. En el podemos identificar diferentes partes como por ejemplo la parte interna del cerebro o tronco encefálico, la cual se encarga de:",
+          "opciones": [
+            "Función auditiva y visual explícita.",
+            "Se asocia y se encarga de las funciones de supervivencia y autónomas.",
+            "Únicamente de la función visual.",
+            "Función motora y visual."
+          ],
+          "respuesta_correcta": "Se asocia y se encarga de las funciones de supervivencia y autónomas."
+        },
+        {
+          "id": "U2_Q55",
+          "pregunta": "Cuando alguien nos nombra, cuando percibimos un olor; o cuando captamos un movimiento de algo o alguien, ¿qué tipo de atención se ve implicada?",
+          "opciones": [
+            "Estímulo intrínseco.",
+            "Atención involuntaria",
+            "Atención tónica",
+            "Estímulo extrínseco"
+          ],
+          "respuesta_correcta": "Atención involuntaria"
+        },
+        {
+          "id": "U2_Q56",
+          "pregunta": "Cuando un individuo realiza una acción por el propio placer de realizarla. Lo denominamos motivación:",
+          "opciones": [
+            "intrinseca",
+            "Plástica.",
+            "Extrínseca",
+            "Aleatoria"
+          ],
+          "respuesta_correcta": "intrinseca"
+        },
+        {
+          "id": "U2_Q57",
+          "pregunta": "McCrae y Costa delimitan cinco factores de la personalidad:",
+          "opciones": [
+            "Neuroticismo; extraversión; apertura a la experiencia, amabilidad; responsabilidad",
+            "Tendencia realizadora; inconsciente colectivo; apertura a la experiencia, amabilidad; responsabilidad.",
+            "Desmotivación; inconsciente colectivo; apertura a la experiencia, amabilidad; responsabilidad.",
+            "Extroversión; inconsciente personal; apertura a la experiencia, amabilidad; responsabilidad."
+          ],
+          "respuesta_correcta": "Neuroticismo; extraversión; apertura a la experiencia, amabilidad; responsabilidad"
+        },
+        {
+          "id": "U2_Q58",
+          "pregunta": "Por ejemplo, conducir un vehículo, atarse los cordones de unas zapatillas, requiere de un tipo de memoria denominada:",
+          "opciones": [
+            "Implícita",
+            "Explícita",
+            "Sensorial",
+            "Largo plazo"
+          ],
+          "respuesta_correcta": "Implícita"
+        },
+        {
+          "id": "U2_Q59",
+          "pregunta": "Según la OMS. Etapa en la que comienza a construirse la identidad del individuo. En ella la pertenencia a los grupos sociales van a marcar dicha etapa. Se denomina:",
+          "opciones": [
+            "Maduración neuronal",
+            "Temprana",
+            "Adolescencia tardía",
+            "Adolescencia media"
+          ],
+          "respuesta_correcta": "Adolescencia media"
+        },
+        {
+          "id": "U2_Q60",
+          "pregunta": "Para Bisquerra una emoción debe entenderse como:",
+          "opciones": [
+            "Ninguna de las respuestas anteriores es correcta.",
+            "Un proceso educativo, continuo y permanente, que pretende potenciar el desarrollo de las competencias emocionales como elemento esencial del desarrollo integral de la persona, con objeto de capacitarle para la vida.",
+            "Un estado que acontece de forma súbita, por lo general de índole sencilla y que no siempre responde a un acontecimiento interno o externo en el individuo.",
+            "Un estado complejo del organismo caracterizado por una excitación o perturbación que predispone a una respuesta organizada. Y que se generan como respuesta a un acontecimiento externo o interno."
+          ],
+          "respuesta_correcta": "Un estado complejo del organismo caracterizado por una excitación o perturbación que predispone a una respuesta organizada. Y que se generan como respuesta a un acontecimiento externo o interno."
+        },
+        {
+          "id": "U2_Q61",
+          "pregunta": "Aquellos adolescentes que han asumido su propia crisis de identidad y han sido capaces de comprometerse y mantener su identidad en los diferentes roles o contextos de su vida. James Marcia en 1980, Jane Kroger en 2000 y 2006 o los de Kathleen Berger 2007, entre otros, dirán que se trata de:",
+          "opciones": [
+            "Hipotecada",
+            "Negativa",
+            "Logro de identidad",
+            "En moratoria"
+          ],
+          "respuesta_correcta": "Logro de identidad"
+        },
+        {
+          "id": "U2_Q62",
+          "pregunta": "Sin ser neuronas, cumplen diferentes funciones. Entre otras la de nutrir, mantener y reparar a las células neuronales.",
+          "opciones": [
+            "Adrenalina",
+            "Mielinización",
+            "Neuronas",
+            "Células Gliales"
+          ],
+          "respuesta_correcta": "Células Gliales"
+        },
+        {
+          "id": "U2_Q63",
+          "pregunta": "Las neuronas son un tipo de célula cuya finalidad es procesar y transmitir la información por todo el Sistema Nervioso. Existen tres tipos y uno de ellos se encarga de interconectar a los otros dos tipos de neuronas entre sí. Se denominan:",
+          "opciones": [
+            "Neurotransmisor",
+            "Neuronas relacionales",
+            "Neuronas deferentes",
+            "Neuronas conectoras"
+          ],
+          "respuesta_correcta": "Neuronas conectoras"
+        },
+        {
+          "id": "U2_Q64",
+          "pregunta": "Se trata de una memoria que se adquiere gradualmente y a través de la práctica. Es la memoria:",
+          "opciones": [
+            "implícita",
+            "explícita",
+            "sensorial",
+            "A corto plazo"
+          ],
+          "respuesta_correcta": "implícita"
+        },
+        {
+          "id": "U2_Q65",
+          "pregunta": "Es aquel conocimiento que se pone en marcha a la hora de realizar una tarea determinada. Este tipo de conocimiento implica la acción. Y que puede ser enmarcado en lo que se denomina \"Saber hacer\". Lo denominamos",
+          "opciones": [
+            "Conocimiento procedimental",
+            "Conocimiento memorístico",
+            "Conocimiento",
+            "Conductismo"
+          ],
+          "respuesta_correcta": "Conocimiento procedimental"
+        },
+        {
+          "id": "U2_Q66",
+          "pregunta": "Aquella información que consiste en hechos, ideas e informaciones que pueden ser expresadas en una oración o proposición. Responde al conocimiento que se enmarca en el 'Saber', se denomina conocimiento:",
+          "opciones": [
+            "Procedimental",
+            "Declarativo",
+            "Actitudinal",
+            "Cognitivismo"
+          ],
+          "respuesta_correcta": "Declarativo"
+        },
+        {
+          "id": "U2_Q67",
+          "pregunta": "Se encargan de procesar y transmitir la información por todo el Sistema Nervioso y un tipo de ellas se encargará de transmitir los impulsos a los músculos y glándulas. Se denominan:",
+          "opciones": [
+            "Axón",
+            "Neuronas desferentes",
+            "neuronas deferentes",
+            "Neuronas eferentes"
+          ],
+          "respuesta_correcta": "Neuronas eferentes"
+        },
+        {
+          "id": "U2_Q68",
+          "pregunta": "Durante la adolescencia son varios los aspectos clave que debemos tener presentes como educadores. Por ello es",
+          "opciones": [
+            "En un contexto formal de la educación, no es primordial tener en cuenta el Autoconcepto y la Autoestima.",
+            "En el proceso de desarrollo de \"sí mismo\" el autoconcepto y la autoestima son clave. Además la autoestima se desarrolla a la par que el Autoconcepto.",
+            "La pieza fundamental en el proceso de desarrollo del \"si mismo\" es el Autoconcepto.",
+            "En el proceso de desarrollo del \"si mismo\" el Autoconcepto y la Autoestima son claves. Además la Autoestima se desarrolla a la par que el Autoconcepto, a pesar de que no debemos entenderlo como un elemento decisivo en la construcción de dicho Autoconcepto."
+          ],
+          "respuesta_correcta": "En el proceso de desarrollo de \"sí mismo\" el autoconcepto y la autoestima son clave. Además la autoestima se desarrolla a la par que el Autoconcepto."
+        },
+        {
+          "id": "U2_Q69",
+          "pregunta": "Carl Jung entendía la Conciencia como:",
+          "opciones": [
+            "Uno de los niveles de la mente humana en la que el Yo no forma parte de ella.",
+            "Aquel nivel de la mente humana que únicamente engloba las experiencias reprimidas de un individuo.",
+            "El conjunto de percepciones (ideas y afectos) que puede percibir el Yo. Siendo el Yo el centro de la Conciencia y de la personalidad.",
+            "El conjunto de percepciones (ideas y afectos) que puede percibir el Yo. Siendo el Yo el centro de la Conciencia, pero no de la personalidad."
+          ],
+          "respuesta_correcta": "El conjunto de percepciones (ideas y afectos) que puede percibir el Yo. Siendo el Yo el centro de la Conciencia, pero no de la personalidad."
+        },
+        {
+          "id": "U2_Q70",
+          "pregunta": "Teniendo en cuenta los estudios de James Marcia en 1980, Jane Krogre en 2000 у 2006 o los de Kathleen Berger 2007, entre otros, sobre los diferentes modos en los que una persona desarrolla su identidad. Se entiende por identidad difusa, aquella en la que:",
+          "opciones": [
+            "Ciertas personas, sin necesidad de atravesar un proceso de crisis de identidad, se declaran por un determinado personal sino en base a lo que otros decidieron o esperan de ellos/as.",
+            "Para algunos adolescentes el hecho de tener que definir su existencia en base a los modelos de rol que les ofrece la sociedad actual, entran en un estado de rebeldía asumiendo una identidad opuesta a aquello que la sociedad espera.",
+            "A pesar de que el individuo observa y analiza pros y contras en la asunción de los diferentes roles personales y sociales, no será capaz de afrontar una crisis de identidad. Y no son capaces de tomar una decisión o posición que les conduzca a definir su identidad.",
+            "El individuo ante los diferentes contextos o roles en los que puede identificarse a sí mismo no adopta un compromiso ni una escala de valores hacia ninguno de ellos."
+          ],
+          "respuesta_correcta": "El individuo ante los diferentes contextos o roles en los que puede identificarse a sí mismo no adopta un compromiso ni una escala de valores hacia ninguno de ellos."
+        },
+        {
+          "id": "U2_Q71",
+          "pregunta": "El área cerebral encargada de monitorizar las áreas del habla en la mayoría de las personas diestras es:",
+          "opciones": [
+            "El Hemisferio izquierdo",
+            "Lóbulo occipital.",
+            "El lóbulo frontal.",
+            "El hemisferio derecho."
+          ],
+          "respuesta_correcta": "El Hemisferio izquierdo"
+        },
+        {
+          "id": "U2_Q72",
+          "pregunta": "Cuando una persona se decanta por un determinado compromiso personal en la construcción de su identidad en base a lo que otros deciden o esperan de ellas, estamos ante:",
+          "opciones": [
+            "Una identidad en moratoria.",
+            "Una identidad difusa.",
+            "Una identidad hipotecada.",
+            "Una identidad negativa."
+          ],
+          "respuesta_correcta": "Una identidad hipotecada."
+        },
+        {
+          "id": "U2_Q73",
+          "pregunta": "A través de esta memoria somos capaces de almacenar información, hechos, experiencias que después recuperaremos y podremos narrar por escrito o podemos contar, etc. Es la memoria:",
+          "opciones": [
+            "Explícita",
+            "Implícita",
+            "sensorial",
+            "Corto plazo"
+          ],
+          "respuesta_correcta": "Explícita"
+        },
+        {
+          "id": "U2_Q74",
+          "pregunta": "Kelly presenta 11 Corolarios que dan explicación a su teoría de los constructos personales. A qué corolario corresponde la siguiente afirmación: un individuo elegirá aquella opción que considera posibilitar a futuro mayores posibilidades de experiencia.",
+          "opciones": [
+            "Corolario de organización.",
+            "corolario de elección",
+            "Corolario de dicotomía",
+            "Corolario de comunidad"
+          ],
+          "respuesta_correcta": "corolario de elección"
+        },
+        {
+          "id": "U2_Q75",
+          "pregunta": "Para Bisquerra una emoción debe entenderse como:",
+          "opciones": [
+            "Un estado que acontece de forma súbita, por lo general de índole sencilla y que no siempre responde a un acontecimiento interno o externo en el individuo",
+            "Ninguna de las respuestas anteriores es correcta.",
+            "Un estado complejo del organismo caracterizado por una excitación o perturbación que predispone a una respuesta organizada. Y que se generan como respuesta a un acontecimiento externo o interno",
+            "Un proceso educativo, continuo y permanente, que pretende potenciar el desarrollo de las competencias emocionales como elemento esencial del desarrollo integral de la persona, con objeto de capacitarlos para la vida."
+          ],
+          "respuesta_correcta": "Un estado complejo del organismo caracterizado por una excitación o perturbación que predispone a una respuesta organizada. Y que se generan como respuesta a un acontecimiento externo o interno"
+        },
+        {
+          "id": "U2_Q76",
+          "pregunta": "La relevancia de la motivación, atención y la memoria como unas funciones ejecutivas primordiales en el aula es un hecho. En qué medida podemos como docentes procurar el desarrollo de dichas funciones en nuestro alumnado. Señala la respuesta correcta.",
+          "opciones": [
+            "Tener presentes los conocimientos previos de nuestro alumnado. De tal manera que estos supongan un punto de partida para poder generar nuevos aprendizajes además de una mayor profundidad o complejidad sobre los que ya poseían.",
+            "Practicar con aquellas informaciones o saberes que no sean especialmente significativos para el alumnado. A través de la toma de contacto regular y supervisada con nuevos conocimientos el alumno ampliará sus conocimientos previos.",
+            "Plantear la acción educativa en base a la cuestión, interrogante o reto en el aula.",
+            "Todas las recomendaciones anteriores son correctas."
+          ],
+          "respuesta_correcta": "Todas las recomendaciones anteriores son correctas."
+        },
+        {
+          "id": "U2_Q77",
+          "pregunta": "En qué etapa dirá Jung que los individuos tratan de encontrar su lugar en el mundo, desarrollar su propia identidad. Es el momento en el que se produce la separación tanto física como psicológica de su entorno familiar y se deposita su máximo interés en el grupo de iguales y en las relaciones sociales con éstos.",
+          "opciones": [
+            "Madurez",
+            "Vejez",
+            "Juventud",
+            "Infancia"
+          ],
+          "respuesta_correcta": "Juventud"
+        },
+        {
+          "id": "U2_Q78",
+          "pregunta": "Cuando alguien nos nombra, cuando percibimos un olor; o cuando captamos un movimiento de algo o alguien ¿qué tipo de atención se ve implicada?",
+          "opciones": [
+            "Estimulo extrínseco",
+            "estimulo intrínseco",
+            "atención involuntaria",
+            "atención tónica"
+          ],
+          "respuesta_correcta": "atención involuntaria"
+        },
+        {
+          "id": "U2_Q79",
+          "pregunta": "El conocimiento procedimental implica:",
+          "opciones": [
+            "Saber hacer",
+            "Saber",
+            "Ser",
+            "Aprender a convivir juntos"
+          ],
+          "respuesta_correcta": "Saber hacer"
+        }
+      ]
+    },
+    {
+      "numero": 3,
+      "nombre": "Tema 3",
+      "preguntas": [
+        {
+          "id": "U3_Q01",
+          "pregunta": "Watson (1920) establecerá el siguiente postulado: la asociación de ideas puede condicionar una respuesta emocional como es el caso del miedo. Y establece como unidades esenciales en el aprendizaje:",
+          "opciones": [
+            "El Estímulo y la Respuesta",
+            "Neuroticismo y Extraversión",
+            "Significancia y Extroversión",
+            "Memorización y Recuperación"
+          ],
+          "respuesta_correcta": "El Estímulo y la Respuesta"
+        },
+        {
+          "id": "U3_Q02",
+          "pregunta": "Para Watson (1920) que establece como base del aprendizaje humano el Estímulo y la Respuesta. Afirmará que aquella respuesta que se dé inmediatamente después del estímulo será la que más probabilidades tenga de ser asociada al mismo. Nos estamos refiriendo a la Ley de:",
+          "opciones": [
+            "Costumbre",
+            "Frecuencia",
+            "Adecuación",
+            "Recencia"
+          ],
+          "respuesta_correcta": "Recencia"
+        },
+        {
+          "id": "U3_Q03",
+          "pregunta": "¿Qué autor representante del neoconductismo, en su Teoría Social del Aprendizaje postula la existencia de un determinismo entre el ambiente y la conducta de los individuos?",
+          "opciones": [
+            "Frederic Skinner",
+            "Jean Piaget",
+            "Albert Bandura",
+            "Jorge Kelly"
+          ],
+          "respuesta_correcta": "Albert Bandura"
+        },
+        {
+          "id": "U3_Q04",
+          "pregunta": "Albert Bandura postula que el aprendizaje se produce a través de la observación. Y se estructura en las siguientes fases:",
+          "opciones": [
+            "Atención, retención, reproducción y motivación",
+            "Atención, retención y reproducción",
+            "Atención y reproducción",
+            "Retención y reproducción"
+          ],
+          "respuesta_correcta": "Atención, retención, reproducción y motivación"
+        },
+        {
+          "id": "U3_Q05",
+          "pregunta": "Albert Bandura establece una serie de fases a través de las cuales se produce el aprendizaje por observación o modelado. En qué fase es imprescindible que el individuo centre toda su atención en el objeto de aprendizaje:",
+          "opciones": [
+            "Motivación",
+            "Memoria",
+            "Retención",
+            "Atención"
+          ],
+          "respuesta_correcta": "Atención"
+        },
+        {
+          "id": "U3_Q06",
+          "pregunta": "¿Para qué corriente teórica, sobre el aprendizaje, el individuo representa un papel activo en el que el alumno debe ser capaz de codificar y estructurar internamente los conocimientos de acuerdo con sus motivaciones?",
+          "opciones": [
+            "Psicoanálisis",
+            "Cognitivismo",
+            "Constructivismo",
+            "Aprendizaje por observación"
+          ],
+          "respuesta_correcta": "Cognitivismo"
+        },
+        {
+          "id": "U3_Q07",
+          "pregunta": "¿Para qué aproximación teórica, el alumnado no sólo tiene un papel activo en el aprendizaje, sino que es el responsable de su propio aprendizaje?",
+          "opciones": [
+            "Constructivismo",
+            "Conectivismo",
+            "Conductismo",
+            "cognitivismo"
+          ],
+          "respuesta_correcta": "Constructivismo"
+        },
+        {
+          "id": "U3_Q08",
+          "pregunta": "Es un tipo de aprendizaje en el que el alumno relaciona el nuevo conocimiento con la estructura cognitiva que ya poseía. Se denomina:",
+          "opciones": [
+            "Aprendizaje modelado no",
+            "Aprendizaje significativo",
+            "Aprendizaje cognitivo",
+            "Aprendizaje por recepción"
+          ],
+          "respuesta_correcta": "Aprendizaje significativo"
+        },
+        {
+          "id": "U3_Q09",
+          "pregunta": "Es un tipo de aprendizaje en el que el alumno construye desde un planteamiento hipotético inductivo su propio conocimiento. El Proceso de A/E se diseñará en base a la presentación al alumnado de situaciones -problema. Se trata de un tipo de aprendizaje denominado:",
+          "opciones": [
+            "Nivel de desarrollo potencial, aquellas situaciones en las que por ser de mayor complejidad de la que el individuo está preparado para resolver, necesita ayuda de alguien.",
+            "Aprendizaje por descubrimiento",
+            "Zona de Desarrollo Próximo, engloba todo el elenco de funciones en el individuo que todavía se encuentran en proceso de maduración",
+            "El nivel de desarrollo real, es decir aquellas actividades o tareas que un individuo es capaz de realizar por sí solo."
+          ],
+          "respuesta_correcta": "Aprendizaje por descubrimiento"
+        },
+        {
+          "id": "U3_Q10",
+          "pregunta": "Para qué autor el conocimiento y la actividad mental en los individuos se produce gracias a la relación con los demás.",
+          "opciones": [
+            "Rogers Pedagogy",
+            "Paulov",
+            "Vygotsky",
+            "Freud"
+          ],
+          "respuesta_correcta": "Vygotsky"
+        },
+        {
+          "id": "U3_Q11",
+          "pregunta": "Qué autor plantea la siguiente idea: los educandos aprenderán en la medida en que el profesorado plantee situaciones de aprendizaje en las que teniendo en cuenta el desarrollo potencial del alumno/a sea posible interaccionar con los iguales.",
+          "opciones": [
+            "Costa",
+            "Vygotsky",
+            "Kelly",
+            "Jung"
+          ],
+          "respuesta_correcta": "Vygotsky"
+        },
+        {
+          "id": "U3_Q12",
+          "pregunta": "Señala la opción que mejor explicaría lo que supone el proceso de aprendizaje basado en el andamiaje planteado por Vygotsky:",
+          "opciones": [
+            "Nivel de desarrollo potencial, aquellas situaciones en las que por ser de mayor complejidad de la que el individuo está preparado para resolver, necesita ayuda de alguien",
+            "Zona de Desarrollo Próximo, engloba todo el elenco de funciones en el individuo que todavía se encuentran en proceso de maduración",
+            "Todas las siguientes afirmaciones son correctas y explican el planteamiento de Vygotsky sobre la Zona de Desarrollo Próximo",
+            "El nivel de desarrollo real, es decir aquellas actividades o tareas que un individuo es capaz de realizar por sí solo."
+          ],
+          "respuesta_correcta": "Todas las siguientes afirmaciones son correctas y explican el planteamiento de Vygotsky sobre la Zona de Desarrollo Próximo"
+        },
+        {
+          "id": "U3_Q13",
+          "pregunta": "Algunos de los aspectos, entre otros, que podrían favorecer el diseño e implementación del Proceso E/A al incorporar los planteamientos de Bruner sobre el aprendizaje, serían:",
+          "opciones": [
+            "Favorecer los mecanismos de búsqueda, selección, organización y reflexión sobre la información.",
+            "Ayudar al desarrollo de la capacidad para tomar decisiones y también favorecerá el desarrollo de la independencia y autonomía de los alumnos/as",
+            "Centrar la situación educativa en acciones prácticas que desarrollen los conocimientos declarativos en el alumnado",
+            "Todos los aspectos anteriormente planteados, desde la perspectiva de la teoría de Bruner, pueden ayudar al Proceso E/A"
+          ],
+          "respuesta_correcta": "Todos los aspectos anteriormente planteados, desde la perspectiva de la teoría de Bruner, pueden ayudar al Proceso E/A"
+        },
+        {
+          "id": "U3_Q14",
+          "pregunta": "A qué teoría del aprendizaje corresponden entre otros los siguientes principios: - El aprendizaje y el conocimiento descansa en la diversidad de opiniones. - El aprendizaje es un proceso de conexión de nodos o fuentes de información - El aprendizaje puede residir en aparatos no humanos",
+          "opciones": [
+            "Conductismo",
+            "Tecnologías emergentes",
+            "Inteligencia artificial",
+            "Conectivismo"
+          ],
+          "respuesta_correcta": "Conectivismo"
+        },
+        {
+          "id": "U3_Q15",
+          "pregunta": "Como educadores qué posibles reflexiones debería provocarnos la teoría sobre el aprendizaje humano denominada Conectivismo:",
+          "opciones": [
+            "Las formas en las que se almacena, cómo se accede a la información y el conocimiento están cambiando",
+            "El conocimiento que se distribuye especialmente por la red acaba asumiendo las mismas condiciones y características que ella.",
+            "Si la red es un espacio que cambia con una celeridad casi inabarcable, en el conocimiento que reside en la red también se permeabiliza de dichas características. En este sentido la obsolescencia de este es un hecho que deberemos aprender a gestionar.",
+            "A raíz de esta teoría Conectivista sobre el modo en cómo el ser humano aprende, estas y otras muchas reflexiones deberían ser objeto de trabajo en nuestros claustros docentes, siendo así todas correctas."
+          ],
+          "respuesta_correcta": "A raíz de esta teoría Conectivista sobre el modo en cómo el ser humano aprende, estas y otras muchas reflexiones deberían ser objeto de trabajo en nuestros claustros docentes, siendo así todas correctas."
+        },
+        {
+          "id": "U3_Q16",
+          "pregunta": "Quién dará nombre a la Teoría del Conectivismo:",
+          "opciones": [
+            "George Lucas",
+            "George Siemens",
+            "Albert Bandura",
+            "Jean Piaget"
+          ],
+          "respuesta_correcta": "George Siemens"
+        },
+        {
+          "id": "U3_Q17",
+          "pregunta": "Para DeSeCo, es imprescindible que los individuos sepan usar un amplio rango de herramientas a la hora de interactuar con el contexto. Señala aquellas que son correctas:",
+          "opciones": [
+            "Ser capaces de actuar de forma autónoma",
+            "Ser capaces de interactuar y relacionarse en grupos heterogéneos de individuos",
+            "Ser capaces de usar herramientas de forma interactiva, como por ejemplo aquellas que se relacionan con el uso del lenguaje, las tecnologías, etc.",
+            "Todas las siguientes propuestas de DeSeCo son correctas"
+          ],
+          "respuesta_correcta": "Todas las siguientes propuestas de DeSeCo son correctas"
+        },
+        {
+          "id": "U3_Q18",
+          "pregunta": "¿A través de qué competencia plantea el Parlamento Europeo (2016) que las personas serán capaces de acceder a nuevos conocimientos y capacidades y de adquirirlos, procesarlos y asimilarlos. Para lo cual la adquisición de las capacidades básicas como la lectura, la escritura, el cálculo y las TIC se torna fundamental?",
+          "opciones": [
+            "Aprender a aprender",
+            "Ciudadanía",
+            "Matemática",
+            "Comunicación lingüística"
+          ],
+          "respuesta_correcta": "Aprender a aprender"
+        },
+        {
+          "id": "U3_Q19",
+          "pregunta": "Entre otras acciones: - Indagar y formarse en diferentes metodologías didácticas y organizativas para el aula. - Incluir tareas en el aula que se relacionan con casos de la vida real. - Fomentar en el aula tanto en los momentos expositivos teóricos como prácticos estrategias cognitivas como las inferencias, comparaciones, dilemas morales, estudio de casos, etc.",
+          "opciones": [
+            "En ningún momento nos servirán para fomentar y desarrollar el pensamiento crítico del alumnado",
+            "Pueden ayudarnos a fomentar y desarrollar el pensamiento crítico en nuestro alumnado",
+            "El sistema educativo no tiene como misión fomentar el pensamiento crítico en los adolescentes",
+            "Diversos estudios han demostrado que la capacidad de reflexionar se desarrolla de forma natural a final de la adolescencia"
+          ],
+          "respuesta_correcta": "Pueden ayudarnos a fomentar y desarrollar el pensamiento crítico en nuestro alumnado"
+        },
+        {
+          "id": "U3_Q20",
+          "pregunta": "En la Agenda 2030 para el desarrollo sostenible, respecto a la oportunidad que pueden brindar las TIC, se reconoce lo siguiente:",
+          "opciones": [
+            "El auge de las tecnologías de la información y la comunicación entraña un considerable potencial para acelerar el progreso, colmar la brecha digital y promover el desarrollo de sociedades del conocimiento inclusivas basadas en los derechos humanos, el empoderamiento y la consecución de la igualdad de género.",
+            "El auge de las tecnologías de la información y la comunicación entraña un considerable riesgo para acelerar el progreso, colmar la brecha digital y promover el desarrollo de sociedades del conocimiento inclusivas basadas en los derechos humanos, el empoderamiento y la consecución de la igualdad de género.",
+            "Las Tecnologías de la Información y Comunicación no se incluyen en la Agenda 2030 para el Desarrollo Sostenible",
+            "El auge de las tecnologías de la información y la comunicación entraña un considerable potencial para acelerar el progreso. Sin embargo, no soluciona la brecha digital y promueve el desarrollo de sociedades menos inclusivas."
+          ],
+          "respuesta_correcta": "El auge de las tecnologías de la información y la comunicación entraña un considerable potencial para acelerar el progreso, colmar la brecha digital y promover el desarrollo de sociedades del conocimiento inclusivas basadas en los derechos humanos, el empoderamiento y la consecución de la igualdad de género."
+        },
+        {
+          "id": "U3_Q21",
+          "pregunta": "El Marco de Competencias para los docentes en TIC según UNESCO (2019) se compone de tres niveles. ¿Qué implica el Nivel I?",
+          "opciones": [
+            "El primer nivel, denominado de adquisición de conocimientos, implica que el profesorado debe ser capaz de ayudar a los alumnos de distintas capacidades, edades, género y medios socioculturales y lingüísticos a utilizar las TIC para aprender con éxito y convertirse en miembros productivos de la sociedad",
+            "El primer nivel, denominado profundización de los conocimientos, implica que el docente debe mejorar sus capacidades para ayudar a alumnos de distintas capacidades, edades, género y medios socioculturales y lingüísticos, a aplicar los conocimientos para resolver problemas complejos y prioritarios que se plantean en situaciones reales de la vida cotidiana, el trabajo o la sociedad",
+            "El primer nivel, denominado de creación de conocimientos: los docentes deben ser capaces de poder crear conocimientos, innovar y aprender durante toda la vida, y beneficiarse con su participación en estas actividades",
+            "El primer nivel, denominado de transferencia, implica que los educadores deberían ser capaces no solo de idear actividades orientadas al aula y encaminadas a estas metas, sino también de elaborar programas conducentes aplicables fuera del aula, en todo el entorno escolar y más allá de él."
+          ],
+          "respuesta_correcta": "El primer nivel, denominado de adquisición de conocimientos, implica que el profesorado debe ser capaz de ayudar a los alumnos de distintas capacidades, edades, género y medios socioculturales y lingüísticos a utilizar las TIC para aprender con éxito y convertirse en miembros productivos de la sociedad"
+        },
+        {
+          "id": "U3_Q22",
+          "pregunta": "El Marco de Competencias para los docentes en TIC según UNESCO (2019) se compone de tres niveles. Que implica el Nivel II",
+          "opciones": [
+            "El segundo nivel, denominado profundización de los conocimientos, implica que el docente debe mejorar sus capacidades para ayudar a alumnos de distintas capacidades, edades, género, y medios socioculturales y lingüísticos, a aplicar los conocimientos para resolver problemas complejos y prioritarios que se plantean en situaciones reales de la vida cotidiana, el trabajo o la sociedad",
+            "El segundo nivel, denominado de transferencia, implica que los educadores deberían ser capaces no solo conducentes aplicables fuera del aula, en todo el entorno escolar y más allá de él",
+            "El segundo nivel, denominado de adquisición de conocimientos, implica que el profesorado debe ser lingüísticos a utilizar las TIC para aprender con éxito y co nvertirse en miembros productivos de la",
+            "El segundo nivel, denominado de creación de conocimientos: los docentes deben ser capaces de poder crear conocimientos, innovar y aprender durante toda la vida, у beneficiarse con su participación en estas actividades."
+          ],
+          "respuesta_correcta": "El segundo nivel, denominado profundización de los conocimientos, implica que el docente debe mejorar sus capacidades para ayudar a alumnos de distintas capacidades, edades, género, y medios socioculturales y lingüísticos, a aplicar los conocimientos para resolver problemas complejos y prioritarios que se plantean en situaciones reales de la vida cotidiana, el trabajo o la sociedad"
+        },
+        {
+          "id": "U3_Q23",
+          "pregunta": "En el modelo TPACK (Technology, And Content Knowledge) de Mishra y Koehler (2006). A qué se denomina Conocimiento Tecnológico y de Contenido:",
+          "opciones": [
+            "La competencia del profesorado para adecuar la materia a las características del alumnado, sus conocimientos previos y su realidad.",
+            "La capacidad para reconocer cómo la tecnología puede colaborar y facilitar el acceso a los conocimientos y el contenido de una materia en si pueden colaborar en el proceso de aprendizaje y mejorar su adquisición o cómo pueden también disrumpir dicho proces o E/A",
+            "El nivel de conocimiento y dominio por parte del profesorado de las herramientas tecnológicas existentes para su uso en el aula. Esto implica reconocer la pertinencia o no de cada una de ellas al objeto didáctico",
+            "El dominio de las diferentes bondades o peligros que las tecnologías presentan a nivel didáctico."
+          ],
+          "respuesta_correcta": "La capacidad para reconocer cómo la tecnología puede colaborar y facilitar el acceso a los conocimientos y el contenido de una materia en si pueden colaborar en el proceso de aprendizaje y mejorar su adquisición o cómo pueden también disrumpir dicho proces o E/A"
+        },
+        {
+          "id": "U3_Q24",
+          "pregunta": "En el modelo TPACK (Technology, Pedagogy And Content Knowledge) de Mishra y Koehler (2006). A qué se denomina Conocimiento Didáctico:",
+          "opciones": [
+            "La competencia del profesorado para adecuar la materia a las características del alumnado, sus conocimientos previos y su realidad.",
+            "El dominio de las diferentes bondades o peligros que las tecnologías presentan a nivel didáctico.",
+            "El dominio que el profesorado tenga sobre la materia a impartir",
+            "Hace referencia al conocimiento didáctico que posea el profesorado sobre los diferentes métodos didácticos y organizativos que se relacionan con el Proceso E/A."
+          ],
+          "respuesta_correcta": "Hace referencia al conocimiento didáctico que posea el profesorado sobre los diferentes métodos didácticos y organizativos que se relacionan con el Proceso E/A."
+        },
+        {
+          "id": "U3_Q25",
+          "pregunta": "En el modelo TPACK (Technology, Pedagogy And Content Knowledge) de Mishra y Koehler (2006). A qué se denomina Conocimiento Tecnológico Didáctico:",
+          "opciones": [
+            "El nivel de conocimiento y dominio por parte del profesorado de las herramientas tecnológicas existentes para su uso en el aula. Esto implica reconocer la pertinencia o no de cada una de ellas al objeto didáctico.",
+            "La competencia del profesorado para adecuar la materia a las características del alumnado, sus conocimientos previos y su realidad",
+            "El conocimiento didáctico que posea el profesorado sobre los diferentes métodos didácticos y organizativos que se relacionan con el Proceso E/A",
+            "El dominio de las diferentes bondades o peligros que las tecnologías presentan a nivel didáctico"
+          ],
+          "respuesta_correcta": "El dominio de las diferentes bondades o peligros que las tecnologías presentan a nivel didáctico"
+        },
+        {
+          "id": "U3_Q26",
+          "pregunta": "En el modelo TPACK (Technology, Pedagogy And Content Knowledge) de Mishra y Koehler (2006). A qué se denomina Conocimiento Tecnológico:",
+          "opciones": [
+            "El conocimiento didáctico que posea el profesorado sobre los diferentes métodos didácticos y organizativos que se relacionan con el Proceso E/A",
+            "El nivel de conocimiento y dominio por parte del profesorado de las herramientas tecnológicas existentes para su uso en el aula",
+            "El dominio que el profesor tenga sobre la materia a impartir",
+            "La competencia del profesorado para adecuar la materia a las características del alumnado, sus conocimientos previos y su realidad."
+          ],
+          "respuesta_correcta": "El nivel de conocimiento y dominio por parte del profesorado de las herramientas tecnológicas existentes para su uso en el aula"
+        },
+        {
+          "id": "U3_Q27",
+          "pregunta": "A que teoría y teórico hacer referencia esta aseveración: \"El aprendizaje se da a partir del reconocimiento de las consecuencias que tiene el modo en el que se interactúa con el entorno\":",
+          "opciones": [
+            "Conductismo de Skinner",
+            "Conductismo de Watson",
+            "Teoría Social del Aprendizaje de Bandura",
+            "Teoría del desarrollo cognitivo de Piaget"
+          ],
+          "respuesta_correcta": "Conductismo de Skinner"
+        },
+        {
+          "id": "U3_Q28",
+          "pregunta": "Según la Teoría de Aprendizaje de Vygotsky, el nivel de desarrollo real se refiere a:",
+          "opciones": [
+            "Aquellas situaciones en las que se necesita ayuda de alguien.",
+            "El elenco de funciones que todavía se encuentran en proceso de maduración.",
+            "Aquellas actividades o tareas que un individuo es capaz de realizar por sí solo.",
+            "Las capacidades de un individuo que aún están por desplegarse."
+          ],
+          "respuesta_correcta": "Aquellas actividades o tareas que un individuo es capaz de realizar por sí solo."
+        },
+        {
+          "id": "U3_Q29",
+          "pregunta": "Cuando aprendemos relacionando los nuevos conocimientos con las estructuras cognitivas que ya poseíamos, estamos ante un tipo de aprendizaje:",
+          "opciones": [
+            "Por recepción.",
+            "Cognitivo.",
+            "Modelado.",
+            "Significativo."
+          ],
+          "respuesta_correcta": "Significativo."
+        },
+        {
+          "id": "U3_Q30",
+          "pregunta": "El pensamiento crítico en el aula puede favorecerse mediante las siguientes acciones:",
+          "opciones": [
+            "Incluyendo tareas en el aula que se relacionan con casos de la vida real.",
+            "Proponiendo dilemas morales",
+            "Analizando y comparando casos (estudio de casos)",
+            "Todas las opciones son correctas"
+          ],
+          "respuesta_correcta": "Todas las opciones son correctas"
+        },
+        {
+          "id": "U3_Q31",
+          "pregunta": "Cuando decimos que el aprendizaje y el conocimiento descansa en la conexión de fuentes de información y que puede residir en aparatos no humanos, nos estamos refiriendo a la Teoría del:",
+          "opciones": [
+            "Conectivismo",
+            "Constructivismo",
+            "Tecnologicismo",
+            "Conductivismo"
+          ],
+          "respuesta_correcta": "Conectivismo"
+        },
+        {
+          "id": "U3_Q32",
+          "pregunta": "¿En qué corriente teórica, sobre el aprendizaje, se considera que lo realmente importante es entender los procesos mentales que determinan lo que el individuo acaba manifestando o no?:",
+          "opciones": [
+            "Neuroticismo",
+            "Constructivismo",
+            "Cognitivismo",
+            "Conectivismo"
+          ],
+          "respuesta_correcta": "Cognitivismo"
+        },
+        {
+          "id": "U3_Q33",
+          "pregunta": "Albert Bandura establece una serie de fases a través de las cuales se produce el aprendizaje por observación o modelado. En qué fase es imprescindible que el individuo centre toda su atención en el objeto de aprendizaje:",
+          "opciones": [
+            "Atención.",
+            "Retención.",
+            "Motivación.",
+            "Memoria."
+          ],
+          "respuesta_correcta": "Atención."
+        },
+        {
+          "id": "U3_Q34",
+          "pregunta": "A qué teoría del aprendizaje corresponden, entre otros, los siguientes principios: -El aprendizaje y el conocimiento descansa en la diversidad de opiniones. -El aprendizaje es un proceso de conexión de nodos o fuentes de información. -El aprendizaje puede residir en aparatos no humanos.",
+          "opciones": [
+            "Inteligencia artificial.",
+            "Tecnologías emergentes.",
+            "Conductismo.",
+            "Conectivismo."
+          ],
+          "respuesta_correcta": "Conectivismo."
+        },
+        {
+          "id": "U3_Q35",
+          "pregunta": "Es un tipo de aprendizaje en el que el alumnado relaciona el nuevo conocimiento con la estructura cognitiva que ya poseía. Se denomina:",
+          "opciones": [
+            "aprendizaje significativo",
+            "aprendizaje por recepción",
+            "aprendizaje modelado",
+            "aprendizaje cognitivo"
+          ],
+          "respuesta_correcta": "aprendizaje significativo"
+        },
+        {
+          "id": "U3_Q36",
+          "pregunta": "¿Qué competencia nos ayudaría a analizar y evaluar diferentes circunstancias y consecuencias?",
+          "opciones": [
+            "La capacidad decisoria",
+            "el pensamiento crítico",
+            "la resolución de problemas",
+            "las competencias emocionales"
+          ],
+          "respuesta_correcta": "el pensamiento crítico"
+        },
+        {
+          "id": "U3_Q37",
+          "pregunta": "¿Qué es un conflicto cognitivo según Piaget?",
+          "opciones": [
+            "cuando es necesario reevaluar lo aprendido",
+            "una nueva experiencia desestructura el esquema de representación previo",
+            "cuando existen dos verdades sobre un mismo término",
+            "no se quiere asumir un nuevo conocimiento porque resulta intolerable."
+          ],
+          "respuesta_correcta": "una nueva experiencia desestructura el esquema de representación previo"
+        },
+        {
+          "id": "U3_Q38",
+          "pregunta": "Dentro del Marco de Competencias para los docentes en TIC de la UNESCO (2019), ¿en qué nivel se espera que \"el docente debe mejorar sus capacidades para ayudar a alumnos de distintas capacidades, edades, género, y medios socioculturales y lingüísticos, a aplicar los conocimientos para resolver problemas complejos y prioritarios que se plantean en situaciones reales de la vida cotidiana, el trabajo o la sociedad\"?",
+          "opciones": [
+            "en el primer nivel",
+            "en el segundo nivel",
+            "en el tercer nivel"
+          ],
+          "respuesta_correcta": "en el segundo nivel"
+        },
+        {
+          "id": "U3_Q39",
+          "pregunta": "El conocimiento procedimental implica:",
+          "opciones": [
+            "Saber",
+            "Ser",
+            "Aprender a convivir juntos",
+            "Saber hacer"
+          ],
+          "respuesta_correcta": "Saber hacer"
+        },
+        {
+          "id": "U3_Q40",
+          "pregunta": "¿Qué principio plantea Ausubel ?",
+          "opciones": [
+            "El principio de posibilitar en el aula un aprendizaje por descubrimiento, frente al aprendizaje por recepción (el más común en el aula).",
+            "El principio de posibilitar en el aula un aprendizaje por imitación, frente al aprendizaje por recepción (el más común en el aula).",
+            "Construcción del imaginario social.",
+            "La herencia estructural: el hecho en sí de la maduración biológica del propio individuo."
+          ],
+          "respuesta_correcta": "El principio de posibilitar en el aula un aprendizaje por descubrimiento, frente al aprendizaje por recepción (el más común en el aula)."
+        },
+        {
+          "id": "U3_Q41",
+          "pregunta": "Según Skinner, cuando queremos mantener una conducta deseable podemos:",
+          "opciones": [
+            "Ofrecer algo agradable o retirar algo desagradable como consecuencia.",
+            "Tanto dar algo bueno como retirar algo bueno como consecuencia.",
+            "Ofrecer algo desagradable como consecuencia.",
+            "Retirar algo que no le guste al sujeto como consecuencia."
+          ],
+          "respuesta_correcta": "Ofrecer algo agradable o retirar algo desagradable como consecuencia."
+        },
+        {
+          "id": "U3_Q42",
+          "pregunta": "Albert Bandura postula que el aprendizaje se produce a través de:",
+          "opciones": [
+            "La observación o modelado",
+            "Los estímulos condicionados.",
+            "Las consecuencias como los refuerzos y castigos",
+            "La atención y la reproducción"
+          ],
+          "respuesta_correcta": "La observación o modelado"
+        },
+        {
+          "id": "U3_Q43",
+          "pregunta": "Cuando un nuevo conocimiento se relaciona de manera significativa con los conocimientos previos para su reconstrucción, nos referimos a:",
+          "opciones": [
+            "Hablamos de aprendizaje por descubrimiento.",
+            "Hablamos de aprendizaje cognitivo.",
+            "Hablamos de aprendizaje por recepción.",
+            "Ninguna de las anteriores es correcta."
+          ],
+          "respuesta_correcta": "Ninguna de las anteriores es correcta."
+        },
+        {
+          "id": "U3_Q44",
+          "pregunta": "La competencia de ser capaces de usar herramientas de forma interactiva, como por ejemplo aquellas que se relacionan con el uso del lenguaje, las tecnologías, etc. Forma parta del proyecto:",
+          "opciones": [
+            "DeSeCo (OCDE, 2003)",
+            "Competencias Clave (LOMLOE, 3/2020)",
+            "Agenda 2030",
+            "Delors (1996)"
+          ],
+          "respuesta_correcta": "DeSeCo (OCDE, 2003)"
+        },
+        {
+          "id": "U3_Q45",
+          "pregunta": "Saber realizar un uso seguro y responsable de las tecnologías digitales, forma parte de:",
+          "opciones": [
+            "Las competencias DeSe Co.",
+            "La competencia digital dentro del currículo escolar.",
+            "Las recomendaciones de la agencia 2030.",
+            "Una recomendación de la UNESCO."
+          ],
+          "respuesta_correcta": "La competencia digital dentro del currículo escolar."
+        },
+        {
+          "id": "U3_Q46",
+          "pregunta": "¿Qué es un conflicto según Piaget?",
+          "opciones": [
+            "Una nueva experiencia desestructura el esquema de representación previo",
+            "No se quiere asumir un nuevo conocimiento porque resulta intolerable.",
+            "Cuando existen dos verdades sobre un mismo término.",
+            "Cuando es necesario reevaluar lo aprendido"
+          ],
+          "respuesta_correcta": "Una nueva experiencia desestructura el esquema de representación previo"
+        },
+        {
+          "id": "U3_Q47",
+          "pregunta": "Según Bermúdez, ¿cómo se puede definir la personalidad?",
+          "opciones": [
+            "Como una organización estable de características funcionales.",
+            "Como una serie de cualidades psicológicas temporales.",
+            "Como un conjunto de experiencias adquiridas.",
+            "Como resultado de aprendizajes observados en el aula."
+          ],
+          "respuesta_correcta": "Como una organización estable de características funcionales."
+        },
+        {
+          "id": "U3_Q48",
+          "pregunta": "¿Qué relación existe entre la enseñanza y el aprendizaje?",
+          "opciones": [
+            "Son interdependientes y no pueden separarse dentro del proceso educativo.",
+            "Son procesos completamente independientes.",
+            "Sólo el aprendizaje depende de la enseñanza, pero no al revés.",
+            "La enseñanza es más importante que el aprendizaje."
+          ],
+          "respuesta_correcta": "Son interdependientes y no pueden separarse dentro del proceso educativo."
+        },
+        {
+          "id": "U3_Q49",
+          "pregunta": "Feldman (2005) habla del aprendizaje como:",
+          "opciones": [
+            "Un proceso permanente, en mayor o menor medida, en la conducta.",
+            "Un proceso permanente, en mayor o menor medida, en las emociones de los alumnos.",
+            "Un proceso intermitente, en mayor o menor medida, en la conducta.",
+            "Un proceso permanente, intermitente e itinerante, en mayor o menor medida, en la co nducta."
+          ],
+          "respuesta_correcta": "Un proceso permanente, en mayor o menor medida, en la conducta."
+        },
+        {
+          "id": "U3_Q50",
+          "pregunta": "La UNESCO en 2022 insiste en que la cultura:",
+          "opciones": [
+            "Comprende el conjunto de rasgos distintivos, espirituales, materiales, intelectuales y afectivos que caracterizan a una sociedad o grupo social.",
+            "No comprende el conjunto de rasgos distintivos, espirituales, materiales, intelectuales y afectivos que caracterizan a una sociedad o grupo social, si no más bien unos rasgos originales de cada raza.",
+            "Comprende un conjunto de 4 rasgos distintivos comunes a todas las personas.",
+            "Comprender el conjunto de rasgos similares, inmateriales, intelectuales y ansiosos que caracterizan a una sociedad o grupo social."
+          ],
+          "respuesta_correcta": "Comprende el conjunto de rasgos distintivos, espirituales, materiales, intelectuales y afectivos que caracterizan a una sociedad o grupo social."
+        },
+        {
+          "id": "U3_Q51",
+          "pregunta": "Enseñar es un acto de comunicación en el que:",
+          "opciones": [
+            "El emisor pretende que el receptor aprenda algo.",
+            "El emisor y el receptor se comunican mediante lenguaje de signos.",
+            "El receptor no entiende lo que el emisor transmite.",
+            "No existe emisor primario y el receptor se encarga de conseguir la información."
+          ],
+          "respuesta_correcta": "El emisor pretende que el receptor aprenda algo."
+        },
+        {
+          "id": "U3_Q52",
+          "pregunta": "Según Langley y Simon, ¿cómo se describe el aprendizaje?",
+          "opciones": [
+            "Un proceso que permite mejorar el rendimiento en diversas tareas.",
+            "Un cambio de conducta a partir de la observación.",
+            "Una experiencia acumulativa.",
+            "Un acto de enseñanza explícito."
+          ],
+          "respuesta_correcta": "Un proceso que permite mejorar el rendimiento en diversas tareas."
+        },
+        {
+          "id": "U3_Q53",
+          "pregunta": "Un individuo percibe y entiende el mundo exterior con relación a su mundo interior. Jung diría que su",
+          "opciones": [
+            "Introversión.",
+            "Rechazo.",
+            "Extroversión.",
+            "Empatía."
+          ],
+          "respuesta_correcta": "Introversión."
+        },
+        {
+          "id": "U3_Q54",
+          "pregunta": "El alumnado como receptor activo fase referencia a",
+          "opciones": [
+            "Codificar y estructurar los conocimientos según sus motivaciones.",
+            "La participación significativa en el aprendizaje.",
+            "La posibilidad de intercambiar roles con los docentes.",
+            "La capacidad de estudiar los conocimientos declarativos de manera autónomo."
+          ],
+          "respuesta_correcta": "Codificar y estructurar los conocimientos según sus motivaciones."
+        },
+        {
+          "id": "U3_Q55",
+          "pregunta": "¿A qué se refiere el termino andamiaje de Vygotsky?",
+          "opciones": [
+            "Aquellas situaciones en las que, por ser de mayor complejidad de la que el individuo está preparado para resolver, necesita ayuda de alguien.",
+            "Aquellas situaciones que necesitan construirse por descubrimiento",
+            "Engloba todo el elenco de funciones en el individuo, que todavías encuentran en proceso de maduración",
+            "Aquellas actividades o tareas que un individuo es capaz de realizar por si sola."
+          ],
+          "respuesta_correcta": "Aquellas situaciones en las que, por ser de mayor complejidad de la que el individuo está preparado para resolver, necesita ayuda de alguien."
+        },
+        {
+          "id": "U3_Q56",
+          "pregunta": "La capacidad para pensar de forma hipotética, se denomina:",
+          "opciones": [
+            "Aprendizaje memorístico",
+            "Razonamiento deductivo",
+            "Razonamiento preoperacional",
+            "Razonamiento inductivo"
+          ],
+          "respuesta_correcta": "Razonamiento deductivo"
+        },
+        {
+          "id": "U3_Q57",
+          "pregunta": "Dentro de la teoría de la motivación, los alumnos que se orientan hacia la consecución de un objetivo final y utilizan principalmente criterios externos y comparativos en la valoración de sus resultados, se considera que utilizan una orientación denominada:",
+          "opciones": [
+            "Orientación de aprendizaje",
+            "Orientación de autoeficacia",
+            "Orientación por competencias",
+            "Orientación hacia la ejecución"
+          ],
+          "respuesta_correcta": "Orientación hacia la ejecución"
+        },
+        {
+          "id": "U3_Q58",
+          "pregunta": "Según Erikson (1985) en su Teoría psicosocial sobre el desarrollo de la personalidad, los adolescentes deben resolver una tarea concreta (señale la respuesta correcta):",
+          "opciones": [
+            "Aceptación sin raciocinio vs difusión de identidad.",
+            "Logro de identidad vs crisis de identidad.",
+            "Conflicto de identidad vs confusión de identidad.",
+            "Logro de identidad vs aceptación razonada"
+          ],
+          "respuesta_correcta": "Logro de identidad vs crisis de identidad."
+        },
+        {
+          "id": "U3_Q59",
+          "pregunta": "¿Qué aspecto es fundamental para un docente al momento de diseñar una situación de enseñanza?",
+          "opciones": [
+            "Adaptarse a las necesidades y particularidades del alumnado",
+            "Concentrarse únicamente en la adquisición de conocimientos teóricos.",
+            "Desconocer las diferencias individuales de los alumnos.",
+            "Focalizarse solo en los exámenes como única medida de éxito."
+          ],
+          "respuesta_correcta": "Adaptarse a las necesidades y particularidades del alumnado"
+        },
+        {
+          "id": "U3_Q60",
+          "pregunta": "¿Qué son los conocimientos declarativos?",
+          "opciones": [
+            "Conocimiento que se acciona para realizar una tarea. Responde a saber hacer.",
+            "Información sobre hechos o ideas que responden a Saber cómo.",
+            "Información sobre hechos o ideas que responden a Saber qué.",
+            "Conocimiento que se acciona para realizar una tarea. Responde a saber qué."
+          ],
+          "respuesta_correcta": "Información sobre hechos o ideas que responden a Saber qué."
+        },
+        {
+          "id": "U3_Q61",
+          "pregunta": "¿Cuál es uno de los objetivos principales de la enseñanza, según el manual?",
+          "opciones": [
+            "Transmitir conocimientos culturales.",
+            "Garantizar la igualdad de oportunidades.",
+            "Evaluar el rendimiento.",
+            "Permitir el desarrollo del pensamiento crítico."
+          ],
+          "respuesta_correcta": "Transmitir conocimientos culturales."
+        },
+        {
+          "id": "U3_Q62",
+          "pregunta": "¿Cómo se define el proceso Enseñanza-Aprendizaje?",
+          "opciones": [
+            "Un proceso paralelo donde se relacionan aprendizaje y enseñanza.",
+            "Un proceso secuencial en el que primero se enseña y luego se evalúa.",
+            "Un proceso donde el docente transmite saberes y el alumno observa.",
+            "Un proceso unidireccional centrado en el profesor."
+          ],
+          "respuesta_correcta": "Un proceso paralelo donde se relacionan aprendizaje y enseñanza."
+        },
+        {
+          "id": "U3_Q63",
+          "pregunta": "¿Cuál es el objetivo principal de la enseñanza en el contexto formal educativo?",
+          "opciones": [
+            "Desarrollar competencias que incluyan saber, saber hacer y saber ser.",
+            "Garantizar que todos los alumnos obtengan las mismas calificaciones.",
+            "Transmite conocimientos en función de la cultura y habilidades de los estudiantes.",
+            "Asegurar que los alumnos memoricen la mayor cantidad de información posible."
+          ],
+          "respuesta_correcta": "Desarrollar competencias que incluyan saber, saber hacer y saber ser."
+        },
+        {
+          "id": "U3_Q64",
+          "pregunta": "Cuando hablamos de enseñar, hablamos de (Señala la INCORRECTA):",
+          "opciones": [
+            "El objetivo principal de enseñar es memorizar datos sin comprender su significado.",
+            "Acto de comunicación entre profesor y alumno.",
+            "Conjunto de actividades de los miembros de una comunidad o grupo social para transmitir conocimientos culturales.",
+            "Dar instrucción a través de una serie de reglas y métodos."
+          ],
+          "respuesta_correcta": "El objetivo principal de enseñar es memorizar datos sin comprender su significado."
+        },
+        {
+          "id": "U3_Q65",
+          "pregunta": "En el aprendizaje cultural existen tres etapas, a saber:",
+          "opciones": [
+            "Imitación, Instrucción, colaboración",
+            "No existe un aprendizaje cultural como tal que explique el modo en que los seres humanos adquieren habilidades, destrezas, conocimientos, conductas, etc.",
+            "Habituación, concentración, ejecución",
+            "Adquisición, retención, ejecución"
+          ],
+          "respuesta_correcta": "Imitación, Instrucción, colaboración"
+        },
+        {
+          "id": "U3_Q66",
+          "pregunta": "- Según la Teoría del \"big Five\", el factor de personalidad en el que las personas con valores altos tienden a ser impulsivas, temperamentales y ansiosas se denomina:",
+          "opciones": [
+            "apertura a la experiencia",
+            "amabilidad",
+            "introversión",
+            "neuroticismo"
+          ],
+          "respuesta_correcta": "neuroticismo"
+        },
+        {
+          "id": "U3_Q67",
+          "pregunta": "Según la OMS y UNICEF, la etapa comprendida entre los 14 y 16 años se denomina:",
+          "opciones": [
+            "adolescencia temprana",
+            "adolescencia media",
+            "preadolescencia",
+            "adolescencia"
+          ],
+          "respuesta_correcta": "adolescencia media"
+        },
+        {
+          "id": "U3_Q68",
+          "pregunta": "Contexto de enseñanza y aprendizaje que está regulado por subsistemas y titulaciones:",
+          "opciones": [
+            "formal",
+            "academicista",
+            "no formal",
+            "informal"
+          ],
+          "respuesta_correcta": "formal"
+        },
+        {
+          "id": "U3_Q69",
+          "pregunta": "¿A qué contexto corresponde un proceso de aprendizaje y enseñanza no genérico, que responde de manera alternativa a una formación específica?",
+          "opciones": [
+            "no formal",
+            "informal",
+            "formal",
+            "no genérico"
+          ],
+          "respuesta_correcta": "no formal"
+        },
+        {
+          "id": "U3_Q70",
+          "pregunta": "¿Qué teoría supuso favorable que un sujeto permita a su parte consciente el contacto con su parte inconsciente ?",
+          "opciones": [
+            "Teoría de Carl Jung.",
+            "Teoría de George Kelly.",
+            "Teoría de Carl Rogers.",
+            "Teoría de Costa y McCrae."
+          ],
+          "respuesta_correcta": "Teoría de Carl Jung."
+        },
+        {
+          "id": "U3_Q71",
+          "pregunta": "¿Qué lóbulos se encargan principalmente de procesar atención, resolución de problemas o inhibición de distracciones?",
+          "opciones": [
+            "Lóbulos parietales y temporales",
+            "Lóbulos frontales",
+            "Lóbulos parietales",
+            "Lóbulos temporales"
+          ],
+          "respuesta_correcta": "Lóbulos frontales"
+        },
+        {
+          "id": "U3_Q72",
+          "pregunta": "Señala la respuesta correcta en relación a nuestro papel como docentes en el desarrollo de la personalidad del alumnado:",
+          "opciones": [
+            "El paso por una institución educativa tiene como fin último el preparar instrumentalmente al alumnado para que adquiera el mayor núme",
+            "La personalidad no se trabaja en los centros educativos, es tarea de los psicólogos y psicólogas.",
+            "La educación no es el medio más adecuado para construir la personalidad.",
+            "Como futuros docentes, no debemos pasar por alto nuestra influencia en el desarrollo íntegro de la persona."
+          ],
+          "respuesta_correcta": "Como futuros docentes, no debemos pasar por alto nuestra influencia en el desarrollo íntegro de la persona."
+        },
+        {
+          "id": "U3_Q73",
+          "pregunta": "Participa en la regulación de la respuesta emocional principalmente:",
+          "opciones": [
+            "Amígdala",
+            "Noradrenalina",
+            "Corteza Prefrontal",
+            "Ínsula"
+          ],
+          "respuesta_correcta": "Amígdala"
+        },
+        {
+          "id": "U3_Q74",
+          "pregunta": "La imagen cognitiva del sí mismo se conoce como:",
+          "opciones": [
+            "Imagen personal",
+            "Autoconcepto",
+            "Autoestima corporal",
+            "Autoestima"
+          ],
+          "respuesta_correcta": "Autoconcepto"
+        },
+        {
+          "id": "U3_Q75",
+          "pregunta": "Señala la respuesta correcta en relación a nuestro papel como docentes en el desarrollo de la personalidad del alumnado:",
+          "opciones": [
+            "El paso por una institución educativa tiene como fin último preparar instrumentalmente al alumnado para que adquiera el mayor de número posible de saberes teóricos y prácticos",
+            "La personalidad no se trabaja en los centro educativos, es tarea de los psicólogos y psicólogas",
+            "La educación no es medio más adecuado para construir la personalidad",
+            "Como futuros docentes, no debemos pasar por alto nuestra influencia en el desarrollo íntegro de la persona."
+          ],
+          "respuesta_correcta": "Como futuros docentes, no debemos pasar por alto nuestra influencia en el desarrollo íntegro de la persona."
+        },
+        {
+          "id": "U3_Q76",
+          "pregunta": "Indica cuál de los siguientes puntos NO supone un reto para los docentes del presente y futuro:",
+          "opciones": [
+            "Impartir clases desde un rol tradicional de experto",
+            "Utilizar las tecnologías en todo el proceso formativo",
+            "Fomentar la aplicación, experimentación y acción",
+            "Darle mayor protagonismo al alumnado intercambiando su rol en el aula."
+          ],
+          "respuesta_correcta": "Impartir clases desde un rol tradicional de experto"
+        },
+        {
+          "id": "U3_Q77",
+          "pregunta": "¿Cuál de los siguientes puntos NO es un Objetivo de Desarrollo Sostenible (ODS) de la Agenda 2030?",
+          "opciones": [
+            "Paz, justicia e instituciones sólidas",
+            "Fin de la pobreza",
+            "Parentalidad positiva",
+            "Educación de calidad"
+          ],
+          "respuesta_correcta": "Parentalidad positiva"
+        },
+        {
+          "id": "U3_Q78",
+          "pregunta": "¿El aprendizaje se da por asociación de estímulos que posibilitan una respuesta condicionada?",
+          "opciones": [
+            "Conductismo",
+            "Cognitivismo",
+            "Constructivismo",
+            "Conectivismo"
+          ],
+          "respuesta_correcta": "Conductismo"
+        },
+        {
+          "id": "U3_Q79",
+          "pregunta": "Según la teoría del desarrollo cognitivo de Piaget, ¿en qué etapa sería posible el razonamiento hipotético-deductivo?",
+          "opciones": [
+            "Sensoriomotriz",
+            "Preoperacional",
+            "Operaciones concretas",
+            "Operaciones formales"
+          ],
+          "respuesta_correcta": "Operaciones formales"
+        },
+        {
+          "id": "U3_Q80",
+          "pregunta": "Cuando un nuevo conocimiento se relaciona de manera significativa con los conocimientos previos para su reconstrucción:",
+          "opciones": [
+            "Hablamos de aprendizaje por recepción",
+            "Hablamos de aprendizaje cognitivo",
+            "Hablamos de aprendizaje por descubrimiento",
+            "Hablamos de aprendizaje"
+          ],
+          "respuesta_correcta": "Hablamos de aprendizaje por descubrimiento"
+        },
+        {
+          "id": "U3_Q81",
+          "pregunta": "Engloba el desarrollo real (la capacidad autónoma de aprender) y el desarrollo potencial (requiere de acompañamiento):",
+          "opciones": [
+            "Aprendizaje significativo",
+            "Reestructuración con andamiaje",
+            "Zona de desarrollo Próximo",
+            "Aprendizaje por descubrimiento"
+          ],
+          "respuesta_correcta": "Zona de desarrollo Próximo"
+        },
+        {
+          "id": "U3_Q82",
+          "pregunta": "Una de las grandes diferencias que representa al constructivismo con respecto al cognitivismo es:",
+          "opciones": [
+            "Los conocimientos son la realidad objetiva y se integran como tales",
+            "Los conocimientos se internalizan, pero no se reelaboran",
+            "Los conocimientos se construyen a través de la propia experiencia",
+            "Los conocimientos son cambiantes y dependen de conexiones significativas"
+          ],
+          "respuesta_correcta": "Los conocimientos se construyen a través de la propia experiencia"
+        },
+        {
+          "id": "U3_Q83",
+          "pregunta": "Cuando retiramos algo desagradable para un sujeto, con motivo de mantener una conducta deseada, hablamos de:",
+          "opciones": [
+            "Refuerzo positivo",
+            "Castigo positivo",
+            "Castigo negativo",
+            "Refuerzo negativo"
+          ],
+          "respuesta_correcta": "Refuerzo negativo"
+        }
+      ]
+    }
+  ]
+}

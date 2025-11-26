@@ -1,0 +1,13 @@
+{
+  "asignatura": "Educación inclusiva y atención a la diversidad",
+  "tipo": "especialidad",
+  "especialidad": "Orientación Educativa",
+  "temas": [
+    {
+      "numero": 1,
+      "nombre": "Tema 1",
+      "preguntas": []
+    }
+  ],
+  "_nota": "Este archivo está pendiente de completar con preguntas"
+}

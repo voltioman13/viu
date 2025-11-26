@@ -1,0 +1,13 @@
+{
+  "asignatura": "Complementos para la formación disciplinar",
+  "tipo": "especialidad",
+  "especialidad": "Biología y Geología",
+  "temas": [
+    {
+      "numero": 1,
+      "nombre": "Tema 1",
+      "preguntas": []
+    }
+  ],
+  "_nota": "Este archivo está pendiente de completar con preguntas"
+}

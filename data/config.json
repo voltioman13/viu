@@ -1,0 +1,342 @@
+{
+  "ramas": [
+    {
+      "id": "tecnologias-informatica",
+      "nombre": "Tecnologías e Informática"
+    },
+    {
+      "id": "orientacion-educativa",
+      "nombre": "Orientación Educativa"
+    },
+    {
+      "id": "musica",
+      "nombre": "Música"
+    },
+    {
+      "id": "lengua-literatura",
+      "nombre": "Lengua y Literatura"
+    },
+    {
+      "id": "ingles",
+      "nombre": "Inglés"
+    },
+    {
+      "id": "geografia-historia",
+      "nombre": "Geografía e Historia"
+    },
+    {
+      "id": "fol",
+      "nombre": "FOL"
+    },
+    {
+      "id": "fisica-quimica",
+      "nombre": "Física y Química"
+    },
+    {
+      "id": "educacion-fisica",
+      "nombre": "Educación Física"
+    },
+    {
+      "id": "economia-administracion",
+      "nombre": "Economía y Administración de Empresas"
+    },
+    {
+      "id": "dibujo",
+      "nombre": "Dibujo"
+    },
+    {
+      "id": "biologia-geologia",
+      "nombre": "Biología y Geología"
+    }
+  ],
+  "asignaturas": [
+    {
+      "id": "sociedad-familia-educacion",
+      "nombre": "Sociedad, familia y educación",
+      "tipo": "obligatoria",
+      "archivo": "sociedad-familia-educacion.json"
+    },
+    {
+      "id": "procesos-contextos-educativos",
+      "nombre": "Procesos y contextos educativos",
+      "tipo": "obligatoria",
+      "archivo": "procesos-contextos-educativos.json"
+    },
+    {
+      "id": "aprendizaje-desarrollo-personalidad",
+      "nombre": "Aprendizaje y desarrollo de la personalidad",
+      "tipo": "obligatoria",
+      "archivo": "aprendizaje-desarrollo-personalidad.json"
+    },
+    {
+      "id": "mediacion",
+      "nombre": "Mediación",
+      "tipo": "optativa-comun",
+      "archivo": "mediacion.json"
+    },
+    {
+      "id": "materiales-estrategias-didacticas",
+      "nombre": "Materiales y estrategias didácticas para la educación en la igualdad, diversidad e integración",
+      "tipo": "optativa-comun",
+      "archivo": "materiales-estrategias-didacticas.json"
+    },
+    {
+      "id": "educacion-emocional",
+      "nombre": "Educación emocional y habilidades sociales",
+      "tipo": "optativa-comun",
+      "archivo": "educacion-emocional.json"
+    },
+    {
+      "id": "innovacion-docente-tecnologias",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["tecnologias-informatica"],
+      "archivo": "innovacion-docente-tecnologias.json"
+    },
+    {
+      "id": "complementos-formacion-tecnologias",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["tecnologias-informatica"],
+      "archivo": "complementos-formacion-tecnologias.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-tecnologias",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["tecnologias-informatica"],
+      "archivo": "aprendizaje-ensenanza-tecnologias.json"
+    },
+    {
+      "id": "procesos-orientacion-educativa",
+      "nombre": "Los procesos de la orientación educativa y el asesoramiento psicopedagógico",
+      "tipo": "especialidad",
+      "ramas": ["orientacion-educativa"],
+      "archivo": "procesos-orientacion-educativa.json"
+    },
+    {
+      "id": "investigacion-innovacion-orientacion",
+      "nombre": "La investigación e innovación educativa y la gestión del cambio",
+      "tipo": "especialidad",
+      "ramas": ["orientacion-educativa"],
+      "archivo": "investigacion-innovacion-orientacion.json"
+    },
+    {
+      "id": "educacion-inclusiva",
+      "nombre": "Educación inclusiva y atención a la diversidad",
+      "tipo": "especialidad",
+      "ramas": ["orientacion-educativa"],
+      "archivo": "educacion-inclusiva.json"
+    },
+    {
+      "id": "innovacion-docente-musica",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["musica"],
+      "archivo": "innovacion-docente-musica.json"
+    },
+    {
+      "id": "complementos-formacion-musica",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["musica"],
+      "archivo": "complementos-formacion-musica.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-musica",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["musica"],
+      "archivo": "aprendizaje-ensenanza-musica.json"
+    },
+    {
+      "id": "innovacion-docente-lengua",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["lengua-literatura"],
+      "archivo": "innovacion-docente-lengua.json"
+    },
+    {
+      "id": "complementos-formacion-lengua",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["lengua-literatura"],
+      "archivo": "complementos-formacion-lengua.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-lengua",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["lengua-literatura"],
+      "archivo": "aprendizaje-ensenanza-lengua.json"
+    },
+    {
+      "id": "innovacion-docente-ingles",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["ingles"],
+      "archivo": "innovacion-docente-ingles.json"
+    },
+    {
+      "id": "complementos-formacion-ingles",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["ingles"],
+      "archivo": "complementos-formacion-ingles.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-ingles",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["ingles"],
+      "archivo": "aprendizaje-ensenanza-ingles.json"
+    },
+    {
+      "id": "innovacion-docente-geografia",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["geografia-historia"],
+      "archivo": "innovacion-docente-geografia.json"
+    },
+    {
+      "id": "complementos-formacion-geografia",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["geografia-historia"],
+      "archivo": "complementos-formacion-geografia.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-geografia",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["geografia-historia"],
+      "archivo": "aprendizaje-ensenanza-geografia.json"
+    },
+    {
+      "id": "innovacion-docente-fol",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["fol"],
+      "archivo": "innovacion-docente-fol.json"
+    },
+    {
+      "id": "complementos-formacion-fol",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["fol"],
+      "archivo": "complementos-formacion-fol.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-fol",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["fol"],
+      "archivo": "aprendizaje-ensenanza-fol.json"
+    },
+    {
+      "id": "innovacion-docente-fisica",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["fisica-quimica"],
+      "archivo": "innovacion-docente-fisica.json"
+    },
+    {
+      "id": "complementos-formacion-fisica",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["fisica-quimica"],
+      "archivo": "complementos-formacion-fisica.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-fisica",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["fisica-quimica"],
+      "archivo": "aprendizaje-ensenanza-fisica.json"
+    },
+    {
+      "id": "innovacion-docente-educacion-fisica",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["educacion-fisica"],
+      "archivo": "innovacion-docente-educacion-fisica.json"
+    },
+    {
+      "id": "complementos-formacion-educacion-fisica",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["educacion-fisica"],
+      "archivo": "complementos-formacion-educacion-fisica.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-educacion-fisica",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["educacion-fisica"],
+      "archivo": "aprendizaje-ensenanza-educacion-fisica.json"
+    },
+    {
+      "id": "innovacion-docente-economia",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["economia-administracion"],
+      "archivo": "innovacion-docente-economia.json"
+    },
+    {
+      "id": "complementos-formacion-economia",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["economia-administracion"],
+      "archivo": "complementos-formacion-economia.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-economia",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["economia-administracion"],
+      "archivo": "aprendizaje-ensenanza-economia.json"
+    },
+    {
+      "id": "innovacion-docente-dibujo",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["dibujo"],
+      "archivo": "innovacion-docente-dibujo.json"
+    },
+    {
+      "id": "complementos-formacion-dibujo",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["dibujo"],
+      "archivo": "complementos-formacion-dibujo.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-dibujo",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["dibujo"],
+      "archivo": "aprendizaje-ensenanza-dibujo.json"
+    },
+    {
+      "id": "innovacion-docente-biologia",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["biologia-geologia"],
+      "archivo": "innovacion-docente-biologia.json"
+    },
+    {
+      "id": "complementos-formacion-biologia",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["biologia-geologia"],
+      "archivo": "complementos-formacion-biologia.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-biologia",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["biologia-geologia"],
+      "archivo": "aprendizaje-ensenanza-biologia.json"
+    }
+  ]
+}

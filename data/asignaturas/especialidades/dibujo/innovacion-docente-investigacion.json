@@ -1,0 +1,13 @@
+{
+  "asignatura": "Innovación docente e iniciación a la investigación",
+  "tipo": "especialidad",
+  "especialidad": "Dibujo",
+  "temas": [
+    {
+      "numero": 1,
+      "nombre": "Tema 1",
+      "preguntas": []
+    }
+  ],
+  "_nota": "Este archivo está pendiente de completar con preguntas"
+}
