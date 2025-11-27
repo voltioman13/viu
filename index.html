@@ -414,7 +414,7 @@
             <div class="nav-buttons">
                 <button class="menu-btn active" onclick="app.navigate('home')">Inicio</button>
                 <div class="dropdown" id="test-dropdown">
-                    <button class="menu-btn" onclick="app.toggleDropdown(event)">📝 Modos Test ▾</button>
+                    <button class="menu-btn" onclick="app.toggleDropdown(event)">📝 Modos ▾</button>
                     <div class="dropdown-content">
                         <button onclick="app.closeDropdown(); app.navigate('home'); app.startQuiz();">📝 Test Normal</button>
                         <button onclick="app.closeDropdown(); app.navigate('exam-mode');">⏱️ Modo Examen</button>
@@ -454,22 +454,35 @@
                 </ul>
             </div>
             
+            <h3 style="color: var(--primary); margin-top: 1rem;">📝 Modos de Estudio</h3>
+            <div style="margin-left: 1rem; margin-bottom: 1rem;">
+                <p><strong>Test Normal:</strong> Práctica con feedback inmediato. Al responder, se muestra si es correcta o incorrecta. Incluye notas personales y navegación libre.</p>
+                <p><strong>⏱️ Modo Examen:</strong> Simulación de examen real con tiempo límite (configurable). Sin feedback durante el examen, solo al finalizar. Incluye navegación libre, temporizador y revisión completa al terminar.</p>
+                <p><strong>🔄 Modo Repaso:</strong> Practica solo las preguntas que has fallado anteriormente. Funciona igual que el test normal pero filtrado por tus errores históricos.</p>
+                <p><strong>📖 Resumen de Temas:</strong> Visualiza todas las preguntas y respuestas correctas de un tema para estudiarlo antes de hacer tests.</p>
+            </div>
+            
             <h3 style="color: var(--primary); margin-top: 1rem;">📝 Notas Personales</h3>
             <p style="margin-left: 1rem; margin-bottom: 1rem;">
                 Cada pregunta tiene un campo de notas donde puedes escribir apuntes personales, recordatorios o explicaciones. 
-                Las notas se guardan automáticamente en tu navegador.
+                Las notas se guardan automáticamente en tu navegador y solo aparecen en Test Normal y Modo Repaso.
             </p>
             
             <h3 style="color: var(--primary); margin-top: 1rem;">⭐ Marcar Preguntas</h3>
             <p style="margin-left: 1rem; margin-bottom: 1rem;">
-                Marca preguntas difíciles para repasarlas después. Las preguntas marcadas se guardan y puedes crear tests solo con ellas.
+                Marca preguntas difíciles con el botón ⭐/🔖 para repasarlas después. Las preguntas marcadas se guardan y puedes crear tests solo con ellas usando el checkbox "Solo preguntas marcadas".
             </p>
             
-            <h3 style="color: var(--primary); margin-top: 1rem;">📊 Estadísticas</h3>
+            <h3 style="color: var(--primary); margin-top: 1rem;">📊 Estadísticas Avanzadas</h3>
             <p style="margin-left: 1rem; margin-bottom: 1rem;">
-                El sistema guarda tu historial de tests, porcentajes de acierto y progreso por asignatura. 
-                Consulta las estadísticas en la página de inicio.
+                El sistema guarda tu historial completo de tests y ofrece:
             </p>
+            <ul style="margin-left: 2rem; margin-bottom: 1rem;">
+                <li><strong>Predictor de aciertos:</strong> Estima tu probabilidad de éxito basado en tus últimos 10 tests</li>
+                <li><strong>Análisis de tendencia:</strong> Compara tu rendimiento reciente con el anterior</li>
+                <li><strong>Gráficos de evolución:</strong> Visualiza tu progreso en los últimos 20 tests</li>
+                <li><strong>Rendimiento por asignatura:</strong> Estadísticas detalladas de cada materia</li>
+            </ul>
             
             <h3 style="color: var(--primary); margin-top: 1rem;">🔍 Búsqueda</h3>
             <p style="margin-left: 1rem; margin-bottom: 1rem;">
@@ -479,7 +492,7 @@
             
             <h3 style="color: var(--primary); margin-top: 1rem;">🌙 Modo Oscuro</h3>
             <p style="margin-left: 1rem; margin-bottom: 1rem;">
-                Alterna entre modo claro y oscuro con el botón ☀️/🌙 en la barra superior.
+                Alterna entre modo claro y oscuro con el botón ☀️/🌙 en la barra superior. La preferencia se guarda automáticamente.
             </p>
             
             <div style="text-align: center; margin-top: 2rem;">
