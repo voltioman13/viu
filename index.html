@@ -107,6 +107,51 @@
             background: rgba(255,255,255,0.2);
             transform: scale(1.1);
         }
+        
+        /* --- MENÚ DESPLEGABLE --- */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown > .menu-btn {
+            cursor: pointer;
+            user-select: none;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--card);
+            min-width: 200px;
+            box-shadow: 0 8px 16px var(--shadow);
+            z-index: 1000;
+            border-radius: 8px;
+            overflow: hidden;
+            top: 100%;
+            margin-top: 0.5rem;
+            border: 1px solid var(--border);
+        }
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+        .dropdown-content button {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .dropdown-content button:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
         /* --- CONTENEDOR CENTRAL --- */
         main {
             flex: 1;
@@ -228,6 +273,8 @@
         [data-theme="dark"] .option-btn.correct { background: #064e3b; color: #6ee7b7; }
         .option-btn.incorrect { background: #fee2e2; border-color: var(--error); color: #991b1b; }
         [data-theme="dark"] .option-btn.incorrect { background: #7f1d1d; color: #fca5a5; }
+        .option-btn.selected { background: var(--primary); border-color: var(--primary); color: white; }
+        [data-theme="dark"] .option-btn.selected { background: var(--primary); color: white; }
         
         /* --- ESTILOS DE LA BÚSQUEDA (ACTUALIZADO) --- */
         .result-item { 
@@ -366,9 +413,16 @@
             <div class="logo">VIU - Master Profesor</div>
             <div class="nav-buttons">
                 <button class="menu-btn active" onclick="app.navigate('home')">Inicio</button>
-                <button class="menu-btn" onclick="app.navigate('quiz')">Test</button>
+                <div class="dropdown" id="test-dropdown">
+                    <button class="menu-btn" onclick="app.toggleDropdown(event)">📝 Modos Test ▾</button>
+                    <div class="dropdown-content">
+                        <button onclick="app.closeDropdown(); app.navigate('home'); app.startQuiz();">📝 Test Normal</button>
+                        <button onclick="app.closeDropdown(); app.navigate('exam-mode');">⏱️ Modo Examen</button>
+                        <button onclick="app.closeDropdown(); app.navigate('review-mode');">🔄 Modo Repaso</button>
+                    </div>
+                </div>
                 <button class="menu-btn" onclick="app.navigate('search')">🔍 Buscar</button>
-                <button class="menu-btn" onclick="app.navigate('contribute')" title="Contribuir con preguntas">+</button>
+                <button class="menu-btn" onclick="app.navigate('contribute')" title="Contribuir con preguntas">+
                 <button class="theme-toggle" onclick="app.showHelp()" title="Ayuda y atajos">
                     ℹ️
                 </button>
@@ -539,6 +593,34 @@
             // Estado para persistir la búsqueda
             searchState: { term: '', resultsHTML: '' },
             
+            // Modo examen
+            // Modo examen
+            examMode: {
+                active: false,
+                timeLimit: 30, // minutos
+                questionCount: 30,
+                startTime: null,
+                endTime: null,
+                timer: null
+            },
+            
+            // Historial de respuestas incorrectas (para modo repaso)
+            failedQuestionsHistory: [],
+            
+            // Controlar dropdown con clic
+            toggleDropdown: (event) => {
+                event.stopPropagation();
+                const dropdown = document.getElementById('test-dropdown');
+                dropdown.classList.toggle('active');
+            },
+            
+            closeDropdown: () => {
+                const dropdown = document.getElementById('test-dropdown');
+                if (dropdown) {
+                    dropdown.classList.remove('active');
+                }
+            },
+            
             init: async () => {
                 app.showLoading('Cargando datos...');
                 app.loadMarkedQuestions();
@@ -548,7 +630,16 @@
                 app.loadQuestionNotes();
                 app.loadContributions();
                 app.loadContribState();
+                app.loadFailedHistory();
                 await app.loadInitialData();
+                
+                // Cerrar dropdown al hacer clic fuera
+                document.addEventListener('click', (e) => {
+                    const dropdown = document.getElementById('test-dropdown');
+                    if (dropdown && !dropdown.contains(e.target)) {
+                        dropdown.classList.remove('active');
+                    }
+                });
                 
                 // Aplicar preferencias guardadas
                 if (app.savedPreferences) {
@@ -787,6 +878,28 @@
                     localStorage.setItem('viu_contrib_state', JSON.stringify(app.contribState));
                 } catch (e) {
                     console.error('Error guardando estado de contribución:', e);
+                }
+            },
+            
+            // Cargar historial de preguntas falladas
+            loadFailedHistory: () => {
+                try {
+                    const failed = localStorage.getItem('viu_failed_questions');
+                    if (failed) {
+                        app.failedQuestionsHistory = JSON.parse(failed);
+                    }
+                } catch (e) {
+                    console.error('Error cargando historial de fallos:', e);
+                    app.failedQuestionsHistory = [];
+                }
+            },
+            
+            // Guardar historial de preguntas falladas
+            saveFailedHistory: () => {
+                try {
+                    localStorage.setItem('viu_failed_questions', JSON.stringify(app.failedQuestionsHistory));
+                } catch (e) {
+                    console.error('Error guardando historial de fallos:', e);
                 }
             },
             
@@ -1068,6 +1181,29 @@
                 }
                 app.saveTestHistory();
                 
+                // Guardar preguntas falladas en el historial
+                if (app.quiz.failedQuestions && app.quiz.failedQuestions.length > 0) {
+                    app.quiz.failedQuestions.forEach(q => {
+                        // Buscar si ya existe en el historial
+                        const existing = app.failedQuestionsHistory.find(fq => fq.id === q.id && fq.subject === q.subject);
+                        if (existing) {
+                            existing.failCount = (existing.failCount || 1) + 1;
+                            existing.lastFailed = new Date().toISOString();
+                        } else {
+                            app.failedQuestionsHistory.push({
+                                ...q,
+                                failCount: 1,
+                                lastFailed: new Date().toISOString()
+                            });
+                        }
+                    });
+                    // Mantener solo las últimas 200 preguntas falladas
+                    if (app.failedQuestionsHistory.length > 200) {
+                        app.failedQuestionsHistory = app.failedQuestionsHistory.slice(0, 200);
+                    }
+                    app.saveFailedHistory();
+                }
+                
                 // Actualizar estadísticas por asignatura
                 if (!app.stats[asignatura]) {
                     app.stats[asignatura] = {
@@ -1285,6 +1421,9 @@
             
             // Navegación
             navigate: (viewId, param = null) => {
+                // Cerrar dropdown si está abierto
+                app.closeDropdown();
+                
                 // Guardar vista actual
                 localStorage.setItem('viu_current_view', viewId);
                 
@@ -1301,7 +1440,13 @@
                 try {
                     // Si navegamos a 'detail', el botón activo sigue siendo 'search'
                     const targetView = viewId === 'detail' ? 'search' : viewId;
-                    activeBtn = document.querySelector(`button[onclick="app.navigate('${targetView}')"]`);
+                    
+                    // Para vistas de test (quiz, exam-mode, review-mode), no marcar ningún botón principal como activo
+                    if (['quiz', 'exam-mode', 'review-mode'].includes(viewId)) {
+                        // No marcar ninguno
+                    } else {
+                        activeBtn = document.querySelector(`button[onclick="app.navigate('${targetView}')"]`);
+                    }
                 } catch(e) { /* Botón no encontrado */ }
 
                 if (activeBtn) activeBtn.classList.add('active');
@@ -1312,6 +1457,10 @@
                 switch(viewId) {
                     case 'home': app.renderHome(container); break;
                     case 'quiz': app.renderQuiz(container); break;
+                    case 'exam-mode': app.renderExamMode(container); break;
+                    case 'review-mode': app.renderReviewMode(container); break;
+                    case 'summary': app.renderSummary(container); break;
+                    case 'stats-advanced': app.renderAdvancedStats(container); break;
                     case 'search': app.renderSearch(container); break;
                     case 'detail': app.renderDetail(container, param); break;
                     case 'history': app.renderHistory(container); break;
@@ -1460,10 +1609,21 @@
                             </p>
                         </div>
                         
-                        <div style="display: grid; gap: 1rem; max-width: 300px; margin: 0 auto;">
+                        <div style="display: grid; gap: 1rem; max-width: 400px; margin: 0 auto;">
                             <button class="btn ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.startQuiz()" ${!canStartQuiz ? 'disabled' : ''}>
-                                📝 Comenzar Test
+                                📝 Comenzar Test Normal
                             </button>
+                            <button class="btn" style="background: #dc2626; border-color: #dc2626;" onclick="app.navigate('exam-mode')" ${!canStartQuiz ? 'disabled' : ''}>
+                                📝 Modo Examen (con tiempo)
+                            </button>
+                            <button class="btn" style="background: #0891b2; border-color: #0891b2;" onclick="app.navigate('review-mode')" ${app.failedQuestionsHistory.length === 0 ? 'disabled' : ''}>
+                                🔄 Repasar Preguntas Falladas (${app.failedQuestionsHistory.length})
+                            </button>
+                            ${canStartQuiz ? `
+                            <button class="btn btn-outline" onclick="app.navigate('summary')">
+                                📖 Ver Resumen del Tema
+                            </button>
+                            ` : ''}
                         </div>
                         
                         ${app.currentAsignatura ? `
@@ -1566,6 +1726,24 @@
                 
                 container.innerHTML = `
                     <div class="card">
+                        ${app.examMode.active ? `
+                        <div style="background: #fee2e2; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 2px solid #dc2626;">
+                            <div style="text-align: center; margin-bottom: 0.75rem;">
+                                <div id="exam-timer" style="font-size: 1.5rem; font-weight: 600; color: #dc2626;">⏱️ --:--</div>
+                                <div style="font-size: 0.85rem; color: #991b1b; margin-top: 0.25rem;">Modo Examen - Tiempo restante</div>
+                            </div>
+                            <div style="display: flex; gap: 0.25rem; flex-wrap: wrap; justify-content: center;">
+                                ${app.activeQuizQuestions.map((_, idx) => {
+                                    const answered = app.quiz.answers[idx];
+                                    const isCurrent = idx === app.quiz.index;
+                                    return `<div style="width: 28px; height: 28px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 2px solid ${isCurrent ? '#dc2626' : answered ? '#22c55e' : '#cbd5e1'}; background: ${answered ? '#dcfce7' : 'white'}; color: ${isCurrent ? '#dc2626' : answered ? '#166534' : '#64748b'};" onclick="app.jumpToQuestion(${idx})" title="${answered ? 'Respondida' : 'Sin responder'}">${idx + 1}</div>`;
+                                }).join('')}
+                            </div>
+                            <div style="text-align: center; margin-top: 0.5rem; font-size: 0.75rem; color: #991b1b;">
+                                Respondidas: ${app.quiz.answers.filter(a => a).length} / ${app.activeQuizQuestions.length}
+                            </div>
+                        </div>
+                        ` : ''}
                         <div class="quiz-header">
                             <span>Pregunta ${app.quiz.index + 1} de ${questions.length}</span>
                             <span class="tag tag-subject">${q.subject} - U${q.unit}</span>
@@ -1599,6 +1777,7 @@
                         </div>
                         <div id="feedback-area" class="${previousAnswer ? '' : 'hidden'} bg-light-box" style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px;"></div>
                         
+                        ${!app.examMode.active ? `
                         <div class="bg-light-box" style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px;">
                             <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary);">
                                 📝 Notas personales:
@@ -1616,20 +1795,30 @@
                                              background: var(--card);
                                              color: var(--text-primary);">${app.questionNotes[q.id] || ''}</textarea>
                         </div>
+                        ` : ''}
                         
-                        <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; gap: 10px;">
+                        <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                             <div>
                                 ${app.quiz.index > 0 ? `
                                 <button class="btn btn-outline" style="width: auto;" onclick="app.previousQuestion()">⬅ Anterior</button>
                                 ` : ''}
                             </div>
+                            ${app.examMode.active ? `
+                            <div style="flex: 1; display: flex; justify-content: center;">
+                                <button class="btn" style="background: #dc2626; border-color: #dc2626;" onclick="app.finishExam()">✅ Finalizar Examen</button>
+                            </div>
+                            ` : ''}
                             <div style="display: flex; gap: 10px;">
-                                ${!app.quiz.answered ? `<button class="btn btn-warning" style="width: auto;" onclick="app.skipQuestion()">Saltar ↷</button>` : ''}
-                                ${app.quiz.index < questions.length - 1 ? `
+                                ${app.examMode.active && app.quiz.index < questions.length - 1 ? `
+                                <button class="btn" style="width: auto;" onclick="app.nextQuestion()">Siguiente ➜</button>
+                                ` : !app.examMode.active && !previousAnswer ? `
+                                <button class="btn btn-warning" style="width: auto;" onclick="app.skipQuestion()">Saltar ↷</button>
+                                ` : ''}
+                                ${!app.examMode.active && app.quiz.index < questions.length - 1 ? `
                                 <button id="next-btn" class="btn ${previousAnswer ? '' : 'hidden'}" style="width: auto;" onclick="app.nextQuestion()">Siguiente ➜</button>
-                                ` : `
+                                ` : !app.examMode.active ? `
                                 <button id="next-btn" class="btn ${previousAnswer ? '' : 'hidden'}" style="width: auto;" onclick="app.nextQuestion()">Ver Resultados 🏁</button>
-                                `}
+                                ` : ''}
                             </div>
                         </div>
                     </div>
@@ -1641,20 +1830,33 @@
                     const feedback = document.getElementById('feedback-area');
                     const optionButtons = document.querySelectorAll('.option-btn');
                     
-                    optionButtons.forEach(btn => {
-                        const optText = btn.innerText.trim();
-                        if (optText === previousAnswer.selectedOption) {
-                            btn.classList.add(previousAnswer.isCorrect ? 'correct' : 'incorrect');
-                        }
-                        if (optText === q.answer) {
-                            btn.classList.add('correct');
-                        }
-                    });
-                    
-                    if (previousAnswer.isCorrect) {
-                        feedback.innerHTML = `<b style="color:var(--success)">¡Correcto! 🎉</b>`;
+                    // En modo examen, solo mostrar selección sin revelar si es correcta (y permitir cambio)
+                    if (app.examMode.active) {
+                        optionButtons.forEach(btn => {
+                            const optText = btn.innerText.trim();
+                            if (optText === previousAnswer.selectedOption) {
+                                btn.classList.add('selected');
+                            }
+                            // NO deshabilitar botones para permitir cambiar
+                            btn.disabled = false;
+                        });
                     } else {
-                        feedback.innerHTML = `<b style="color:var(--error)">Incorrecto.</b><br>La respuesta correcta es: <b>${q.answer}</b>`;
+                        // Modo normal: mostrar correctas e incorrectas
+                        optionButtons.forEach(btn => {
+                            const optText = btn.innerText.trim();
+                            if (optText === previousAnswer.selectedOption) {
+                                btn.classList.add(previousAnswer.isCorrect ? 'correct' : 'incorrect');
+                            }
+                            if (optText === q.answer) {
+                                btn.classList.add('correct');
+                            }
+                        });
+                        
+                        if (previousAnswer.isCorrect) {
+                            feedback.innerHTML = `<b style="color:var(--success)">¡Correcto! 🎉</b>`;
+                        } else {
+                            feedback.innerHTML = `<b style="color:var(--error)">Incorrecto.</b><br>La respuesta correcta es: <b>${q.answer}</b>`;
+                        }
                     }
                 }
                 
@@ -1821,8 +2023,19 @@
                     
                     if (app.testHistory.length > 5) {
                         statsHTML += `
-                            <button class="btn btn-outline" onclick="app.navigate('history')" style="margin-top: 0.75rem; width: 100%; font-size: 0.9rem;">
-                                📈 Ver historial completo (${app.testHistory.length} tests)
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.75rem;">
+                                <button class="btn btn-outline" onclick="app.navigate('history')" style="font-size: 0.85rem;">
+                                    📈 Historial
+                                </button>
+                                <button class="btn btn-outline" onclick="app.navigate('stats-advanced')" style="font-size: 0.85rem;">
+                                    📊 Estadísticas avanzadas
+                                </button>
+                            </div>
+                        `;
+                    } else if (app.testHistory.length > 0) {
+                        statsHTML += `
+                            <button class="btn btn-outline" onclick="app.navigate('stats-advanced')" style="margin-top: 0.75rem; width: 100%; font-size: 0.9rem;">
+                                📊 Ver estadísticas avanzadas
                             </button>
                         `;
                     }
@@ -1959,6 +2172,591 @@
                 app.showToast('✅ Historial limpiado');
                 app.navigate('history');
             },
+            
+            // === NUEVAS FUNCIONALIDADES ===
+            
+            // 1. MODO EXAMEN SIMULADO
+            renderExamMode: (container) => {
+                const totalPreguntas = app.filteredQuestions.length;
+                const canStart = totalPreguntas > 0 && app.currentAsignatura;
+                
+                container.innerHTML = `
+                    <div class="card">
+                        <h1>📝 Modo Examen Simulado</h1>
+                        <p class="text-muted">Prepárate para el examen real con límite de tiempo</p>
+                        
+                        ${canStart ? `
+                        <div style="max-width: 500px; margin: 2rem auto; text-align: left;">
+                            <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                                <h3 style="margin-top: 0; font-size: 1.1rem;">⚙️ Configuración del Examen</h3>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">📚 Asignatura seleccionada:</label>
+                                    <div style="padding: 0.75rem; background: var(--card); border: 2px solid var(--primary); border-radius: 6px; font-weight: 600;">
+                                        ${app.currentAsignatura.nombre}
+                                    </div>
+                                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0.5rem 0 0 0;">
+                                        Total disponible: ${totalPreguntas} preguntas
+                                    </p>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">📊 Número de preguntas:</label>
+                                    <input type="number" id="exam-question-count" class="form-select" 
+                                           value="30" min="5" max="${totalPreguntas}" style="font-size: 1.1rem; font-weight: 600;">
+                                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0.5rem 0 0 0;">
+                                        Mínimo 5, máximo ${totalPreguntas}
+                                    </p>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">⏱️ Tiempo límite (minutos):</label>
+                                    <input type="number" id="exam-time-limit" class="form-select" 
+                                           value="30" min="5" max="180" style="font-size: 1.1rem; font-weight: 600;">
+                                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0.5rem 0 0 0;">
+                                        Recomendado: 1 minuto por pregunta
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-light-box" style="padding: 1rem; border-radius: 8px; border-left: 4px solid #dc2626; margin-bottom: 1.5rem;">
+                                <h4 style="margin: 0 0 0.5rem 0; color: #dc2626; font-size: 0.95rem;">⚠️ Condiciones del examen:</h4>
+                                <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                                    <li>El tiempo comenzará al iniciar el examen</li>
+                                    <li>Las preguntas se presentarán en orden aleatorio</li>
+                                    <li>Cuando el tiempo termine, el examen se enviará automáticamente</li>
+                                    <li>No podrás volver atrás en las preguntas</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem;">
+                                <button class="btn btn-outline" onclick="app.navigate('home')" style="flex: 1;">
+                                    ← Volver
+                                </button>
+                                <button class="btn" onclick="app.startExamMode()" style="flex: 2; background: #dc2626; border-color: #dc2626;">
+                                    🚀 Comenzar Examen
+                                </button>
+                            </div>
+                        </div>
+                        ` : `
+                        <div style="padding: 2rem; text-align: center;">
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                                Primero debes seleccionar una asignatura desde la página de inicio.
+                            </p>
+                            <button class="btn" onclick="app.navigate('home')">
+                                🏠 Ir al Inicio
+                            </button>
+                        </div>
+                        `}
+                    </div>
+                `;
+            },
+            
+            startExamMode: () => {
+                const questionCount = parseInt(document.getElementById('exam-question-count').value);
+                const timeLimit = parseInt(document.getElementById('exam-time-limit').value);
+                
+                if (questionCount < 5 || questionCount > app.filteredQuestions.length) {
+                    app.showToast('⚠️ Número de preguntas inválido');
+                    return;
+                }
+                
+                if (timeLimit < 5 || timeLimit > 180) {
+                    app.showToast('⚠️ Tiempo límite inválido');
+                    return;
+                }
+                
+                // Configurar modo examen
+                app.examMode.active = true;
+                app.examMode.questionCount = questionCount;
+                app.examMode.timeLimit = timeLimit;
+                app.examMode.startTime = Date.now();
+                app.examMode.endTime = Date.now() + (timeLimit * 60 * 1000);
+                
+                // Seleccionar preguntas aleatorias
+                const shuffled = app.shuffle([...app.filteredQuestions]);
+                app.activeQuizQuestions = shuffled.slice(0, questionCount);
+                
+                // Reiniciar quiz
+                app.quiz.index = 0;
+                app.quiz.score = 0;
+                app.quiz.answered = false;
+                app.quiz.failedQuestions = [];
+                app.quiz.answers = [];
+                
+                // Iniciar temporizador
+                app.startExamTimer();
+                
+                app.navigate('quiz');
+            },
+            
+            startExamTimer: () => {
+                const updateTimer = () => {
+                    const now = Date.now();
+                    const remaining = app.examMode.endTime - now;
+                    
+                    if (remaining <= 0) {
+                        // Tiempo terminado
+                        clearInterval(app.examMode.timer);
+                        app.examMode.active = false;
+                        app.showToast('⏰ ¡Tiempo terminado!');
+                        // Forzar finalización
+                        app.quiz.index = app.activeQuizQuestions.length;
+                        app.navigate('quiz');
+                        return;
+                    }
+                    
+                    // Actualizar display del timer
+                    const minutes = Math.floor(remaining / 60000);
+                    const seconds = Math.floor((remaining % 60000) / 1000);
+                    const timerDisplay = document.getElementById('exam-timer');
+                    if (timerDisplay) {
+                        const isUrgent = remaining < 60000; // Menos de 1 minuto
+                        timerDisplay.textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                        timerDisplay.style.color = isUrgent ? '#dc2626' : 'var(--text-primary)';
+                        timerDisplay.style.fontWeight = isUrgent ? '800' : '600';
+                    }
+                };
+                
+                updateTimer();
+                app.examMode.timer = setInterval(updateTimer, 1000);
+            },
+            
+            // 2. MODO REPASO DE FALLOS
+            renderReviewMode: (container) => {
+                const failedCount = app.failedQuestionsHistory.length;
+                
+                if (failedCount === 0) {
+                    container.innerHTML = `
+                        <div class="card text-center">
+                            <h1>🔄 Modo Repaso</h1>
+                            <p class="text-muted">Repasa las preguntas que has fallado anteriormente</p>
+                            <div style="font-size: 3rem; margin: 2rem 0;">✅</div>
+                            <h3 style="color: var(--success);">¡No tienes preguntas falladas!</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                                Completa algunos tests para que aparezcan aquí las preguntas que necesitas repasar.
+                            </p>
+                            <button class="btn" onclick="app.navigate('home')">
+                                🏠 Volver al Inicio
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Agrupar por asignatura
+                const bySubject = {};
+                app.failedQuestionsHistory.forEach(q => {
+                    if (!bySubject[q.subject]) {
+                        bySubject[q.subject] = [];
+                    }
+                    bySubject[q.subject].push(q);
+                });
+                
+                let optionsHTML = Object.keys(bySubject).map(subject => {
+                    const count = bySubject[subject].length;
+                    return `<option value="${subject}">${subject} (${count} pregunta${count > 1 ? 's' : ''})</option>`;
+                }).join('');
+                
+                container.innerHTML = `
+                    <div class="card">
+                        <h1>🔄 Modo Repaso</h1>
+                        <p class="text-muted">Preguntas que has fallado anteriormente</p>
+                        
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin: 2rem 0; border: 2px solid #0891b2;">
+                            <h3 style="margin-top: 0; font-size: 1.1rem; color: #0e7490;">📊 Estadísticas de Repaso</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                                <div style="text-align: center; padding: 1rem; background: var(--card); border-radius: 6px;">
+                                    <div style="font-size: 2rem; font-weight: 700; color: #dc2626;">${failedCount}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Preguntas falladas</div>
+                                </div>
+                                <div style="text-align: center; padding: 1rem; background: var(--card); border-radius: 6px;">
+                                    <div style="font-size: 2rem; font-weight: 700; color: #0891b2;">${Object.keys(bySubject).length}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Asignaturas</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="max-width: 500px; margin: 0 auto;">
+                            <div class="form-group">
+                                <label class="form-label">📚 Filtrar por asignatura:</label>
+                                <select id="review-subject-filter" class="form-select">
+                                    <option value="all">Todas las asignaturas (${failedCount})</option>
+                                    ${optionsHTML}
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">🔢 Ordenar por:</label>
+                                <select id="review-sort" class="form-select">
+                                    <option value="recent">Más recientes primero</option>
+                                    <option value="most-failed">Más falladas primero</option>
+                                    <option value="random">Orden aleatorio</option>
+                                </select>
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                                <button class="btn btn-outline" onclick="app.navigate('home')" style="flex: 1;">
+                                    ← Volver
+                                </button>
+                                <button class="btn" onclick="app.startReviewMode()" style="flex: 2; background: #0891b2; border-color: #0891b2;">
+                                    🚀 Comenzar Repaso
+                                </button>
+                            </div>
+                            
+                            <button class="btn" onclick="app.clearFailedHistory()" 
+                                    style="width: 100%; margin-top: 1rem; background: #fef2f2; color: #991b1b; border-color: #fca5a5;">
+                                🗑️ Limpiar historial de fallos
+                            </button>
+                        </div>
+                    </div>
+                `;
+            },
+            
+            startReviewMode: () => {
+                // RESETEAR MODO EXAMEN - esto es un test normal de repaso
+                if (app.examMode.timer) {
+                    clearInterval(app.examMode.timer);
+                }
+                app.examMode = {
+                    active: false,
+                    timeLimit: 30,
+                    questionCount: 30,
+                    startTime: null,
+                    endTime: null,
+                    timer: null
+                };
+                
+                const subjectFilter = document.getElementById('review-subject-filter').value;
+                const sortBy = document.getElementById('review-sort').value;
+                
+                let questions = [...app.failedQuestionsHistory];
+                
+                // Filtrar por asignatura
+                if (subjectFilter !== 'all') {
+                    questions = questions.filter(q => q.subject === subjectFilter);
+                }
+                
+                // Ordenar
+                if (sortBy === 'recent') {
+                    questions.sort((a, b) => new Date(b.lastFailed) - new Date(a.lastFailed));
+                } else if (sortBy === 'most-failed') {
+                    questions.sort((a, b) => (b.failCount || 1) - (a.failCount || 1));
+                } else {
+                    questions = app.shuffle(questions);
+                }
+                
+                if (questions.length === 0) {
+                    app.showToast('⚠️ No hay preguntas con ese filtro');
+                    return;
+                }
+                
+                // Configurar quiz
+                app.activeQuizQuestions = questions;
+                app.quiz.index = 0;
+                app.quiz.score = 0;
+                app.quiz.answered = false;
+                app.quiz.failedQuestions = [];
+                app.quiz.answers = [];
+                
+                app.navigate('quiz');
+            },
+            
+            clearFailedHistory: () => {
+                if (confirm('¿Seguro que quieres limpiar el historial de preguntas falladas?')) {
+                    app.failedQuestionsHistory = [];
+                    app.saveFailedHistory();
+                    app.showToast('✅ Historial de fallos limpiado');
+                    app.navigate('home');
+                }
+            },
+            
+            // 3. MODO RESUMEN DE TEMA
+            renderSummary: (container) => {
+                if (!app.currentAsignatura) {
+                    container.innerHTML = `
+                        <div class="card text-center">
+                            <h1>📖 Resumen de Temas</h1>
+                            <p class="text-muted">Selecciona una asignatura primero</p>
+                            <button class="btn" onclick="app.navigate('home')">🏠 Ir al Inicio</button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const temas = app.currentAsignatura.data.temas.filter(t => t.preguntas && t.preguntas.length > 0);
+                
+                container.innerHTML = `
+                    <div class="card">
+                        <h1>📖 Resumen de Temas</h1>
+                        <p class="text-muted">${app.currentAsignatura.nombre}</p>
+                        
+                        <div style="max-width: 600px; margin: 2rem auto;">
+                            <div class="form-group">
+                                <label class="form-label">📚 Selecciona un tema:</label>
+                                <select id="summary-tema-select" class="form-select" onchange="app.showTemaSummary(this.value)">
+                                    <option value="">-- Selecciona un tema --</option>
+                                    ${temas.map(t => `<option value="${t.numero}">${t.nombre} (${t.preguntas.length} preguntas)</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div id="summary-content" style="margin-top: 2rem;"></div>
+                        
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button class="btn btn-outline" onclick="app.navigate('home')">← Volver al Inicio</button>
+                        </div>
+                    </div>
+                `;
+            },
+            
+            showTemaSummary: (temaNumero) => {
+                const summaryContent = document.getElementById('summary-content');
+                
+                if (!temaNumero) {
+                    summaryContent.innerHTML = '';
+                    return;
+                }
+                
+                const tema = app.currentAsignatura.data.temas.find(t => t.numero == temaNumero);
+                if (!tema) return;
+                
+                let html = `
+                    <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; border: 2px solid var(--primary); text-align: left;">
+                        <h2 style="margin-top: 0; color: var(--primary);">${tema.nombre}</h2>
+                        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                            📊 ${tema.preguntas.length} pregunta${tema.preguntas.length > 1 ? 's' : ''} en este tema
+                        </p>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                `;
+                
+                tema.preguntas.forEach((p, idx) => {
+                    const isMarked = app.markedQuestions.has(p.id);
+                    const hasNote = app.questionNotes[p.id];
+                    
+                    html += `
+                        <div class="bg-white-box" style="padding: 1.25rem; border-radius: 8px; box-shadow: 0 2px 4px var(--shadow); border-left: 4px solid ${isMarked ? '#f59e0b' : 'var(--primary)'};">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                                <h4 style="margin: 0; font-size: 0.95rem; color: var(--text-secondary);">Pregunta ${idx + 1}</h4>
+                                ${isMarked ? '<span style="font-size: 1.2rem;">🔖</span>' : ''}
+                            </div>
+                            
+                            <p style="font-weight: 600; margin-bottom: 1rem; line-height: 1.5;">${p.pregunta}</p>
+                            
+                            <div style="background: #f0fdf4; padding: 1rem; border-radius: 6px; border: 2px solid #22c55e;">
+                                <div style="font-weight: 600; color: #166534; margin-bottom: 0.5rem; font-size: 0.9rem;">✓ Respuesta correcta:</div>
+                                <div style="color: #15803d; font-weight: 500;">${p.respuesta_correcta}</div>
+                            </div>
+                            
+                            ${hasNote ? `
+                            <div style="margin-top: 1rem; padding: 0.75rem; background: #fffbeb; border-radius: 6px; border-left: 3px solid #f59e0b;">
+                                <div style="font-weight: 600; color: #92400e; margin-bottom: 0.25rem; font-size: 0.85rem;">📝 Tus notas:</div>
+                                <div style="color: #78350f; font-size: 0.9rem; white-space: pre-wrap;">${hasNote}</div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                        
+                        <div style="margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--border);">
+                            <button class="btn" onclick="app.studyThisTema(${temaNumero})" style="width: 100%;">
+                                📝 Practicar este tema ahora
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                summaryContent.innerHTML = html;
+            },
+            
+            studyThisTema: (temaNumero) => {
+                // Aplicar filtro de tema
+                const unitSelector = document.getElementById('unit-selector');
+                if (unitSelector) {
+                    unitSelector.value = temaNumero;
+                }
+                app.applyTemaFilter(temaNumero);
+                app.savePreferences();
+                
+                // Iniciar test
+                app.navigate('home');
+                setTimeout(() => {
+                    app.startQuiz();
+                }, 500);
+            },
+            
+            // 4. ESTADÍSTICAS AVANZADAS CON PREDICTOR
+            renderAdvancedStats: (container) => {
+                if (app.testHistory.length === 0) {
+                    container.innerHTML = `
+                        <div class="card text-center">
+                            <h1>📊 Estadísticas Avanzadas</h1>
+                            <p class="text-muted">Completa algunos tests para ver tus estadísticas avanzadas</p>
+                            <button class="btn" onclick="app.navigate('home')">🏠 Volver al Inicio</button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Calcular predicción basada en últimos 10 tests
+                const last10 = app.testHistory.slice(0, 10);
+                const avgLast10 = Math.round(last10.reduce((sum, t) => sum + t.percentage, 0) / last10.length);
+                
+                // Calcular tendencia (mejorando/empeorando)
+                const last5 = app.testHistory.slice(0, 5);
+                const prev5 = app.testHistory.slice(5, 10);
+                const avgLast5 = last5.length > 0 ? Math.round(last5.reduce((sum, t) => sum + t.percentage, 0) / last5.length) : 0;
+                const avgPrev5 = prev5.length > 0 ? Math.round(prev5.reduce((sum, t) => sum + t.percentage, 0) / prev5.length) : 0;
+                const trend = avgLast5 - avgPrev5;
+                
+                // Predictor de examen
+                let prediction = avgLast10;
+                let predictionText = '';
+                let predictionColor = '';
+                
+                if (trend > 5) {
+                    prediction = Math.min(100, avgLast10 + 5);
+                    predictionText = 'Tendencia al alza 📈';
+                    predictionColor = '#22c55e';
+                } else if (trend < -5) {
+                    prediction = Math.max(0, avgLast10 - 5);
+                    predictionText = 'Necesitas repasar más 📉';
+                    predictionColor = '#ef4444';
+                } else {
+                    predictionText = 'Rendimiento estable ➡️';
+                    predictionColor = '#f59e0b';
+                }
+                
+                // Estadísticas por asignatura
+                let byAsignatura = {};
+                app.testHistory.forEach(t => {
+                    if (!byAsignatura[t.asignatura]) {
+                        byAsignatura[t.asignatura] = {
+                            tests: [],
+                            total: 0,
+                            correct: 0
+                        };
+                    }
+                    byAsignatura[t.asignatura].tests.push(t);
+                    byAsignatura[t.asignatura].total += t.total;
+                    byAsignatura[t.asignatura].correct += t.score;
+                });
+                
+                let asignaturasHTML = '';
+                Object.keys(byAsignatura).sort((a, b) => {
+                    const avgA = (byAsignatura[a].correct / byAsignatura[a].total) * 100;
+                    const avgB = (byAsignatura[b].correct / byAsignatura[b].total) * 100;
+                    return avgB - avgA;
+                }).forEach(asigName => {
+                    const data = byAsignatura[asigName];
+                    const avg = Math.round((data.correct / data.total) * 100);
+                    const color = avg >= 70 ? '#22c55e' : avg >= 50 ? '#f59e0b' : '#ef4444';
+                    
+                    asignaturasHTML += `
+                        <div class="bg-white-box" style="padding: 1rem; border-radius: 8px; border-left: 4px solid ${color};">
+                            <h4 style="margin: 0 0 0.5rem 0; font-size: 0.95rem;">${asigName}</h4>
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                                <div style="flex: 1;">
+                                    <div style="background: #f1f5f9; border-radius: 4px; overflow: hidden; height: 12px;">
+                                        <div style="background: ${color}; height: 100%; width: ${avg}%; transition: width 0.3s;"></div>
+                                    </div>
+                                </div>
+                                <div style="font-weight: 700; font-size: 1.1rem; color: ${color}; min-width: 50px; text-align: right;">
+                                    ${avg}%
+                                </div>
+                            </div>
+                            <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+                                ${data.tests.length} test${data.tests.length > 1 ? 's' : ''} · ${data.correct}/${data.total} correctas
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = `
+                    <div class="card">
+                        <h1>📊 Estadísticas Avanzadas</h1>
+                        <p class="text-muted">Análisis detallado de tu rendimiento</p>
+                        
+                        <!-- Predictor de examen -->
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; border: 3px solid ${predictionColor}; margin: 2rem 0;">
+                            <h2 style="margin-top: 0; font-size: 1.2rem; color: ${predictionColor};">🔮 Predictor de Examen</h2>
+                            <div style="text-align: center; margin: 1.5rem 0;">
+                                <div style="font-size: 3rem; font-weight: 800; color: ${predictionColor};">
+                                    ${prediction}%
+                                </div>
+                                <div style="font-size: 1.1rem; margin-top: 0.5rem; color: var(--text-secondary);">
+                                    ${predictionText}
+                                </div>
+                            </div>
+                            <div style="background: var(--card); padding: 1rem; border-radius: 6px;">
+                                <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">
+                                    Basado en tus últimos ${last10.length} tests, tu rendimiento promedio es del <strong>${avgLast10}%</strong>.
+                                    ${trend > 0 ? `Has mejorado un <strong>${trend}%</strong> en las últimas sesiones. ¡Sigue así! 🎉` : 
+                                      trend < 0 ? `Has bajado un <strong>${Math.abs(trend)}%</strong>. Dedica más tiempo al repaso. 💪` :
+                                      'Mantienes un rendimiento constante. 👍'}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Gráfico de evolución -->
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                            <h3 style="margin-top: 0; font-size: 1.1rem;">📈 Evolución Temporal</h3>
+                            <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 150px; gap: 4px; padding: 1rem; background: var(--card); border-radius: 6px;">
+                                ${app.testHistory.slice(0, 20).reverse().map((test, idx) => {
+                                    const height = test.percentage;
+                                    const color = test.percentage >= 70 ? '#22c55e' : test.percentage >= 50 ? '#f59e0b' : '#ef4444';
+                                    return `
+                                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;" title="${test.asignatura}: ${test.percentage}%">
+                                            <div style="font-size: 0.65rem; font-weight: 600; margin-bottom: 3px;">${test.percentage}%</div>
+                                            <div style="width: 100%; height: ${height}%; background: ${color}; border-radius: 4px 4px 0 0; min-height: 5px; transition: all 0.3s; box-shadow: 0 -2px 4px rgba(0,0,0,0.1);"></div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                            <p style="margin: 1rem 0 0 0; font-size: 0.85rem; text-align: center; color: var(--text-secondary);">
+                                Últimos ${Math.min(20, app.testHistory.length)} tests (más recientes a la derecha)
+                            </p>
+                        </div>
+                        
+                        <!-- Rendimiento por asignatura -->
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                            <h3 style="margin-top: 0; font-size: 1.1rem;">📚 Rendimiento por Asignatura</h3>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                ${asignaturasHTML}
+                            </div>
+                        </div>
+                        
+                        <!-- Recomendaciones -->
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                            <h3 style="margin-top: 0; font-size: 1.1rem; color: #1e40af;">💡 Recomendaciones</h3>
+                            <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                                ${app.failedQuestionsHistory.length > 0 ? 
+                                    `<li>Tienes <strong>${app.failedQuestionsHistory.length} preguntas falladas</strong>. Usa el modo repaso para mejorarlas.</li>` : 
+                                    '<li>¡Excelente! No tienes preguntas pendientes de repasar.</li>'}
+                                ${trend < 0 ? 
+                                    '<li>Tu rendimiento ha bajado. Considera tomar un descanso y luego repasar conceptos básicos.</li>' : 
+                                    trend > 5 ? 
+                                    '<li>¡Vas muy bien! Mantén el ritmo de estudio.</li>' :
+                                    '<li>Rendimiento estable. Considera aumentar la dificultad o probar el modo examen.</li>'}
+                                <li>Usa el <strong>modo resumen</strong> para repasar antes de hacer tests.</li>
+                                ${avgLast10 < 70 ? 
+                                    '<li>Intenta hacer más tests en modo normal antes del examen simulado.</li>' :
+                                    '<li>Estás listo para probar el modo examen simulado con límite de tiempo.</li>'}
+                            </ul>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button class="btn btn-outline" onclick="app.navigate('home')">← Volver al Inicio</button>
+                        </div>
+                    </div>
+                `;
+            },
+            
+            // === FIN DE NUEVAS FUNCIONALIDADES ===
             
             // Renderizar vista de contribuciones
             renderContribute: (container) => {
@@ -2789,15 +3587,39 @@
                 }
             },
             checkAnswer: (btn) => {
-                if (app.quiz.answered) return;
-                app.quiz.answered = true;
-                
                 const q = app.activeQuizQuestions[app.quiz.index];
-                // Obtener la opción seleccionada del texto del botón
                 const selectedOpt = btn.innerText.trim();
                 const isCorrect = selectedOpt === q.answer;
                 const feedback = document.getElementById('feedback-area');
                 const nextBtn = document.getElementById('next-btn');
+                
+                // MODO EXAMEN: Permitir cambiar selección
+                if (app.examMode.active) {
+                    // Remover selección anterior
+                    document.querySelectorAll('.option-btn').forEach(b => {
+                        b.classList.remove('selected');
+                        b.disabled = false;
+                    });
+                    
+                    // Marcar nueva selección
+                    btn.classList.add('selected');
+                    app.quiz.answered = true;
+                    
+                    // Guardar la respuesta en el array
+                    app.quiz.answers[app.quiz.index] = {
+                        questionIndex: app.quiz.index,
+                        selectedOption: selectedOpt,
+                        isCorrect: isCorrect
+                    };
+                    
+                    // Mostrar botón siguiente
+                    nextBtn.classList.remove('hidden');
+                    return;
+                }
+                
+                // MODO NORMAL: No permitir cambios
+                if (app.quiz.answered) return;
+                app.quiz.answered = true;
                 
                 // Guardar la respuesta en el array
                 app.quiz.answers[app.quiz.index] = {
@@ -2813,6 +3635,7 @@
                 // Deshabilitar todos los botones
                 document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
                 
+                // MODO NORMAL: Mostrar feedback inmediato
                 if (isCorrect) {
                     btn.classList.add('correct');
                     app.quiz.score++;
@@ -2838,17 +3661,118 @@
                 app.showToast("Pregunta saltada ↷");
             },
             nextQuestion: () => {
+                // En modo examen, recalcular score y preguntas falladas
+                if (app.examMode.active) {
+                    app.quiz.score = 0;
+                    app.quiz.failedQuestions = [];
+                    
+                    app.quiz.answers.forEach((answer, idx) => {
+                        if (answer) {
+                            if (answer.isCorrect) {
+                                app.quiz.score++;
+                            } else {
+                                app.quiz.failedQuestions.push(app.activeQuizQuestions[idx]);
+                            }
+                        }
+                    });
+                }
+                
                 app.quiz.index++;
                 app.navigate('quiz');
             },
             
             previousQuestion: () => {
                 if (app.quiz.index > 0) {
+                    // En modo examen, recalcular score y preguntas falladas antes de retroceder
+                    if (app.examMode.active) {
+                        app.quiz.score = 0;
+                        app.quiz.failedQuestions = [];
+                        
+                        app.quiz.answers.forEach((answer, idx) => {
+                            if (answer) {
+                                if (answer.isCorrect) {
+                                    app.quiz.score++;
+                                } else {
+                                    app.quiz.failedQuestions.push(app.activeQuizQuestions[idx]);
+                                }
+                            }
+                        });
+                    }
+                    
                     app.quiz.index--;
                     app.navigate('quiz');
                 }
             },
+            
+            jumpToQuestion: (index) => {
+                if (!app.examMode.active) return;
+                
+                // Recalcular score antes de saltar
+                app.quiz.score = 0;
+                app.quiz.failedQuestions = [];
+                
+                app.quiz.answers.forEach((answer, idx) => {
+                    if (answer) {
+                        if (answer.isCorrect) {
+                            app.quiz.score++;
+                        } else {
+                            app.quiz.failedQuestions.push(app.activeQuizQuestions[idx]);
+                        }
+                    }
+                });
+                
+                app.quiz.index = index;
+                app.navigate('quiz');
+            },
+            
+            finishExam: () => {
+                if (!app.examMode.active) return;
+                
+                const unanswered = app.activeQuizQuestions.length - app.quiz.answers.filter(a => a).length;
+                
+                if (unanswered > 0) {
+                    const confirmMsg = `⚠️ Tienes ${unanswered} pregunta${unanswered > 1 ? 's' : ''} sin responder.\n\n¿Seguro que quieres finalizar el examen?`;
+                    if (!confirm(confirmMsg)) {
+                        return;
+                    }
+                }
+                
+                // Recalcular puntuación final
+                app.quiz.score = 0;
+                app.quiz.failedQuestions = [];
+                
+                app.quiz.answers.forEach((answer, idx) => {
+                    if (answer) {
+                        if (answer.isCorrect) {
+                            app.quiz.score++;
+                        } else {
+                            app.quiz.failedQuestions.push(app.activeQuizQuestions[idx]);
+                        }
+                    } else {
+                        // Preguntas sin responder también cuentan como falladas
+                        app.quiz.failedQuestions.push(app.activeQuizQuestions[idx]);
+                    }
+                });
+                
+                // Ir directamente a resultados
+                app.quiz.index = app.activeQuizQuestions.length;
+                app.navigate('quiz');
+            },
+            
             startQuiz: () => {
+                // RESETEAR MODO EXAMEN - esto es un test normal
+                if (app.examMode.timer) {
+                    clearInterval(app.examMode.timer);
+                }
+                app.examMode = {
+                    active: false,
+                    timeLimit: 30,
+                    questionCount: 30,
+                    startTime: null,
+                    endTime: null,
+                    timer: null
+                };
+                
                 // Obtener selección de unidad
                 const unitSelector = document.getElementById('unit-selector');
                 const selectedUnit = unitSelector ? unitSelector.value : 'all';
@@ -2906,6 +3830,12 @@
                 app.navigate('quiz');
             },
             renderQuizResult: (container) => {
+                // Detener temporizador del modo examen si está activo
+                if (app.examMode.active && app.examMode.timer) {
+                    clearInterval(app.examMode.timer);
+                    app.examMode.timer = null;
+                }
+                
                 const total = app.activeQuizQuestions.length;
                 const percent = Math.round((app.quiz.score / total) * 100);
                 const numFailed = app.quiz.failedQuestions.length;
@@ -2913,6 +3843,12 @@
                 if(percent === 100) msg = "¡Impecable! 🏆";
                 
                 const asignaturaName = app.currentAsignatura ? app.currentAsignatura.nombre : 'Sin asignatura';
+                const wasExamMode = app.examMode.active;
+                
+                // Resetear modo examen
+                if (app.examMode.active) {
+                    app.examMode.active = false;
+                }
                 
                 // Registrar test completado
                 if (app.currentAsignatura) {
@@ -2922,6 +3858,75 @@
                     app.recordTestCompletion(app.quiz.score, total, asignaturaName, temaName);
                 }
                 
+                // Si fue modo examen, mostrar revisión detallada
+                if (wasExamMode) {
+                    let reviewHTML = `
+                        <div class="card">
+                            <h1>📊 Resultados del Examen</h1>
+                            <p style="color:#dc2626; font-weight: 600;">🎯 Modo Examen Simulado</p>
+                            <p style="color:#64748b">Asignatura: ${asignaturaName}</p>
+                            <div style="font-size: 4rem; font-weight: 800; color: var(--primary); margin: 1rem 0;">
+                                ${app.quiz.score} / ${total}
+                            </div>
+                            <p style="font-size: 1.5rem;">${percent}%</p>
+                            <p style="margin-bottom:1rem;">${msg}</p>
+                            
+                            <div style="background: #f0f9ff; padding: 1rem; border-radius: 8px; margin: 1.5rem 0; border: 2px solid #0ea5e9;">
+                                <h3 style="margin-top: 0; font-size: 1.1rem;">📋 Revisión Completa</h3>
+                            </div>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem; text-align: left;">
+                    `;
+                    
+                    app.activeQuizQuestions.forEach((q, idx) => {
+                        const answer = app.quiz.answers[idx];
+                        const isCorrect = answer && answer.isCorrect;
+                        const userAnswer = answer ? answer.selectedOption : 'Sin respuesta';
+                        
+                        reviewHTML += `
+                            <div class="bg-light-box" style="padding: 1.25rem; border-radius: 8px; border-left: 4px solid ${isCorrect ? '#22c55e' : '#ef4444'};">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                                    <h4 style="margin: 0; font-size: 0.95rem; color: var(--text-secondary);">Pregunta ${idx + 1} de ${total}</h4>
+                                    <span style="font-size: 1.5rem;">${isCorrect ? '✅' : '❌'}</span>
+                                </div>
+                                
+                                <p style="font-weight: 600; margin-bottom: 1rem; line-height: 1.5;">${q.question}</p>
+                                
+                                ${!isCorrect && answer ? `
+                                <div style="background: #fee2e2; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem; border: 1px solid #fca5a5;">
+                                    <div style="font-weight: 600; color: #991b1b; margin-bottom: 0.25rem; font-size: 0.9rem;">❌ Tu respuesta:</div>
+                                    <div style="color: #dc2626;">${userAnswer}</div>
+                                </div>
+                                ` : answer ? `
+                                <div style="background: #f0fdf4; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem; border: 1px solid #86efac;">
+                                    <div style="font-weight: 600; color: #166534; margin-bottom: 0.25rem; font-size: 0.9rem;">✅ Tu respuesta:</div>
+                                    <div style="color: #15803d;">${userAnswer}</div>
+                                </div>
+                                ` : ''}
+                                
+                                <div style="background: #f0fdf4; padding: 0.75rem; border-radius: 6px; border: 2px solid #22c55e;">
+                                    <div style="font-weight: 600; color: #166534; margin-bottom: 0.25rem; font-size: 0.9rem;">✓ Respuesta correcta:</div>
+                                    <div style="color: #15803d; font-weight: 500;">${q.answer}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    reviewHTML += `
+                            </div>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 300px; margin: 0 auto;">
+                                <button class="btn" onclick="app.navigate('exam-mode')">🔁 Repetir Modo Examen</button>
+                                <button class="btn btn-outline" onclick="app.navigate('home')">🏠 Volver al Inicio</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.innerHTML = reviewHTML;
+                    return;
+                }
+                
+                // Modo normal
                 container.innerHTML = `
                     <div class="card text-center">
                         <h1>📊 Resultados</h1>
