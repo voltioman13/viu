@@ -368,6 +368,7 @@
                 <button class="menu-btn active" onclick="app.navigate('home')">Inicio</button>
                 <button class="menu-btn" onclick="app.navigate('quiz')">Test</button>
                 <button class="menu-btn" onclick="app.navigate('search')">🔍 Buscar</button>
+                <button class="menu-btn" onclick="app.navigate('contribute')" title="Contribuir con preguntas">+</button>
                 <button class="theme-toggle" onclick="app.showHelp()" title="Ayuda y atajos">
                     ℹ️
                 </button>
@@ -523,6 +524,15 @@
             // Notas personales por pregunta
             questionNotes: {},
             
+            // Tamaño de fuente (porcentaje)
+            fontSize: 100,
+            
+            // Contribuciones del usuario
+            userContributions: [],
+            
+            // Estado de contribución (para mantener especialidad, asignatura, tema)
+            contribState: { especialidad: '', asignatura: '', tema: '' },
+            
             // Estado para persistir la búsqueda
             searchState: { term: '', resultsHTML: '' },
             
@@ -533,6 +543,8 @@
                 app.loadStats();
                 app.loadPreferences();
                 app.loadQuestionNotes();
+                app.loadContributions();
+                app.loadContribState();
                 await app.loadInitialData();
                 
                 // Aplicar preferencias guardadas
@@ -543,6 +555,10 @@
                     }
                     if (app.savedPreferences.lastAsignatura) {
                         app.selectAsignatura(app.savedPreferences.lastAsignatura);
+                        // Aplicar filtro de tema si hay uno guardado
+                        if (app.savedPreferences.lastTema && app.savedPreferences.lastTema !== 'all') {
+                            app.applyTemaFilter(app.savedPreferences.lastTema);
+                        }
                     }
                     if (app.savedPreferences.randomOrder !== undefined) {
                         app.quizSettings.randomOrder = app.savedPreferences.randomOrder;
@@ -555,13 +571,18 @@
                 // Cargar y aplicar tema
                 app.loadTheme();
                 
+                // Cargar y aplicar tamaño de fuente
+                app.loadFontSize();
+                
                 // Configurar atajos de teclado
                 app.setupKeyboardShortcuts();
                 
                 // Inicializar modal de ayuda
                 app.initHelpModal();
                 
-                app.navigate('home');
+                // Restaurar vista anterior o ir a home
+                const savedView = localStorage.getItem('viu_current_view') || 'home';
+                app.navigate(savedView);
             },
             
             // Gestión de tema oscuro/claro
@@ -618,6 +639,27 @@
                         }
                     });
                 }
+            },
+            
+            // Gestión de tamaño de fuente
+            loadFontSize: () => {
+                const savedSize = localStorage.getItem('viu_font_size');
+                if (savedSize) {
+                    app.fontSize = parseInt(savedSize);
+                } else {
+                    app.fontSize = 100;
+                }
+                app.applyFontSize();
+            },
+            
+            saveFontSize: (size) => {
+                app.fontSize = size;
+                localStorage.setItem('viu_font_size', size.toString());
+                app.applyFontSize();
+            },
+            
+            applyFontSize: () => {
+                document.documentElement.style.fontSize = `${app.fontSize}%`;
             },
             
             // Cargar preguntas marcadas desde localStorage
@@ -701,6 +743,119 @@
                     delete app.questionNotes[questionId];
                 }
                 app.saveQuestionNotes();
+            },
+            
+            // Cargar contribuciones del usuario
+            loadContributions: () => {
+                try {
+                    const contributions = localStorage.getItem('viu_user_contributions');
+                    if (contributions) {
+                        app.userContributions = JSON.parse(contributions);
+                    }
+                } catch (e) {
+                    app.userContributions = [];
+                }
+            },
+            
+            // Guardar contribuciones del usuario
+            saveContributions: () => {
+                try {
+                    localStorage.setItem('viu_user_contributions', JSON.stringify(app.userContributions));
+                } catch (e) {
+                    console.error('Error guardando contribuciones:', e);
+                }
+            },
+            
+            // Cargar estado de contribución
+            loadContribState: () => {
+                try {
+                    const state = localStorage.getItem('viu_contrib_state');
+                    if (state) {
+                        app.contribState = JSON.parse(state);
+                    }
+                } catch (e) {
+                    app.contribState = { especialidad: '', asignatura: '', tema: '' };
+                }
+            },
+            
+            // Guardar estado de contribución
+            saveContribState: () => {
+                try {
+                    localStorage.setItem('viu_contrib_state', JSON.stringify(app.contribState));
+                } catch (e) {
+                    console.error('Error guardando estado de contribución:', e);
+                }
+            },
+            
+            // Añadir nueva contribución
+            addContribution: (contribution) => {
+                contribution.id = 'contrib_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                contribution.timestamp = new Date().toISOString();
+                app.userContributions.push(contribution);
+                app.saveContributions();
+                app.showToast('✅ Pregunta añadida a tus contribuciones');
+            },
+            
+            // Eliminar contribución
+            deleteContribution: (id) => {
+                if (confirm('¿Eliminar esta contribución?')) {
+                    app.userContributions = app.userContributions.filter(c => c.id !== id);
+                    app.saveContributions();
+                    app.showToast('🗑️ Contribución eliminada');
+                    // Solo actualizar la lista, no recargar toda la vista
+                    app.renderContributionsList();
+                }
+            },
+            
+            // Limpiar todas las contribuciones
+            clearAllContributions: () => {
+                if (confirm(`¿Eliminar todas las ${app.userContributions.length} contribuciones?\n\n⚠️ Esta acción no se puede deshacer.`)) {
+                    app.userContributions = [];
+                    app.saveContributions();
+                    app.showToast('✅ Todas las contribuciones eliminadas');
+                    // Solo actualizar la lista, no recargar toda la vista
+                    app.renderContributionsList();
+                }
+            },
+            
+            // Exportar contribuciones como JSON
+            exportContributions: () => {
+                if (app.userContributions.length === 0) {
+                    app.showToast('⚠️ No hay contribuciones para exportar');
+                    return;
+                }
+                
+                // Reparar contribuciones antiguas que no tienen baseFileName
+                const repairedContributions = app.userContributions.map(contrib => {
+                    if (!contrib.baseFileName) {
+                        // Intentar encontrar la asignatura para obtener el baseFileName
+                        const asignatura = app.asignaturasDisponibles.find(a => a.id === contrib.asignaturaId);
+                        if (asignatura && asignatura.archivo) {
+                            contrib.baseFileName = asignatura.archivo.split('/').pop().replace('.json', '');
+                        } else {
+                            // Fallback: intentar derivarlo del asignaturaId
+                            // Si tiene prefijo de especialidad (3+ partes), quitar las primeras 2
+                            const parts = contrib.asignaturaId.split('-');
+                            contrib.baseFileName = parts.length > 3 ? parts.slice(2).join('-') : contrib.asignaturaId;
+                        }
+                    }
+                    return contrib;
+                });
+                
+                const dataStr = JSON.stringify(repairedContributions, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `contribuciones_viu_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                // Guardar las contribuciones reparadas
+                app.userContributions = repairedContributions;
+                app.saveContributions();
+                
+                app.showToast('📥 Archivo descargado. Las contribuciones se mantienen guardadas.');
             },
             
             // Configurar atajos de teclado
@@ -866,32 +1021,28 @@
             loadInitialData: async () => {
                 try {
                     // Intentar cargar todas las asignaturas obligatorias
-                    for (const asig of CONFIG.asignaturas.obligatorias) {
-                        try {
-                            const response = await fetch(`data/asignaturas/${asig.archivo}`);
-                            if (response.ok) {
-                                const data = await response.json();
-                                app.loadedData[asig.id] = data;
-                            }
-                        } catch (error) {
-                            console.warn(`No se pudo cargar ${asig.nombre}`);
+                for (const asig of CONFIG.asignaturas.obligatorias) {
+                    try {
+                        const response = await fetch(`data/asignaturas/${asig.archivo}?t=${Date.now()}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            app.loadedData[asig.id] = data;
                         }
+                    } catch (error) {
+                        console.warn(`No se pudo cargar ${asig.nombre}`);
                     }
-                    
-                    // Intentar cargar optativas comunes
-                    for (const asig of CONFIG.asignaturas.optativas) {
-                        try {
-                            const response = await fetch(`data/asignaturas/${asig.archivo}`);
-                            if (response.ok) {
-                                const data = await response.json();
-                                app.loadedData[asig.id] = data;
-                            }
-                        } catch (error) {
-                            console.warn(`No se pudo cargar ${asig.nombre}`);
+                }                    // Intentar cargar optativas comunes
+                for (const asig of CONFIG.asignaturas.optativas) {
+                    try {
+                        const response = await fetch(`data/asignaturas/${asig.archivo}?t=${Date.now()}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            app.loadedData[asig.id] = data;
                         }
+                    } catch (error) {
+                        console.warn(`No se pudo cargar ${asig.nombre}`);
                     }
-                    
-                    app.updateAvailableSubjects();
+                }                    app.updateAvailableSubjects();
                 } catch (error) {
                     console.error('Error cargando datos:', error);
                 }
@@ -908,7 +1059,8 @@
                     const key = `${especialidadId}-${asig.id}`;
                     if (!app.loadedData[key]) {
                         try {
-                            const response = await fetch(`${especialidadPath}/${asig.archivo}`);
+                            const url = `${especialidadPath}/${asig.archivo}?t=${Date.now()}`;
+                            const response = await fetch(url);
                             if (response.ok) {
                                 const data = await response.json();
                                 app.loadedData[key] = data;
@@ -932,6 +1084,7 @@
                             id: asig.id,
                             nombre: asig.nombre,
                             tipo: 'obligatoria',
+                            archivo: asig.archivo,
                             data: app.loadedData[asig.id]
                         });
                     }
@@ -944,6 +1097,7 @@
                             id: asig.id,
                             nombre: asig.nombre,
                             tipo: 'optativa',
+                            archivo: asig.archivo,
                             data: app.loadedData[asig.id]
                         });
                     }
@@ -963,6 +1117,8 @@
                                 nombre: asig.nombre,
                                 tipo: 'especialidad',
                                 especialidad: CONFIG.especialidades[app.currentEspecialidad],
+                                archivo: asig.archivo,
+                                baseId: asig.id,
                                 data: app.loadedData[key]
                             });
                         }
@@ -1020,6 +1176,33 @@
                 });
             },
             
+            // Aplicar filtro de tema específico
+            applyTemaFilter: (temaNum) => {
+                if (!app.currentAsignatura || temaNum === 'all') {
+                    app.updateQuestionsFromAsignatura();
+                    return;
+                }
+                
+                const data = app.currentAsignatura.data;
+                app.filteredQuestions = [];
+                
+                if (!data.temas || !Array.isArray(data.temas)) return;
+                
+                const tema = data.temas.find(t => t.numero == temaNum);
+                if (tema && tema.preguntas && Array.isArray(tema.preguntas)) {
+                    tema.preguntas.forEach(p => {
+                        app.filteredQuestions.push({
+                            id: p.id,
+                            subject: data.asignatura,
+                            unit: tema.numero,
+                            question: p.pregunta,
+                            options: p.opciones,
+                            answer: p.respuesta_correcta
+                        });
+                    });
+                }
+            },
+            
             showLoading: (message = 'Cargando...') => {
                 const container = document.getElementById('app-container');
                 if (container) {
@@ -1034,6 +1217,9 @@
             
             // Navegación
             navigate: (viewId, param = null) => {
+                // Guardar vista actual
+                localStorage.setItem('viu_current_view', viewId);
+                
                 // Actualizar menú
                 document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
                 
@@ -1061,6 +1247,8 @@
                     case 'search': app.renderSearch(container); break;
                     case 'detail': app.renderDetail(container, param); break;
                     case 'history': app.renderHistory(container); break;
+                    case 'contribute': app.renderContribute(container); break;
+                    case 'admin': app.renderAdmin(container); break;
                     default: app.renderHome(container);
                 }
             },
@@ -1123,6 +1311,12 @@
                     `<option value="${tema.numero}" ${savedTema == tema.numero ? 'selected' : ''}>${tema.nombre} (${tema.preguntas.length} preguntas)</option>`
                 ).join('');
                 
+                // Determinar el tema seleccionado para mostrar en el mensaje
+                const currentTema = savedTema === 'all' ? 'all' : savedTema;
+                const temaInfo = currentTema !== 'all' 
+                    ? `✅ ${totalPreguntas} preguntas disponibles - Tema ${currentTema}`
+                    : `✅ ${totalPreguntas} preguntas disponibles (${temasDisponibles.length} temas)`;
+                
                 container.innerHTML = `
                     <div class="card text-center">
                         <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
@@ -1177,15 +1371,23 @@
                                             🗑️
                                         </button>
                                     </div>
+                                    <div class="text-dark" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        <label style="font-weight: 500; display: flex; align-items: center; justify-content: space-between;">
+                                            <span>🔤 Tamaño de letra</span>
+                                            <span id="font-size-value" style="font-size: 0.9rem; color: var(--text-secondary);">${app.fontSize || 100}%</span>
+                                        </label>
+                                        <input type="range" id="font-size-slider" min="80" max="120" step="5" value="${app.fontSize || 100}"
+                                               style="width: 100%; cursor: pointer; accent-color: var(--primary);">
+                                    </div>
                                 </div>
                             </div>
                             ` : ''}
                         </div>
                         
-                        <div style="background:${canStartQuiz ? '#dcfce7' : '#fee2e2'}; padding:1rem; border-radius:8px; margin-bottom:2rem; border: 2px solid ${canStartQuiz ? 'var(--success)' : 'var(--error)'};">
+                        <div id="quiz-info-box" style="background:${canStartQuiz ? '#dcfce7' : '#fee2e2'}; padding:1rem; border-radius:8px; margin-bottom:2rem; border: 2px solid ${canStartQuiz ? 'var(--success)' : 'var(--error)'};">
                             <p style="margin:0; font-weight:600; color: ${canStartQuiz ? '#065f46' : '#991b1b'};">
                                 ${canStartQuiz 
-                                    ? `✅ ${totalPreguntas} preguntas disponibles (${temasDisponibles.length} temas)` 
+                                    ? temaInfo
                                     : '⚠️ Esta asignatura aún no tiene preguntas disponibles'}
                             </p>
                         </div>
@@ -1230,6 +1432,8 @@
                     const randomCheck = document.getElementById('random-order-check');
                     const onlyMarkedCheck = document.getElementById('only-marked-check');
                     const unitSelector = document.getElementById('unit-selector');
+                    const fontSizeSlider = document.getElementById('font-size-slider');
+                    const fontSizeValue = document.getElementById('font-size-value');
                     
                     if (randomCheck) {
                         randomCheck.addEventListener('change', () => app.savePreferences());
@@ -1237,8 +1441,35 @@
                     if (onlyMarkedCheck) {
                         onlyMarkedCheck.addEventListener('change', () => app.savePreferences());
                     }
+                    if (fontSizeSlider && fontSizeValue) {
+                        fontSizeSlider.addEventListener('input', (e) => {
+                            const value = parseInt(e.target.value);
+                            fontSizeValue.textContent = value + '%';
+                            app.saveFontSize(value);
+                        });
+                    }
                     if (unitSelector) {
-                        unitSelector.addEventListener('change', () => app.savePreferences());
+                        unitSelector.addEventListener('change', () => {
+                            const selectedValue = unitSelector.value;
+                            
+                            // Aplicar filtro de tema
+                            app.applyTemaFilter(selectedValue);
+                            
+                            app.savePreferences();
+                            
+                            // Actualizar el mensaje dinámicamente
+                            const infoBox = document.getElementById('quiz-info-box');
+                            if (infoBox) {
+                                const temas = app.currentAsignatura?.data?.temas?.filter(t => t.preguntas && t.preguntas.length > 0) || [];
+                                let totalQ = app.filteredQuestions.length;
+                                
+                                if (selectedValue === 'all') {
+                                    infoBox.innerHTML = `<p style="margin:0; font-weight:600; color: #065f46;">✅ ${totalQ} preguntas disponibles (${temas.length} temas)</p>`;
+                                } else {
+                                    infoBox.innerHTML = `<p style="margin:0; font-weight:600; color: #065f46;">✅ ${totalQ} preguntas disponibles - Tema ${selectedValue}</p>`;
+                                }
+                            }
+                        });
                     }
                 }, 0);
             },
@@ -1659,6 +1890,656 @@
                 app.saveStats();
                 app.showToast('✅ Historial limpiado');
                 app.navigate('history');
+            },
+            
+            // Renderizar vista de contribuciones
+            renderContribute: (container) => {
+                // Opciones de especialidad
+                const especialidadOptions = Object.entries(CONFIG.especialidades).map(([id, nombre]) => 
+                    `<option value="${id}">${nombre}</option>`
+                ).join('');
+                
+                // Agrupar asignaturas disponibles
+                const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
+                const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
+                
+                let asignaturaOptions = '';
+                
+                if (obligatorias.length > 0) {
+                    asignaturaOptions += '<optgroup label="📕 Obligatorias">';
+                    obligatorias.forEach(a => {
+                        asignaturaOptions += `<option value="${a.id}">${a.nombre}</option>`;
+                    });
+                    asignaturaOptions += '</optgroup>';
+                }
+                
+                if (optativas.length > 0) {
+                    asignaturaOptions += '<optgroup label="📗 Optativas Comunes">';
+                    optativas.forEach(a => {
+                        asignaturaOptions += `<option value="${a.id}">${a.nombre}</option>`;
+                    });
+                    asignaturaOptions += '</optgroup>';
+                }
+                
+                container.innerHTML = `
+                    <div class="card">
+                        <h2>➕ Contribuir con Preguntas</h2>
+                        <p class="text-muted" style="margin-bottom: 2rem;">Ayuda a ampliar el banco de preguntas. Selecciona la asignatura y añade preguntas una tras otra.</p>
+                        
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                            <h3 style="font-size: 1.1rem; margin-top: 0;">1️⃣ Selecciona la Asignatura</h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">🎓 Especialidad (opcional):</label>
+                                <select id="contrib-especialidad" class="form-select" onchange="app.updateContribAsignaturas()">
+                                    <option value="">Sin especialidad</option>
+                                    ${especialidadOptions}
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">📖 Asignatura:</label>
+                                <select id="contrib-asignatura" class="form-select">
+                                    <option value="">Selecciona una asignatura</option>
+                                    ${asignaturaOptions}
+                                </select>
+                            </div>
+                            
+                            <button class="btn" onclick="app.startContributing()" style="width: 100%;">
+                                ➡️ Continuar
+                            </button>
+                        </div>
+                        
+                        <div id="contrib-form-area" style="display: none;"></div>
+                        <div id="contributions-list"></div>
+                        
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button class="btn-outline" style="border:none; font-size:0.8rem; color: var(--text-secondary); cursor: pointer;" onclick="app.navigate('admin')">
+                                Acceso administrador
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                app.renderContributionsList();
+                
+                // Restaurar valores guardados
+                setTimeout(() => {
+                    const espSelect = document.getElementById('contrib-especialidad');
+                    const asigSelect = document.getElementById('contrib-asignatura');
+                    
+                    if (espSelect && app.contribState.especialidad) {
+                        espSelect.value = app.contribState.especialidad;
+                        app.updateContribAsignaturas().then(() => {
+                            if (asigSelect && app.contribState.asignatura) {
+                                asigSelect.value = app.contribState.asignatura;
+                            }
+                        });
+                    } else if (asigSelect && app.contribState.asignatura) {
+                        asigSelect.value = app.contribState.asignatura;
+                    }
+                }, 100);
+            },
+            
+            // Actualizar asignaturas según especialidad
+            updateContribAsignaturas: async () => {
+                const especialidadId = document.getElementById('contrib-especialidad').value;
+                const asignaturaSelect = document.getElementById('contrib-asignatura');
+                
+                if (!asignaturaSelect) return;
+                
+                let options = '<option value="">Selecciona una asignatura</option>';
+                
+                if (especialidadId) {
+                    // Cargar asignaturas de especialidad si no están cargadas
+                    await app.loadEspecialidadData(especialidadId);
+                    
+                    // Filtrar asignaturas de la especialidad seleccionada (el ID de la asig contiene el especialidadId)
+                    const especialidadAsigs = app.asignaturasDisponibles.filter(a => 
+                        a.tipo === 'especialidad' && a.id.startsWith(especialidadId + '-')
+                    );
+                    
+                    if (especialidadAsigs.length > 0) {
+                        options += '<optgroup label="📘 Especialidad">';
+                        especialidadAsigs.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                        options += '</optgroup>';
+                    }
+                    
+                    // También incluir obligatorias y optativas
+                    const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
+                    const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
+                    
+                    if (obligatorias.length > 0) {
+                        options += '<optgroup label="📕 Obligatorias">';
+                        obligatorias.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                        options += '</optgroup>';
+                    }
+                    
+                    if (optativas.length > 0) {
+                        options += '<optgroup label="📗 Optativas Comunes">';
+                        optativas.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                        options += '</optgroup>';
+                    }
+                } else {
+                    // Solo mostrar obligatorias y optativas
+                    const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
+                    const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
+                    
+                    if (obligatorias.length > 0) {
+                        options += '<optgroup label="📕 Obligatorias">';
+                        obligatorias.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                        options += '</optgroup>';
+                    }
+                    
+                    if (optativas.length > 0) {
+                        options += '<optgroup label="📗 Optativas Comunes">';
+                        optativas.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                        options += '</optgroup>';
+                    }
+                }
+                
+                asignaturaSelect.innerHTML = options;
+            },
+            
+            // Iniciar proceso de contribución
+            startContributing: () => {
+                const asignaturaId = document.getElementById('contrib-asignatura').value;
+                const especialidadId = document.getElementById('contrib-especialidad').value;
+                
+                if (!asignaturaId) {
+                    app.showToast('⚠️ Selecciona una asignatura');
+                    return;
+                }
+                
+                // Guardar estado
+                app.contribState.especialidad = especialidadId;
+                app.contribState.asignatura = asignaturaId;
+                app.saveContribState();
+                
+                const formArea = document.getElementById('contrib-form-area');
+                formArea.style.display = 'block';
+                formArea.innerHTML = `
+                    <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.1rem; margin-top: 0;">2️⃣ Añade Preguntas</h3>
+                        <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1rem;">
+                            Asignatura seleccionada: <strong id="selected-asig-name"></strong>
+                        </p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">📚 Número de Tema (1-50):</label>
+                            <input type="number" id="contrib-tema" class="form-select" placeholder="Ej: 1, 2, 3..." min="1" max="50" step="1" value="${app.contribState.tema || ''}" style="font-size: 1.1rem; font-weight: 600;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">❓ Pregunta:</label>
+                            <textarea id="contrib-question" class="form-select" rows="3" placeholder="Escribe la pregunta aquí..." style="resize: vertical;"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">📝 Opciones de respuesta:</label>
+                            <input type="text" id="contrib-option-1" class="form-select" placeholder="Opción 1" style="margin-bottom: 0.5rem;">
+                            <input type="text" id="contrib-option-2" class="form-select" placeholder="Opción 2" style="margin-bottom: 0.5rem;">
+                            <input type="text" id="contrib-option-3" class="form-select" placeholder="Opción 3" style="margin-bottom: 0.5rem;">
+                            <input type="text" id="contrib-option-4" class="form-select" placeholder="Opción 4">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">✅ Respuesta correcta:</label>
+                            <select id="contrib-correct" class="form-select">
+                                <option value="">Selecciona la opción correcta</option>
+                                <option value="1">Opción 1</option>
+                                <option value="2">Opción 2</option>
+                                <option value="3">Opción 3</option>
+                                <option value="4">Opción 4</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="btn" onclick="app.submitContribution()" style="flex: 1;">
+                                ➕ Añadir Pregunta
+                            </button>
+                            <button class="btn btn-outline" onclick="app.finishContributing()" style="flex: 1;">
+                                ✅ Finalizar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Obtener nombre de asignatura
+                const asig = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
+                const nameElement = document.getElementById('selected-asig-name');
+                if (nameElement && asig) {
+                    nameElement.textContent = asig.nombre;
+                }
+                
+                // Scroll al formulario
+                formArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            },
+            
+            // Finalizar contribuciones
+            finishContributing: () => {
+                const formArea = document.getElementById('contrib-form-area');
+                formArea.style.display = 'none';
+                
+                if (app.userContributions.length > 0) {
+                    app.showToast(`✅ ${app.userContributions.length} pregunta(s) guardadas. No olvides exportarlas.`);
+                }
+                
+                // Actualizar botón de exportar
+                app.navigate('contribute');
+            },
+            
+            // Actualizar lista de contribuciones
+            renderContributionsList: () => {
+                const listContainer = document.getElementById('contributions-list');
+                if (!listContainer) return;
+                
+                if (app.userContributions.length === 0) {
+                    listContainer.innerHTML = `
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; text-align: center;">
+                            <p class="text-muted">No tienes contribuciones pendientes</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = `
+                    <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 style="font-size: 1.1rem; margin: 0;">📋 Tus Contribuciones (${app.userContributions.length})</h3>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn" onclick="app.exportContributions()" style="padding: 0.5rem 1rem;">
+                                    📥 Exportar
+                                </button>
+                                <button class="btn" onclick="app.clearAllContributions()" style="padding: 0.5rem 1rem; background: #fca5a5; border-color: #f87171;" title="Limpiar todas">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 1rem 0;">
+                            💾 Las contribuciones se guardan automáticamente y persisten al recargar la página
+                        </p>
+                        <div style="display: flex; flex-direction: column; gap: 1rem; max-height: 400px; overflow-y: auto;">
+                `;
+                
+                app.userContributions.forEach(contrib => {
+                    html += `
+                        <div class="bg-white-box" style="padding: 1rem; border-radius: 6px; border: 1px solid var(--border);">
+                            <div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                        ${contrib.asignaturaName} - Tema ${contrib.tema}
+                                    </div>
+                                    <div style="font-weight: 600; margin-bottom: 0.5rem;">${contrib.question}</div>
+                                    <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                                        <div>✅ ${contrib.answer}</div>
+                                    </div>
+                                </div>
+                                <button onclick="app.deleteContribution('${contrib.id}')" 
+                                        style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 4px; padding: 0.5rem; cursor: pointer; flex-shrink: 0;"
+                                        title="Eliminar">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div></div>';
+                listContainer.innerHTML = html;
+            },
+            
+            // Actualizar temas disponibles según asignatura seleccionada
+            updateContribTemas: () => {
+                const asignaturaId = document.getElementById('contrib-asignatura').value;
+                const temaInput = document.getElementById('contrib-tema');
+                
+                if (asignaturaId) {
+                    const asignatura = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
+                    if (asignatura && asignatura.data && asignatura.data.temas) {
+                        const maxTema = asignatura.data.temas.length;
+                        temaInput.max = maxTema;
+                        temaInput.placeholder = `Número de tema (1-${maxTema})`;
+                    }
+                } else {
+                    temaInput.max = '';
+                    temaInput.placeholder = 'Número de tema (ej: 1, 2, 3...)';
+                }
+            },
+            
+            // Enviar contribución
+            submitContribution: () => {
+                const asignaturaId = document.getElementById('contrib-asignatura').value;
+                const tema = document.getElementById('contrib-tema').value;
+                const question = document.getElementById('contrib-question').value.trim();
+                const option1 = document.getElementById('contrib-option-1').value.trim();
+                const option2 = document.getElementById('contrib-option-2').value.trim();
+                const option3 = document.getElementById('contrib-option-3').value.trim();
+                const option4 = document.getElementById('contrib-option-4').value.trim();
+                const correctIdx = document.getElementById('contrib-correct').value;
+                
+                // Validaciones
+                if (!asignaturaId) {
+                    app.showToast('⚠️ Selecciona una asignatura');
+                    return;
+                }
+                
+                // Validar tema como número entero entre 1 y 50
+                const temaNum = parseInt(tema);
+                if (!tema || isNaN(temaNum) || temaNum < 1 || temaNum > 50 || tema.includes('.')) {
+                    app.showToast('⚠️ El tema debe ser un número entero entre 1 y 50');
+                    document.getElementById('contrib-tema').focus();
+                    return;
+                }
+                if (!question) {
+                    app.showToast('⚠️ Escribe una pregunta');
+                    return;
+                }
+                if (!option1 || !option2 || !option3 || !option4) {
+                    app.showToast('⚠️ Completa las 4 opciones');
+                    return;
+                }
+                if (!correctIdx) {
+                    app.showToast('⚠️ Selecciona la respuesta correcta');
+                    return;
+                }
+                
+                // Buscar asignatura en todas las listas
+                const asignatura = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
+                
+                if (!asignatura) {
+                    app.showToast('❌ Error: Asignatura no encontrada');
+                    return;
+                }
+                
+                const options = [option1, option2, option3, option4];
+                const answer = options[parseInt(correctIdx) - 1];
+                
+                // Extraer el nombre base del archivo (sin ruta ni .json)
+                let baseFileName = asignatura.archivo.split('/').pop().replace('.json', '');
+                
+                const contribution = {
+                    asignaturaId,
+                    asignaturaName: asignatura.nombre,
+                    baseFileName,  // Nombre del archivo real en data/asignaturas/
+                    tema: parseInt(tema),
+                    question,
+                    options,
+                    answer
+                };
+                
+                app.addContribution(contribution);
+                
+                // Guardar el tema para la próxima pregunta
+                app.contribState.tema = temaNum;
+                app.saveContribState();
+                
+                // Limpiar solo pregunta y opciones, mantener tema
+                document.getElementById('contrib-question').value = '';
+                document.getElementById('contrib-option-1').value = '';
+                document.getElementById('contrib-option-2').value = '';
+                document.getElementById('contrib-option-3').value = '';
+                document.getElementById('contrib-option-4').value = '';
+                document.getElementById('contrib-correct').value = '';
+                
+                // Focus en el campo de pregunta para continuar rápidamente
+                document.getElementById('contrib-question').focus();
+                
+                app.renderContributionsList();
+            },
+            
+            // Renderizar vista de administración
+            renderAdmin: (container) => {
+                container.innerHTML = `
+                    <div class="card">
+                        <h2>🔧 Panel de Administración</h2>
+                        <p class="text-muted" style="margin-bottom: 2rem;">Herramienta para procesar archivos de contribuciones y generar archivos listos para GitHub.</p>
+                        
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                            <h3 style="font-size: 1.1rem; margin-top: 0;">📁 Procesar y Fusionar Contribuciones</h3>
+                            <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1rem;">
+                                Sube archivos de contribuciones y opcionalmente el archivo final existente para fusionarlos automáticamente.
+                            </p>
+                            
+                            <div class="form-group">
+                                <label class="form-label">📋 Archivos de contribuciones (nuevas preguntas):</label>
+                                <input type="file" id="admin-contrib-files" accept=".json" multiple class="form-select" style="cursor: pointer;">
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                    Archivos exportados desde "Contribuir a Preguntas"
+                                </p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">📂 Archivo final existente (opcional):</label>
+                                <input type="file" id="admin-existing-file" accept=".json" class="form-select" style="cursor: pointer;">
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                    Si ya tienes preguntas en producción, sube el archivo para fusionarlo con las nuevas contribuciones
+                                </p>
+                            </div>
+                            
+                            <button class="btn" onclick="app.processContributions()" style="width: 100%;">
+                                🔀 Procesar y Fusionar
+                            </button>
+                        </div>
+                        
+                        <div id="process-result" style="display: none;"></div>
+                        
+                        <button class="btn btn-outline" onclick="app.navigate('contribute')" style="width: 100%; margin-top: 2rem;">
+                            ⬅️ Volver a Contribuir
+                        </button>
+                    </div>
+                `;
+            },
+            
+            // Fusionar archivos JSON
+            processContributions: async () => {
+                const contribInput = document.getElementById('admin-contrib-files');
+                const existingInput = document.getElementById('admin-existing-file');
+                
+                if (!contribInput.files.length) {
+                    app.showToast('⚠️ Selecciona al menos un archivo de contribuciones');
+                    return;
+                }
+                
+                try {
+                    // Leer archivo existente si se proporcionó
+                    let existingData = null;
+                    if (existingInput.files.length > 0) {
+                        const existingText = await existingInput.files[0].text();
+                        existingData = JSON.parse(existingText);
+                        console.log('📂 Archivo existente cargado:', existingData);
+                    }
+                    
+                    // Leer todos los archivos de contribuciones
+                    const allContributions = [];
+                    for (let file of contribInput.files) {
+                        const text = await file.text();
+                        const contributions = JSON.parse(text);
+                        if (Array.isArray(contributions)) {
+                            allContributions.push(...contributions);
+                        }
+                    }
+                    
+                    if (allContributions.length === 0 && !existingData) {
+                        app.showToast('⚠️ No se encontraron contribuciones válidas');
+                        return;
+                    }
+                    
+                    // Agrupar por asignatura
+                    // Importante: Usar el asignaturaId completo (con prefijo de especialidad si existe)
+                    // para mantener separadas las asignaturas de diferentes especialidades
+                    const byAsignatura = {};
+                    allContributions.forEach(contrib => {
+                        if (!byAsignatura[contrib.asignaturaId]) {
+                            byAsignatura[contrib.asignaturaId] = {
+                                name: contrib.asignaturaName,
+                                contributions: []
+                            };
+                        }
+                        byAsignatura[contrib.asignaturaId].contributions.push(contrib);
+                    });
+                    
+                    // Generar resumen y archivos por asignatura
+                    const resultDiv = document.getElementById('process-result');
+                    let resultHTML = `
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <h3 style="font-size: 1.1rem; margin-top: 0;">✅ Procesamiento Completado</h3>
+                            <p><strong>${allContributions.length}</strong> contribuciones procesadas de <strong>${contribInput.files.length}</strong> archivo(s)</p>
+                            <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                Agrupadas en <strong>${Object.keys(byAsignatura).length}</strong> asignatura(s):
+                            </p>
+                        </div>
+                    `;
+                    
+                    // Crear un archivo por cada asignatura
+                    for (const [asigId, data] of Object.entries(byAsignatura)) {
+                        // Agrupar por tema dentro de cada asignatura
+                        const byTema = {};
+                        
+                        // FUSIÓN: Si existe archivo previo, cargar sus preguntas primero
+                        if (existingData && existingData.temas) {
+                            existingData.temas.forEach(tema => {
+                                if (!byTema[tema.numero]) {
+                                    byTema[tema.numero] = [];
+                                }
+                                // Las preguntas existentes ya están en formato correcto
+                                byTema[tema.numero].push(...tema.preguntas);
+                            });
+                            console.log('✅ Preguntas existentes cargadas en temas:', Object.keys(byTema));
+                        }
+                        
+                        // Agregar las nuevas contribuciones
+                        data.contributions.forEach(contrib => {
+                            if (!byTema[contrib.tema]) {
+                                byTema[contrib.tema] = [];
+                            }
+                            // Convertir a formato español para que coincida con los archivos existentes
+                            byTema[contrib.tema].push({
+                                id: contrib.id || `contrib_${Date.now()}`,
+                                pregunta: contrib.question,
+                                opciones: contrib.options,
+                                respuesta_correcta: contrib.answer
+                            });
+                        });
+                        
+                        // Crear estructura final
+                        const temas = [];
+                        for (const [temaNum, preguntas] of Object.entries(byTema)) {
+                            temas.push({
+                                numero: parseInt(temaNum),
+                                nombre: `Tema ${temaNum}`,
+                                preguntas: preguntas
+                            });
+                        }
+                        
+                        // Ordenar por número de tema
+                        temas.sort((a, b) => a.numero - b.numero);
+                        
+                        // Calcular totales
+                        const totalPreguntas = temas.reduce((sum, t) => sum + t.preguntas.length, 0);
+                        const nuevasPreguntas = data.contributions.length;
+                        const existentes = totalPreguntas - nuevasPreguntas;
+                        
+                        // Determinar tipo de asignatura basado en el asignaturaId
+                        let tipo = 'optativa'; // default
+                        if (asigId.includes('-')) {
+                            // Si tiene guiones múltiples, probablemente es de especialidad
+                            const parts = asigId.split('-');
+                            if (parts.length > 2) {
+                                tipo = 'especialidad';
+                            } else {
+                                // Verificar si es obligatoria
+                                const obligatorias = ['aprendizaje-desarrollo-personalidad', 'procesos-contextos-educativos', 'sociedad-familia-educacion'];
+                                tipo = obligatorias.includes(asigId) ? 'obligatoria' : 'optativa';
+                            }
+                        }
+                        
+                        const outputData = {
+                            asignatura: data.name,
+                            tipo: tipo,
+                            temas: temas
+                        };
+                        const jsonStr = JSON.stringify(outputData, null, 2);
+                        
+                        // Obtener baseFileName de la primera contribución (todas deberían tener el mismo)
+                        const baseFileName = data.contributions[0]?.baseFileName || null;
+                        
+                        // Crear botón de descarga para esta asignatura
+                        resultHTML += `
+                            <div class="bg-white-box" style="padding: 1rem; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; margin-bottom: 0.25rem;">${data.name}</div>
+                                        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                            ${existingData ? `
+                                                <span style="color: var(--success);">✅ ${existentes} existentes</span> + 
+                                                <span style="color: var(--accent);">➕ ${nuevasPreguntas} nuevas</span> = 
+                                                <strong>${totalPreguntas} total</strong> · ${temas.length} tema(s)
+                                            ` : `${data.contributions.length} pregunta(s) · ${temas.length} tema(s)`}
+                                        </div>
+                                        ${baseFileName ? `<div style="font-size: 0.75rem; color: var(--accent); margin-top: 0.25rem;">📂 ${baseFileName}.json</div>` : ''}
+                                    </div>
+                                    <button class="btn" onclick="app.downloadAsignaturaJSON('${asigId}', '${data.name}', ${JSON.stringify(outputData).replace(/"/g, '&quot;')}, '${baseFileName || ''}')" style="padding: 0.5rem 1rem; white-space: nowrap;">
+                                        📥 Descargar
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    resultHTML += `
+                        <div class="bg-light-box" style="padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                                💡 <strong>Siguiente paso:</strong> ${existingData ? 
+                                    'El archivo descargado contiene TODAS las preguntas (existentes + nuevas) fusionadas. Reemplaza el archivo en GitHub con este nuevo.' : 
+                                    'Descarga cada archivo y reemplázalo en la carpeta correspondiente de GitHub.'}
+                            </p>
+                        </div>
+                    `;
+                    
+                    resultDiv.innerHTML = resultHTML;
+                    resultDiv.style.display = 'block';
+                    
+                    app.showToast('✅ Contribuciones procesadas correctamente');
+                } catch (e) {
+                    console.error(e);
+                    app.showToast('❌ Error al procesar los archivos: ' + e.message);
+                }
+            },
+            
+            // Descargar JSON de asignatura
+            downloadAsignaturaJSON: (asigId, asigName, data, baseFileName) => {
+                const jsonStr = JSON.stringify(data, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                
+                // Usar baseFileName si está disponible (viene de las contribuciones)
+                // Si no, intentar buscar en asignaturasDisponibles o usar el asigId como fallback
+                let fileName = baseFileName;
+                
+                if (!fileName) {
+                    const asignatura = app.asignaturasDisponibles.find(a => a.id === asigId);
+                    if (asignatura && asignatura.archivo) {
+                        fileName = asignatura.archivo.split('/').pop().replace('.json', '');
+                    } else {
+                        // Último fallback: usar el ID sin prefijo de especialidad
+                        // Ej: "tecnologias-informatica-complementos-formacion-disciplinar" → "complementos-formacion-disciplinar"
+                        const parts = asigId.split('-');
+                        if (parts.length > 3) {
+                            // Probablemente tiene prefijo de especialidad (2 palabras)
+                            fileName = parts.slice(2).join('-');
+                        } else {
+                            fileName = asigId;
+                        }
+                    }
+                }
+                
+                link.download = `${fileName}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                app.showToast(`📥 ${asigName} descargado`);
             },
             
             // Confirmar y reiniciar todos los datos
