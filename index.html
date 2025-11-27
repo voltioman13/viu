@@ -435,9 +435,10 @@
     
     <!-- Modal de Ayuda -->
     <div id="help-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
-        <div class="card bg-white-box" style="max-width: 600px; max-height: 80vh; overflow-y: auto; margin: 20px; position: relative;">
-            <button onclick="app.hideHelp()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary);">&times;</button>
-            <h2 style="margin-bottom: 1.5rem;">📚 Guía de Uso</h2>
+        <div class="card bg-white-box" style="max-width: 600px; max-height: 80vh; margin: 20px; position: relative; display: flex; flex-direction: column;">
+            <button onclick="app.hideHelp()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary); z-index: 1;">&times;</button>
+            <div style="overflow-y: auto; flex: 1; padding-right: 10px;">
+                <h2 style="margin-bottom: 1.5rem;">📚 Guía de Uso</h2>
             
             <h3 style="color: var(--primary); margin-top: 1rem;">⌨️ Atajos de Teclado</h3>
             <div style="margin-left: 1rem; margin-bottom: 1rem;">
@@ -494,8 +495,9 @@
             <p style="margin-left: 1rem; margin-bottom: 1rem;">
                 Alterna entre modo claro y oscuro con el botón ☀️/🌙 en la barra superior. La preferencia se guarda automáticamente.
             </p>
+            </div>
             
-            <div style="text-align: center; margin-top: 2rem;">
+            <div style="text-align: center; padding: 1.5rem 0 0 0; border-top: 1px solid var(--border); margin-top: 1rem;">
                 <button class="btn" onclick="app.hideHelp()">¡Entendido!</button>
             </div>
         </div>
