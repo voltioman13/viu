@@ -533,6 +533,9 @@
             // Estado de contribución (para mantener especialidad, asignatura, tema)
             contribState: { especialidad: '', asignatura: '', tema: '' },
             
+            // ID de contribución siendo editada (null si es nueva)
+            editingContribId: null,
+            
             // Estado para persistir la búsqueda
             searchState: { term: '', resultsHTML: '' },
             
@@ -794,6 +797,71 @@
                 app.userContributions.push(contribution);
                 app.saveContributions();
                 app.showToast('✅ Pregunta añadida a tus contribuciones');
+            },
+            
+            // Editar contribución
+            editContribution: (id) => {
+                const contrib = app.userContributions.find(c => c.id === id);
+                if (!contrib) return;
+                
+                // Guardar ID de contribución que se está editando
+                app.editingContribId = id;
+                
+                // Restaurar estado de la contribución
+                app.contribState.especialidad = '';
+                app.contribState.asignatura = contrib.asignaturaId;
+                app.contribState.tema = contrib.tema;
+                
+                // Detectar si es de especialidad
+                const parts = contrib.asignaturaId.split('-');
+                if (parts.length > 2) {
+                    app.contribState.especialidad = parts[0] + '-' + parts[1];
+                }
+                
+                // Navegar a la vista de contribuir
+                app.navigate('contribute');
+                
+                // Esperar a que se renderice y luego cargar los datos
+                setTimeout(async () => {
+                    // Seleccionar especialidad si existe
+                    const espSelect = document.getElementById('contrib-especialidad');
+                    if (espSelect && app.contribState.especialidad) {
+                        espSelect.value = app.contribState.especialidad;
+                        await app.updateContribAsignaturas();
+                    }
+                    
+                    // Seleccionar asignatura
+                    const asigSelect = document.getElementById('contrib-asignatura');
+                    if (asigSelect) {
+                        asigSelect.value = contrib.asignaturaId;
+                    }
+                    
+                    // Iniciar el formulario de contribución
+                    app.startContributing();
+                    
+                    // Cargar los datos de la contribución en el formulario
+                    setTimeout(() => {
+                        document.getElementById('contrib-tema').value = contrib.tema;
+                        document.getElementById('contrib-question').value = contrib.question;
+                        document.getElementById('contrib-option-1').value = contrib.options[0];
+                        document.getElementById('contrib-option-2').value = contrib.options[1];
+                        document.getElementById('contrib-option-3').value = contrib.options[2];
+                        document.getElementById('contrib-option-4').value = contrib.options[3];
+                        
+                        // Seleccionar la respuesta correcta
+                        const correctIdx = contrib.options.indexOf(contrib.answer) + 1;
+                        document.getElementById('contrib-correct').value = correctIdx;
+                        
+                        // Cambiar el botón de enviar
+                        const submitBtn = document.querySelector('#contrib-form-area button[onclick="app.submitContribution()"]');
+                        if (submitBtn) {
+                            submitBtn.innerHTML = '💾 Guardar Cambios';
+                            submitBtn.style.background = '#3b82f6';
+                        }
+                        
+                        app.showToast('✏️ Editando contribución');
+                    }, 100);
+                }, 200);
             },
             
             // Eliminar contribución
@@ -1994,14 +2062,23 @@
                     // Cargar asignaturas de especialidad si no están cargadas
                     await app.loadEspecialidadData(especialidadId);
                     
-                    // Filtrar asignaturas de la especialidad seleccionada (el ID de la asig contiene el especialidadId)
-                    const especialidadAsigs = app.asignaturasDisponibles.filter(a => 
-                        a.tipo === 'especialidad' && a.id.startsWith(especialidadId + '-')
-                    );
+                    // Obtener la lista de asignaturas de especialidad desde CONFIG
+                    const asignaturasEsp = especialidadId === 'orientacion-educativa' 
+                        ? CONFIG.asignaturas.especialidadOrientacion 
+                        : CONFIG.asignaturas.especialidad;
                     
-                    if (especialidadAsigs.length > 0) {
+                    // Construir opciones de especialidad directamente desde loadedData
+                    const especialidadOpts = [];
+                    asignaturasEsp.forEach(asig => {
+                        const key = `${especialidadId}-${asig.id}`;
+                        if (app.loadedData[key]) {
+                            especialidadOpts.push({ id: key, nombre: asig.nombre });
+                        }
+                    });
+                    
+                    if (especialidadOpts.length > 0) {
                         options += '<optgroup label="📘 Especialidad">';
-                        especialidadAsigs.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                        especialidadOpts.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
                         options += '</optgroup>';
                     }
                     
@@ -2175,11 +2252,18 @@
                                         <div>✅ ${contrib.answer}</div>
                                     </div>
                                 </div>
-                                <button onclick="app.deleteContribution('${contrib.id}')" 
-                                        style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 4px; padding: 0.5rem; cursor: pointer; flex-shrink: 0;"
-                                        title="Eliminar">
-                                    🗑️
-                                </button>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button onclick="app.editContribution('${contrib.id}')" 
+                                            style="background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; border-radius: 4px; padding: 0.5rem; cursor: pointer; flex-shrink: 0;"
+                                            title="Editar">
+                                        ✏️
+                                    </button>
+                                    <button onclick="app.deleteContribution('${contrib.id}')" 
+                                            style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 4px; padding: 0.5rem; cursor: pointer; flex-shrink: 0;"
+                                            title="Eliminar">
+                                        🗑️
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -2268,24 +2352,42 @@
                     answer
                 };
                 
-                app.addContribution(contribution);
-                
-                // Guardar el tema para la próxima pregunta
-                app.contribState.tema = temaNum;
-                app.saveContribState();
-                
-                // Limpiar solo pregunta y opciones, mantener tema
-                document.getElementById('contrib-question').value = '';
-                document.getElementById('contrib-option-1').value = '';
-                document.getElementById('contrib-option-2').value = '';
-                document.getElementById('contrib-option-3').value = '';
-                document.getElementById('contrib-option-4').value = '';
-                document.getElementById('contrib-correct').value = '';
-                
-                // Focus en el campo de pregunta para continuar rápidamente
-                document.getElementById('contrib-question').focus();
-                
-                app.renderContributionsList();
+                // Si estamos editando, reemplazar la contribución existente
+                if (app.editingContribId) {
+                    const index = app.userContributions.findIndex(c => c.id === app.editingContribId);
+                    if (index !== -1) {
+                        // Mantener el ID y timestamp originales
+                        contribution.id = app.editingContribId;
+                        contribution.timestamp = app.userContributions[index].timestamp;
+                        app.userContributions[index] = contribution;
+                        app.saveContributions();
+                        app.showToast('✅ Contribución actualizada');
+                    }
+                    // Resetear el modo de edición
+                    app.editingContribId = null;
+                    // Volver a la lista
+                    app.navigate('contribute');
+                } else {
+                    // Nueva contribución
+                    app.addContribution(contribution);
+                    
+                    // Guardar el tema para la próxima pregunta
+                    app.contribState.tema = temaNum;
+                    app.saveContribState();
+                    
+                    // Limpiar solo pregunta y opciones, mantener tema
+                    document.getElementById('contrib-question').value = '';
+                    document.getElementById('contrib-option-1').value = '';
+                    document.getElementById('contrib-option-2').value = '';
+                    document.getElementById('contrib-option-3').value = '';
+                    document.getElementById('contrib-option-4').value = '';
+                    document.getElementById('contrib-correct').value = '';
+                    
+                    // Focus en el campo de pregunta para continuar rápidamente
+                    document.getElementById('contrib-question').focus();
+                    
+                    app.renderContributionsList();
+                }
             },
             
             // Renderizar vista de administración
