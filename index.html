@@ -1268,7 +1268,7 @@
             },
             
             // Cargar asignaturas de especialidad
-            loadEspecialidadData: async (especialidadId) => {
+            loadEspecialidadData: async (especialidadId, forceUpdate = false) => {
                 const especialidadPath = `data/asignaturas/especialidades/${especialidadId}`;
                 const asignaturasEsp = especialidadId === 'orientacion-educativa' 
                     ? CONFIG.asignaturas.especialidadOrientacion 
@@ -1289,7 +1289,31 @@
                         }
                     }
                 }
-                app.updateAvailableSubjects();
+                
+                // Si forceUpdate es true, agregar manualmente las asignaturas de especialidad a asignaturasDisponibles
+                // sin depender de app.currentEspecialidad
+                if (forceUpdate) {
+                    // Remover asignaturas de especialidad anteriores
+                    app.asignaturasDisponibles = app.asignaturasDisponibles.filter(a => a.tipo !== 'especialidad');
+                    
+                    // Agregar las nuevas asignaturas de especialidad
+                    asignaturasEsp.forEach(asig => {
+                        const key = `${especialidadId}-${asig.id}`;
+                        if (app.loadedData[key]) {
+                            app.asignaturasDisponibles.push({
+                                id: key,
+                                nombre: asig.nombre,
+                                tipo: 'especialidad',
+                                especialidad: CONFIG.especialidades[especialidadId],
+                                archivo: asig.archivo,
+                                baseId: asig.id,
+                                data: app.loadedData[key]
+                            });
+                        }
+                    });
+                } else {
+                    app.updateAvailableSubjects();
+                }
             },
             
             // Actualizar lista de asignaturas disponibles
@@ -2873,7 +2897,8 @@
                 
                 if (especialidadId) {
                     // Cargar asignaturas de especialidad si no están cargadas
-                    await app.loadEspecialidadData(especialidadId);
+                    // Usar forceUpdate=true para agregar a asignaturasDisponibles aunque no esté currentEspecialidad
+                    await app.loadEspecialidadData(especialidadId, true);
                 }
                 
                 // Ahora construir las opciones desde asignaturasDisponibles (que ya está actualizado)
