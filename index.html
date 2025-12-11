@@ -2874,58 +2874,29 @@
                 if (especialidadId) {
                     // Cargar asignaturas de especialidad si no están cargadas
                     await app.loadEspecialidadData(especialidadId);
-                    
-                    // Obtener la lista de asignaturas de especialidad desde CONFIG
-                    const asignaturasEsp = especialidadId === 'orientacion-educativa' 
-                        ? CONFIG.asignaturas.especialidadOrientacion 
-                        : CONFIG.asignaturas.especialidad;
-                    
-                    // Construir opciones de especialidad directamente desde loadedData
-                    const especialidadOpts = [];
-                    asignaturasEsp.forEach(asig => {
-                        const key = `${especialidadId}-${asig.id}`;
-                        if (app.loadedData[key]) {
-                            especialidadOpts.push({ id: key, nombre: asig.nombre });
-                        }
-                    });
-                    
-                    if (especialidadOpts.length > 0) {
-                        options += '<optgroup label="📘 Especialidad">';
-                        especialidadOpts.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                        options += '</optgroup>';
-                    }
-                    
-                    // También incluir obligatorias y optativas
-                    const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
-                    const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
-                    
-                    if (obligatorias.length > 0) {
-                        options += '<optgroup label="📕 Obligatorias">';
-                        obligatorias.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                        options += '</optgroup>';
-                    }
-                    
-                    if (optativas.length > 0) {
-                        options += '<optgroup label="📗 Optativas Comunes">';
-                        optativas.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                        options += '</optgroup>';
-                    }
-                } else {
-                    // Solo mostrar obligatorias y optativas
-                    const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
-                    const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
-                    
-                    if (obligatorias.length > 0) {
-                        options += '<optgroup label="📕 Obligatorias">';
-                        obligatorias.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                        options += '</optgroup>';
-                    }
-                    
-                    if (optativas.length > 0) {
-                        options += '<optgroup label="📗 Optativas Comunes">';
-                        optativas.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                        options += '</optgroup>';
-                    }
+                }
+                
+                // Ahora construir las opciones desde asignaturasDisponibles (que ya está actualizado)
+                const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
+                const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
+                const especialidad = app.asignaturasDisponibles.filter(a => a.tipo === 'especialidad');
+                
+                if (especialidad.length > 0) {
+                    options += '<optgroup label="📘 Especialidad">';
+                    especialidad.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                    options += '</optgroup>';
+                }
+                
+                if (obligatorias.length > 0) {
+                    options += '<optgroup label="📕 Obligatorias">';
+                    obligatorias.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                    options += '</optgroup>';
+                }
+                
+                if (optativas.length > 0) {
+                    options += '<optgroup label="📗 Optativas Comunes">';
+                    optativas.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                    options += '</optgroup>';
                 }
                 
                 asignaturaSelect.innerHTML = options;
