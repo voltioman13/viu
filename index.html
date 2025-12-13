@@ -512,6 +512,13 @@
     <!-- Notificación Flotante -->
     <div id="toast">Mensaje</div>
     <script>
+        // --- CONFIGURACIÓN RESTDB.IO ---
+        const RESTDB_CONFIG = {
+            baseUrl: 'https://viuexamenestest-305b.restdb.io/rest',
+            apiKey: '693da0fb093655f0e7408453',
+            collection: 'preguntas'
+        };
+        
         // --- CONFIGURACIÓN Y ESTRUCTURA ---
         const CONFIG = {
             especialidades: {
@@ -560,6 +567,13 @@
             asignaturasDisponibles: [],
             loadedData: {},
             
+            // Preguntas de la base de datos
+            dbQuestions: [],
+            dbQuestionsLoaded: false,
+            
+            // ID único del usuario (para controlar sus propias preguntas)
+            userId: null,
+            
             // Estado del Quiz
             quiz: { 
                 index: 0, 
@@ -605,6 +619,9 @@
             // ID de contribución siendo editada (null si es nueva)
             editingContribId: null,
             
+            // ID de pregunta de BD siendo editada (null si es nueva)
+            editingDbQuestionId: null,
+            
             // Estado para persistir la búsqueda
             searchState: { term: '', resultsHTML: '' },
             
@@ -638,6 +655,7 @@
             
             init: async () => {
                 app.showLoading('Cargando datos...');
+                app.getUserId(); // Inicializar ID del usuario
                 app.loadMarkedQuestions();
                 app.loadTestHistory();
                 app.loadStats();
@@ -663,10 +681,10 @@
                         await app.loadEspecialidadData(app.savedPreferences.lastEspecialidad);
                     }
                     if (app.savedPreferences.lastAsignatura) {
-                        app.selectAsignatura(app.savedPreferences.lastAsignatura);
+                        await app.selectAsignatura(app.savedPreferences.lastAsignatura);
                         // Aplicar filtro de tema si hay uno guardado
                         if (app.savedPreferences.lastTema && app.savedPreferences.lastTema !== 'all') {
-                            app.applyTemaFilter(app.savedPreferences.lastTema);
+                            await app.applyTemaFilter(app.savedPreferences.lastTema);
                         }
                     }
                     if (app.savedPreferences.randomOrder !== undefined) {
@@ -917,6 +935,185 @@
                     console.error('Error guardando historial de fallos:', e);
                 }
             },
+            
+            // ==========================================
+            // === FUNCIONES RESTDB.IO ===
+            // ==========================================
+            
+            // Obtener o crear ID único del usuario
+            getUserId: () => {
+                if (app.userId) return app.userId;
+                let stored = localStorage.getItem('viu_user_id');
+                if (!stored) {
+                    stored = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('viu_user_id', stored);
+                }
+                app.userId = stored;
+                return stored;
+            },
+            
+            // Cargar preguntas de la base de datos
+            loadDbQuestions: async (especialidad = '', asignatura = '') => {
+                try {
+                    let url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}`;
+                    const params = [];
+                    
+                    // Construir query para filtrar
+                    const query = {};
+                    if (especialidad) query.especialidad = especialidad;
+                    if (asignatura) query.asignatura = asignatura;
+                    
+                    if (Object.keys(query).length > 0) {
+                        params.push(`q=${encodeURIComponent(JSON.stringify(query))}`);
+                    }
+                    
+                    if (params.length > 0) {
+                        url += '?' + params.join('&');
+                    }
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-apikey': RESTDB_CONFIG.apiKey,
+                            'cache-control': 'no-cache'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    app.dbQuestions = data;
+                    app.dbQuestionsLoaded = true;
+                    console.log(`✅ Cargadas ${data.length} preguntas de la BD`);
+                    return data;
+                } catch (error) {
+                    console.error('Error cargando preguntas de BD:', error);
+                    app.showToast('⚠️ Error conectando con la base de datos');
+                    return [];
+                }
+            },
+            
+            // Guardar pregunta en la base de datos
+            saveQuestionToDb: async (questionData) => {
+                try {
+                    console.log('💾 Guardando pregunta en BD...');
+                    console.log('📦 Datos:', questionData);
+                    
+                    const response = await fetch(`${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-apikey': RESTDB_CONFIG.apiKey
+                        },
+                        body: JSON.stringify(questionData)
+                    });
+                    
+                    console.log('📬 Response status:', response.status);
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('Error response:', errorText);
+                        throw new Error(`HTTP ${response.status}: ${errorText}`);
+                    }
+                    
+                    const saved = await response.json();
+                    console.log('✅ Pregunta guardada en BD:', saved._id);
+                    return saved;
+                } catch (error) {
+                    console.error('Error guardando pregunta:', error);
+                    throw error;
+                }
+            },
+            
+            // Eliminar pregunta de la base de datos (solo el autor puede)
+            deleteQuestionFromDb: async (questionId) => {
+                try {
+                    const response = await fetch(`${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}/${questionId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-apikey': RESTDB_CONFIG.apiKey
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP: ${response.status}`);
+                    }
+                    
+                    console.log('✅ Pregunta eliminada de BD:', questionId);
+                    return true;
+                } catch (error) {
+                    console.error('Error eliminando pregunta:', error);
+                    throw error;
+                }
+            },
+            
+            // Convertir preguntas de BD a formato del sistema
+            convertDbQuestionsToFormat: (dbQuestions) => {
+                const byTema = {};
+                dbQuestions.forEach(q => {
+                    const tema = q.tema || 1;
+                    if (!byTema[tema]) {
+                        byTema[tema] = {
+                            numero: tema,
+                            nombre: `Tema ${tema}`,
+                            preguntas: []
+                        };
+                    }
+                    
+                    // Parsear opciones si es string JSON
+                    let opciones = q.opciones;
+                    if (typeof opciones === 'string') {
+                        try {
+                            opciones = JSON.parse(opciones);
+                        } catch (e) {
+                            opciones = [opciones];
+                        }
+                    }
+                    
+                    byTema[tema].preguntas.push({
+                        id: q._id,
+                        pregunta: q.pregunta,
+                        opciones: opciones,
+                        respuesta_correcta: q.respuesta_correcta,
+                        autor: q.autor,
+                        fromDb: true
+                    });
+                });
+                
+                return Object.values(byTema).sort((a, b) => a.numero - b.numero);
+            },
+            
+            // Obtener preguntas combinadas (JSON local + BD)
+            getCombinedQuestions: async (asignaturaId, especialidadId = '') => {
+                // AHORA SOLO USAMOS PREGUNTAS DE LA BASE DE DATOS
+                // Los archivos JSON ya no se usan para los tests
+                
+                // Cargar preguntas de la BD para esta asignatura
+                const dbQuestions = await app.loadDbQuestions(especialidadId, asignaturaId);
+                const dbTemas = app.convertDbQuestionsToFormat(dbQuestions);
+                
+                // Ordenar temas por número
+                dbTemas.sort((a, b) => a.numero - b.numero);
+                
+                // Buscar nombre de asignatura
+                const localData = app.loadedData[asignaturaId];
+                const asignaturaNombre = localData?.nombre || asignaturaId;
+                
+                return {
+                    id: asignaturaId,
+                    nombre: asignaturaNombre,
+                    temas: dbTemas,
+                    totalDbQuestions: dbQuestions.length
+                };
+            },
+            
+            // ==========================================
+            // === FIN FUNCIONES RESTDB.IO ===
+            // ==========================================
             
             // Añadir nueva contribución
             addContribution: (contribution) => {
@@ -1356,69 +1553,102 @@
             },
             
             // Seleccionar asignatura
-            selectAsignatura: (asigId) => {
+            selectAsignatura: async (asigId) => {
                 const asig = app.asignaturasDisponibles.find(a => a.id === asigId);
                 if (asig) {
                     app.currentAsignatura = asig;
-                    app.updateQuestionsFromAsignatura();
+                    await app.updateQuestionsFromAsignatura();
                 }
             },
             
-            // Actualizar preguntas desde la asignatura actual
-            updateQuestionsFromAsignatura: () => {
+            // Actualizar preguntas desde la asignatura actual (incluyendo BD)
+            updateQuestionsFromAsignatura: async () => {
                 if (!app.currentAsignatura) {
                     app.filteredQuestions = [];
                     return;
                 }
                 
-                const data = app.currentAsignatura.data;
                 app.filteredQuestions = [];
                 
-                if (!data.temas || !Array.isArray(data.temas)) {
-                    console.error('Datos inválidos: no hay temas', data);
+                // SOLO cargar preguntas de la BD (ya no usamos JSON locales)
+                try {
+                    const dbQuestions = await app.loadDbQuestions(app.currentEspecialidad, app.currentAsignatura.id);
+                    dbQuestions.forEach(q => {
+                        let opciones = q.opciones;
+                        if (typeof opciones === 'string') {
+                            try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                        }
+                        
+                        app.filteredQuestions.push({
+                            id: q._id,
+                            subject: q.asignatura_nombre || app.currentAsignatura.nombre,
+                            unit: q.tema,
+                            question: q.pregunta,
+                            options: opciones,
+                            answer: q.respuesta_correcta,
+                            fromDb: true,
+                            autor: q.autor
+                        });
+                    });
+                    
+                    console.log(`📚 Cargadas ${dbQuestions.length} preguntas de la BD`);
+                } catch (error) {
+                    console.warn('No se pudieron cargar preguntas de la BD:', error);
+                }
+            },
+
+            // Aplicar filtro de tema específico (incluyendo BD)
+            applyTemaFilter: async (temaNum) => {
+                if (!app.currentAsignatura || temaNum === 'all') {
+                    await app.updateQuestionsFromAsignatura();
                     return;
                 }
                 
-                data.temas.forEach(tema => {
-                    if (tema.preguntas && Array.isArray(tema.preguntas)) {
-                        tema.preguntas.forEach(p => {
+                app.filteredQuestions = [];
+                
+                // SOLO cargar preguntas de la BD (ya no usamos JSON locales)
+                try {
+                    let url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}`;
+                    const query = {
+                        asignatura: app.currentAsignatura.id,
+                        tema: parseInt(temaNum)
+                    };
+                    if (app.currentEspecialidad) {
+                        query.especialidad = app.currentEspecialidad;
+                    }
+                    url += `?q=${encodeURIComponent(JSON.stringify(query))}`;
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-apikey': RESTDB_CONFIG.apiKey,
+                            'cache-control': 'no-cache'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const dbQuestions = await response.json();
+                        dbQuestions.forEach(q => {
+                            let opciones = q.opciones;
+                            if (typeof opciones === 'string') {
+                                try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                            }
+                            
                             app.filteredQuestions.push({
-                                id: p.id,
-                                subject: data.asignatura,
-                                unit: tema.numero,
-                                question: p.pregunta,
-                                options: p.opciones,
-                                answer: p.respuesta_correcta
+                                id: q._id,
+                                subject: q.asignatura_nombre || app.currentAsignatura.nombre,
+                                unit: q.tema,
+                                question: q.pregunta,
+                                options: opciones,
+                                answer: q.respuesta_correcta,
+                                fromDb: true,
+                                autor: q.autor
                             });
                         });
                     }
-                });
-            },
-            
-            // Aplicar filtro de tema específico
-            applyTemaFilter: (temaNum) => {
-                if (!app.currentAsignatura || temaNum === 'all') {
-                    app.updateQuestionsFromAsignatura();
-                    return;
-                }
-                
-                const data = app.currentAsignatura.data;
-                app.filteredQuestions = [];
-                
-                if (!data.temas || !Array.isArray(data.temas)) return;
-                
-                const tema = data.temas.find(t => t.numero == temaNum);
-                if (tema && tema.preguntas && Array.isArray(tema.preguntas)) {
-                    tema.preguntas.forEach(p => {
-                        app.filteredQuestions.push({
-                            id: p.id,
-                            subject: data.asignatura,
-                            unit: tema.numero,
-                            question: p.pregunta,
-                            options: p.opciones,
-                            answer: p.respuesta_correcta
-                        });
-                    });
+                } catch (error) {
+                    console.warn('No se pudieron cargar preguntas de la BD:', error);
                 }
             },
             
@@ -1435,7 +1665,7 @@
             },
             
             // Navegación
-            navigate: (viewId, param = null) => {
+            navigate: async (viewId, param = null) => {
                 // Cerrar dropdown si está abierto
                 app.closeDropdown();
                 
@@ -1470,7 +1700,7 @@
                 container.innerHTML = '';
 
                 switch(viewId) {
-                    case 'home': app.renderHome(container); break;
+                    case 'home': await app.renderHome(container); break;
                     case 'quiz': app.renderQuiz(container); break;
                     case 'exam-mode': app.renderExamMode(container); break;
                     case 'review-mode': app.renderReviewMode(container); break;
@@ -1481,12 +1711,59 @@
                     case 'history': app.renderHistory(container); break;
                     case 'contribute': app.renderContribute(container); break;
                     case 'admin': app.renderAdmin(container); break;
-                    default: app.renderHome(container);
+                    default: await app.renderHome(container);
                 }
             },
 
             // --- VISTAS ---
-            renderHome: (container) => {
+            renderHome: async (container) => {
+                // Mostrar loading mientras cargamos datos de BD
+                container.innerHTML = '<div class="loading-box"><p>⏳ Cargando preguntas...</p></div>';
+                
+                // Cargar TODAS las preguntas de la BD de una sola vez
+                let allDbQuestions = [];
+                try {
+                    const url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}?max=1000`;
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-apikey': RESTDB_CONFIG.apiKey,
+                            'cache-control': 'no-cache'
+                        }
+                    });
+                    if (response.ok) {
+                        allDbQuestions = await response.json();
+                        console.log('📚 Total preguntas en BD:', allDbQuestions.length);
+                        // Debug: mostrar las asignaturas únicas en BD
+                        const asignaturasEnBD = [...new Set(allDbQuestions.map(q => q.asignatura))];
+                        console.log('📋 Asignaturas en BD:', asignaturasEnBD);
+                    }
+                } catch (e) {
+                    console.warn('Error cargando preguntas de BD:', e);
+                }
+                
+                // Función para contar preguntas por asignatura (desde datos ya cargados)
+                const countByAsignatura = (asignaturaId) => {
+                    const count = allDbQuestions.filter(q => q.asignatura === asignaturaId).length;
+                    if (count > 0) console.log(`📊 ${asignaturaId}: ${count} preguntas`);
+                    return count;
+                };
+                
+                // Función para obtener temas de una asignatura (desde datos ya cargados)
+                const getTemasForAsignatura = (asignaturaId) => {
+                    const questions = allDbQuestions.filter(q => q.asignatura === asignaturaId);
+                    const temasMap = {};
+                    questions.forEach(q => {
+                        const tema = q.tema || 1;
+                        if (!temasMap[tema]) {
+                            temasMap[tema] = { numero: tema, nombre: `Tema ${tema}`, count: 0 };
+                        }
+                        temasMap[tema].count++;
+                    });
+                    return Object.values(temasMap).sort((a, b) => a.numero - b.numero);
+                };
+                
                 // Opciones de especialidad
                 const especialidadOptions = Object.entries(CONFIG.especialidades).map(([id, nombre]) => 
                     `<option value="${id}" ${id === app.currentEspecialidad ? 'selected' : ''}>${nombre}</option>`
@@ -1502,7 +1779,7 @@
                 if (obligatorias.length > 0) {
                     asignaturaOptions += '<optgroup label="📕 Obligatorias">';
                     obligatorias.forEach(a => {
-                        const numPreguntas = a.data.temas.reduce((sum, t) => sum + t.preguntas.length, 0);
+                        const numPreguntas = countByAsignatura(a.id);
                         const selected = app.currentAsignatura && app.currentAsignatura.id === a.id ? 'selected' : '';
                         asignaturaOptions += `<option value="${a.id}" ${selected}>${a.nombre} (${numPreguntas} preguntas)</option>`;
                     });
@@ -1512,7 +1789,7 @@
                 if (optativas.length > 0) {
                     asignaturaOptions += '<optgroup label="📗 Optativas Comunes">';
                     optativas.forEach(a => {
-                        const numPreguntas = a.data.temas.reduce((sum, t) => sum + t.preguntas.length, 0);
+                        const numPreguntas = countByAsignatura(a.id);
                         const selected = app.currentAsignatura && app.currentAsignatura.id === a.id ? 'selected' : '';
                         asignaturaOptions += `<option value="${a.id}" ${selected}>${a.nombre} (${numPreguntas} preguntas)</option>`;
                     });
@@ -1522,7 +1799,8 @@
                 if (especialidad.length > 0) {
                     asignaturaOptions += `<optgroup label="📘 ${app.currentAsignatura?.especialidad || 'Especialidad'}">`;
                     especialidad.forEach(a => {
-                        const numPreguntas = a.data.temas.reduce((sum, t) => sum + t.preguntas.length, 0);
+                        const numPreguntas = countByAsignatura(a.id);
+                        console.log(`🔍 Buscando asignatura especialidad: "${a.id}"`);
                         const selected = app.currentAsignatura && app.currentAsignatura.id === a.id ? 'selected' : '';
                         asignaturaOptions += `<option value="${a.id}" ${selected}>${a.nombre} (${numPreguntas} preguntas)</option>`;
                     });
@@ -1532,15 +1810,15 @@
                 const totalPreguntas = app.filteredQuestions.length;
                 const canStartQuiz = totalPreguntas > 0;
                 
-                // Obtener temas disponibles de la asignatura actual
+                // Obtener temas disponibles para la asignatura actual
                 let temasDisponibles = [];
-                if (app.currentAsignatura && app.currentAsignatura.data.temas) {
-                    temasDisponibles = app.currentAsignatura.data.temas.filter(t => t.preguntas && t.preguntas.length > 0);
+                if (app.currentAsignatura) {
+                    temasDisponibles = getTemasForAsignatura(app.currentAsignatura.id);
                 }
                 
                 const savedTema = app.savedPreferences?.lastTema || 'all';
                 const unitOptions = temasDisponibles.map(tema => 
-                    `<option value="${tema.numero}" ${savedTema == tema.numero ? 'selected' : ''}>${tema.nombre} (${tema.preguntas.length} preguntas)</option>`
+                    `<option value="${tema.numero}" ${savedTema == tema.numero ? 'selected' : ''}>${tema.nombre} (${tema.count} preguntas)</option>`
                 ).join('');
                 
                 // Determinar el tema seleccionado para mostrar en el mensaje
@@ -1648,7 +1926,8 @@
                                 <li><strong>Nombre:</strong> ${app.currentAsignatura.nombre}</li>
                                 <li><strong>Tipo:</strong> ${app.currentAsignatura.tipo}</li>
                                 ${app.currentAsignatura.especialidad ? `<li><strong>Especialidad:</strong> ${app.currentAsignatura.especialidad}</li>` : ''}
-                                <li><strong>Temas:</strong> ${app.currentAsignatura.data.temas.length}</li>
+                                <li><strong>Temas:</strong> ${temasDisponibles.length}</li>
+                                <li><strong>Preguntas:</strong> ${totalPreguntas}</li>
                             </ul>
                         </div>
                         ` : ''}
@@ -1692,22 +1971,23 @@
                         });
                     }
                     if (unitSelector) {
-                        unitSelector.addEventListener('change', () => {
+                        unitSelector.addEventListener('change', async () => {
                             const selectedValue = unitSelector.value;
                             
                             // Aplicar filtro de tema
-                            app.applyTemaFilter(selectedValue);
+                            await app.applyTemaFilter(selectedValue);
                             
                             app.savePreferences();
                             
                             // Actualizar el mensaje dinámicamente
                             const infoBox = document.getElementById('quiz-info-box');
                             if (infoBox) {
-                                const temas = app.currentAsignatura?.data?.temas?.filter(t => t.preguntas && t.preguntas.length > 0) || [];
                                 let totalQ = app.filteredQuestions.length;
+                                // Contar temas únicos de las preguntas filtradas
+                                const uniqueTemas = new Set(app.filteredQuestions.map(q => q.unit));
                                 
                                 if (selectedValue === 'all') {
-                                    infoBox.innerHTML = `<p style="margin:0; font-weight:600; color: #065f46;">✅ ${totalQ} preguntas disponibles (${temas.length} temas)</p>`;
+                                    infoBox.innerHTML = `<p style="margin:0; font-weight:600; color: #065f46;">✅ ${totalQ} preguntas disponibles (${uniqueTemas.size} temas)</p>`;
                                 } else {
                                     infoBox.innerHTML = `<p style="margin:0; font-weight:600; color: #065f46;">✅ ${totalQ} preguntas disponibles - Tema ${selectedValue}</p>`;
                                 }
@@ -2588,13 +2868,13 @@
                 summaryContent.innerHTML = html;
             },
             
-            studyThisTema: (temaNumero) => {
+            studyThisTema: async (temaNumero) => {
                 // Aplicar filtro de tema
                 const unitSelector = document.getElementById('unit-selector');
                 if (unitSelector) {
                     unitSelector.value = temaNumero;
                 }
-                app.applyTemaFilter(temaNumero);
+                await app.applyTemaFilter(temaNumero);
                 app.savePreferences();
                 
                 // Iniciar test
@@ -2820,7 +3100,7 @@
                             
                             <div class="form-group">
                                 <label class="form-label">📖 Asignatura:</label>
-                                <select id="contrib-asignatura" class="form-select">
+                                <select id="contrib-asignatura" class="form-select" onchange="app.renderDbContributionsList()">
                                     <option value="">Selecciona una asignatura</option>
                                     ${asignaturaOptions}
                                 </select>
@@ -2833,16 +3113,11 @@
                         
                         <div id="contrib-form-area" style="display: none;"></div>
                         <div id="contributions-list"></div>
-                        
-                        <div style="text-align: center; margin-top: 2rem;">
-                            <button class="btn-outline" style="border:none; font-size:0.8rem; color: var(--text-secondary); cursor: pointer;" onclick="app.navigate('admin')">
-                                Acceso administrador
-                            </button>
-                        </div>
                     </div>
                 `;
                 
-                app.renderContributionsList();
+                // Cargar preguntas del usuario desde la BD (filtradas por selección)
+                app.renderDbContributionsList();
                 
                 // Restaurar valores guardados
                 setTimeout(() => {
@@ -2929,6 +3204,9 @@
                 }
                 
                 asignaturaSelect.innerHTML = options;
+                
+                // Actualizar lista de contribuciones con el nuevo filtro
+                app.renderDbContributionsList();
             },
             
             // Iniciar proceso de contribución
@@ -3092,21 +3370,19 @@
                 const temaInput = document.getElementById('contrib-tema');
                 
                 if (asignaturaId) {
-                    const asignatura = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
-                    if (asignatura && asignatura.data && asignatura.data.temas) {
-                        const maxTema = asignatura.data.temas.length;
-                        temaInput.max = maxTema;
-                        temaInput.placeholder = `Número de tema (1-${maxTema})`;
-                    }
+                    // Con BD, permitimos hasta 50 temas (ya no dependemos del JSON)
+                    temaInput.max = 50;
+                    temaInput.placeholder = 'Número de tema (1-50)';
                 } else {
-                    temaInput.max = '';
+                    temaInput.max = 50;
                     temaInput.placeholder = 'Número de tema (ej: 1, 2, 3...)';
                 }
             },
             
             // Enviar contribución
-            submitContribution: () => {
+            submitContribution: async () => {
                 const asignaturaId = document.getElementById('contrib-asignatura').value;
+                const especialidadId = document.getElementById('contrib-especialidad').value;
                 const tema = document.getElementById('contrib-tema').value;
                 const question = document.getElementById('contrib-question').value.trim();
                 const option1 = document.getElementById('contrib-option-1').value.trim();
@@ -3141,48 +3417,90 @@
                     return;
                 }
                 
-                // Buscar asignatura en todas las listas
-                const asignatura = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
+                // Buscar asignatura - primero en asignaturasDisponibles
+                let asignatura = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
+                let asignaturaNombre = '';
                 
-                if (!asignatura) {
+                // Si no se encuentra, puede ser una asignatura de especialidad (ID compuesto)
+                if (!asignatura && especialidadId) {
+                    // El ID es algo como "tecnologias-informatica-complementos-formacion-disciplinar"
+                    // Extraer el nombre de la asignatura base
+                    const asignaturasEsp = especialidadId === 'orientacion-educativa' 
+                        ? CONFIG.asignaturas.especialidadOrientacion 
+                        : CONFIG.asignaturas.especialidad;
+                    
+                    // Buscar en las asignaturas de especialidad
+                    for (const asig of asignaturasEsp) {
+                        const expectedId = `${especialidadId}-${asig.id}`;
+                        if (expectedId === asignaturaId) {
+                            asignaturaNombre = asig.nombre;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!asignatura && !asignaturaNombre) {
                     app.showToast('❌ Error: Asignatura no encontrada');
                     return;
+                }
+                
+                if (asignatura) {
+                    asignaturaNombre = asignatura.nombre;
                 }
                 
                 const options = [option1, option2, option3, option4];
                 const answer = options[parseInt(correctIdx) - 1];
                 
-                // Extraer el nombre base del archivo (sin ruta ni .json)
-                let baseFileName = asignatura.archivo.split('/').pop().replace('.json', '');
+                // Verificar si estamos editando una pregunta existente
+                const isEditing = !!app.editingDbQuestionId;
                 
-                const contribution = {
-                    asignaturaId,
-                    asignaturaName: asignatura.nombre,
-                    baseFileName,  // Nombre del archivo real en data/asignaturas/
-                    tema: parseInt(tema),
-                    question,
-                    options,
-                    answer
+                // Crear objeto para guardar en la BD
+                const questionData = {
+                    pregunta: question,
+                    opciones: JSON.stringify(options), // Guardar como JSON string
+                    respuesta_correcta: answer,
+                    especialidad: especialidadId || '',
+                    asignatura: asignaturaId,
+                    asignatura_nombre: asignaturaNombre,
+                    tema: temaNum,
+                    autor: app.getUserId(),
+                    fecha_creacion: isEditing ? undefined : new Date().toISOString(), // No cambiar fecha si editamos
+                    aprobada: true // Por defecto aprobada para que aparezca
                 };
                 
-                // Si estamos editando, reemplazar la contribución existente
-                if (app.editingContribId) {
-                    const index = app.userContributions.findIndex(c => c.id === app.editingContribId);
-                    if (index !== -1) {
-                        // Mantener el ID y timestamp originales
-                        contribution.id = app.editingContribId;
-                        contribution.timestamp = app.userContributions[index].timestamp;
-                        app.userContributions[index] = contribution;
-                        app.saveContributions();
-                        app.showToast('✅ Contribución actualizada');
+                // Mostrar estado de carga
+                const submitBtn = document.querySelector('#contrib-form-area button[onclick="app.submitContribution()"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = isEditing ? '⏳ Guardando...' : '⏳ Enviando...';
+                }
+                
+                try {
+                    if (isEditing) {
+                        // Actualizar pregunta existente con PUT
+                        const url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}/${app.editingDbQuestionId}`;
+                        
+                        // Eliminar campos undefined
+                        if (!questionData.fecha_creacion) delete questionData.fecha_creacion;
+                        
+                        const response = await fetch(url, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'x-apikey': RESTDB_CONFIG.apiKey
+                            },
+                            body: JSON.stringify(questionData)
+                        });
+                        
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        
+                        app.showToast('✅ ¡Pregunta actualizada correctamente!');
+                        app.editingDbQuestionId = null; // Limpiar modo edición
+                    } else {
+                        // Guardar nueva pregunta
+                        await app.saveQuestionToDb(questionData);
+                        app.showToast('✅ ¡Pregunta enviada correctamente!');
                     }
-                    // Resetear el modo de edición
-                    app.editingContribId = null;
-                    // Volver a la lista
-                    app.navigate('contribute');
-                } else {
-                    // Nueva contribución
-                    app.addContribution(contribution);
                     
                     // Guardar el tema para la próxima pregunta
                     app.contribState.tema = temaNum;
@@ -3199,8 +3517,445 @@
                     // Focus en el campo de pregunta para continuar rápidamente
                     document.getElementById('contrib-question').focus();
                     
-                    app.renderContributionsList();
+                    // Recargar la lista de contribuciones de la BD
+                    app.renderDbContributionsList();
+                    
+                } catch (error) {
+                    console.error('Error enviando pregunta:', error);
+                    app.showToast('❌ Error al enviar. Inténtalo de nuevo.');
+                } finally {
+                    // Restaurar botón
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '➕ Añadir Pregunta';
+                    }
                 }
+            },
+            
+            // Renderizar lista de contribuciones del usuario desde la BD (filtrada)
+            renderDbContributionsList: async () => {
+                const listContainer = document.getElementById('contributions-list');
+                if (!listContainer) return;
+                
+                // Obtener filtros seleccionados
+                const especialidadSelect = document.getElementById('contrib-especialidad');
+                const asignaturaSelect = document.getElementById('contrib-asignatura');
+                const especialidadFilter = especialidadSelect ? especialidadSelect.value : '';
+                const asignaturaFilter = asignaturaSelect ? asignaturaSelect.value : '';
+                
+                listContainer.innerHTML = '<div class="loading-box"><p>⏳ Cargando tus preguntas...</p></div>';
+                
+                try {
+                    // Construir query con filtros
+                    const userId = app.getUserId();
+                    const query = { autor: userId };
+                    
+                    // Añadir filtros si están seleccionados
+                    if (especialidadFilter) query.especialidad = especialidadFilter;
+                    if (asignaturaFilter) query.asignatura = asignaturaFilter;
+                    
+                    const url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}?q=${encodeURIComponent(JSON.stringify(query))}`;
+                    
+                    console.log('🔍 Cargando preguntas con filtros:', query);
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-apikey': RESTDB_CONFIG.apiKey,
+                            'cache-control': 'no-cache'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    const myQuestions = await response.json();
+                    console.log('✅ Preguntas cargadas:', myQuestions.length);
+                    
+                    // Construir mensaje de filtro activo
+                    let filterMsg = '';
+                    if (especialidadFilter || asignaturaFilter) {
+                        filterMsg = `<p style="font-size: 0.85rem; color: var(--info); margin: 0 0 1rem 0;">🔍 Filtrado por: ${especialidadFilter ? CONFIG.especialidades[especialidadFilter] : ''} ${asignaturaFilter ? '→ ' + (asignaturaSelect.options[asignaturaSelect.selectedIndex]?.text || asignaturaFilter) : ''}</p>`;
+                    }
+                    
+                    if (myQuestions.length === 0) {
+                        listContainer.innerHTML = `
+                            <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; text-align: center;">
+                                ${filterMsg}
+                                <p class="text-muted">${especialidadFilter || asignaturaFilter ? 'No tienes preguntas con estos filtros' : 'No has enviado preguntas todavía'}</p>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary);">Las preguntas que envíes aparecerán aquí y estarán disponibles para todos los usuarios.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    let html = `
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3 style="font-size: 1.1rem; margin: 0;">📋 Tus Preguntas Enviadas (${myQuestions.length})</h3>
+                            </div>
+                            ${filterMsg}
+                            <p style="font-size: 0.85rem; color: var(--success); margin: 0 0 1rem 0;">
+                                ✅ Estas preguntas ya están disponibles para todos los usuarios
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 1rem; max-height: 400px; overflow-y: auto;">
+                    `;
+                    
+                    myQuestions.forEach(q => {
+                        let opciones = q.opciones;
+                        if (typeof opciones === 'string') {
+                            try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                        }
+                        
+                        // Guardar datos para edición
+                        const qDataStr = encodeURIComponent(JSON.stringify({
+                            _id: q._id,
+                            pregunta: q.pregunta,
+                            opciones: opciones,
+                            respuesta_correcta: q.respuesta_correcta,
+                            tema: q.tema,
+                            especialidad: q.especialidad,
+                            asignatura: q.asignatura,
+                            asignatura_nombre: q.asignatura_nombre
+                        }));
+                        
+                        html += `
+                            <div class="bg-white-box" style="padding: 1rem; border-radius: 6px; border: 1px solid var(--border);">
+                                <div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                            ${q.asignatura_nombre || q.asignatura} - Tema ${q.tema}
+                                            ${q.especialidad ? `<span class="tag tag-especialidad">${CONFIG.especialidades[q.especialidad] || q.especialidad}</span>` : ''}
+                                        </div>
+                                        <div style="font-weight: 600; margin-bottom: 0.5rem;">${q.pregunta}</div>
+                                        <div style="font-size: 0.9rem; color: var(--success);">
+                                            ✅ ${q.respuesta_correcta}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+                                        <button onclick="app.editMyQuestion('${qDataStr}')" 
+                                                style="background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; border-radius: 4px; padding: 0.5rem; cursor: pointer;"
+                                                title="Editar pregunta">
+                                            ✏️
+                                        </button>
+                                        <button onclick="app.deleteMyQuestion('${q._id}')" 
+                                                style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 4px; padding: 0.5rem; cursor: pointer;"
+                                                title="Eliminar pregunta">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div></div>';
+                    listContainer.innerHTML = html;
+                    
+                } catch (error) {
+                    console.error('Error cargando contribuciones:', error);
+                    listContainer.innerHTML = `
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; text-align: center;">
+                            <p class="text-muted">⚠️ Error conectando con la base de datos</p>
+                            <button class="btn btn-outline" onclick="app.renderDbContributionsList()" style="margin-top: 1rem;">Reintentar</button>
+                        </div>
+                    `;
+                }
+            },
+            
+            // Editar pregunta propia
+            editMyQuestion: (qDataStr) => {
+                const qData = JSON.parse(decodeURIComponent(qDataStr));
+                
+                // Guardar ID para actualización
+                app.editingDbQuestionId = qData._id;
+                
+                // Configurar selectores
+                const espSelect = document.getElementById('contrib-especialidad');
+                const asigSelect = document.getElementById('contrib-asignatura');
+                
+                if (espSelect && qData.especialidad) {
+                    espSelect.value = qData.especialidad;
+                }
+                
+                // Mostrar formulario
+                app.startContributing();
+                
+                // Rellenar datos después de un pequeño delay
+                setTimeout(() => {
+                    if (asigSelect) asigSelect.value = qData.asignatura;
+                    
+                    document.getElementById('contrib-tema').value = qData.tema;
+                    document.getElementById('contrib-question').value = qData.pregunta;
+                    document.getElementById('contrib-option-1').value = qData.opciones[0] || '';
+                    document.getElementById('contrib-option-2').value = qData.opciones[1] || '';
+                    document.getElementById('contrib-option-3').value = qData.opciones[2] || '';
+                    document.getElementById('contrib-option-4').value = qData.opciones[3] || '';
+                    
+                    // Seleccionar respuesta correcta
+                    const correctIdx = qData.opciones.indexOf(qData.respuesta_correcta) + 1;
+                    document.getElementById('contrib-correct').value = correctIdx > 0 ? correctIdx : '';
+                    
+                    // Cambiar botón de enviar
+                    const submitBtn = document.querySelector('#contrib-form-area button[onclick="app.submitContribution()"]');
+                    if (submitBtn) {
+                        submitBtn.innerHTML = '💾 Guardar Cambios';
+                        submitBtn.style.background = '#3b82f6';
+                    }
+                    
+                    app.showToast('✏️ Editando pregunta');
+                }, 150);
+            },
+            
+            // Eliminar pregunta propia
+            deleteMyQuestion: async (questionId) => {
+                if (!confirm('¿Eliminar esta pregunta? Esta acción no se puede deshacer.')) return;
+                
+                try {
+                    await app.deleteQuestionFromDb(questionId);
+                    app.showToast('✅ Pregunta eliminada');
+                    app.renderDbContributionsList();
+                } catch (error) {
+                    app.showToast('❌ Error al eliminar');
+                }
+            },
+            
+            // Renderizar vista para explorar todas las preguntas de la BD
+            renderBrowseDbQuestions: async (container) => {
+                // Opciones de especialidad
+                const especialidadOptions = Object.entries(CONFIG.especialidades).map(([id, nombre]) => 
+                    `<option value="${id}">${nombre}</option>`
+                ).join('');
+                
+                container.innerHTML = `
+                    <div class="card">
+                        <h2>🔍 Explorar Preguntas de la Base de Datos</h2>
+                        <p class="text-muted" style="margin-bottom: 2rem;">Busca y filtra preguntas enviadas por todos los usuarios. Puedes iniciar un test con las preguntas seleccionadas.</p>
+                        
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                            <h3 style="font-size: 1.1rem; margin-top: 0;">🔎 Filtros</h3>
+                            
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <div class="form-group" style="flex: 1; min-width: 200px;">
+                                    <label class="form-label">🎓 Especialidad:</label>
+                                    <select id="db-filter-especialidad" class="form-select" onchange="app.loadDbQuestionsFiltered()">
+                                        <option value="">Todas</option>
+                                        ${especialidadOptions}
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group" style="flex: 1; min-width: 200px;">
+                                    <label class="form-label">📚 Tema:</label>
+                                    <input type="number" id="db-filter-tema" class="form-select" placeholder="Ej: 1, 2, 3..." min="1" max="50" onchange="app.loadDbQuestionsFiltered()">
+                                </div>
+                            </div>
+                            
+                            <button class="btn" onclick="app.loadDbQuestionsFiltered()" style="width: 100%;">
+                                🔄 Cargar Preguntas
+                            </button>
+                        </div>
+                        
+                        <div id="db-questions-stats" style="margin-bottom: 1rem;"></div>
+                        
+                        <div id="db-questions-list">
+                            <div class="loading-box">
+                                <p>Selecciona filtros y pulsa "Cargar Preguntas"</p>
+                            </div>
+                        </div>
+                        
+                        <div id="db-test-actions" style="display: none; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                            <button class="btn btn-success" onclick="app.startDbQuestionsTest()" style="width: 100%;">
+                                📝 Iniciar Test con Preguntas Seleccionadas
+                            </button>
+                        </div>
+                        
+                        <button class="btn btn-outline" onclick="app.navigate('contribute')" style="width: 100%; margin-top: 1rem;">
+                            ⬅️ Volver
+                        </button>
+                    </div>
+                `;
+            },
+            
+            // Cargar preguntas filtradas de la BD
+            loadDbQuestionsFiltered: async () => {
+                const especialidad = document.getElementById('db-filter-especialidad').value;
+                const tema = document.getElementById('db-filter-tema').value;
+                const listContainer = document.getElementById('db-questions-list');
+                const statsContainer = document.getElementById('db-questions-stats');
+                const actionsContainer = document.getElementById('db-test-actions');
+                
+                listContainer.innerHTML = '<div class="loading-box"><p>⏳ Cargando preguntas...</p></div>';
+                statsContainer.innerHTML = '';
+                actionsContainer.style.display = 'none';
+                
+                try {
+                    let url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}`;
+                    const query = {};
+                    
+                    if (especialidad) query.especialidad = especialidad;
+                    if (tema) query.tema = parseInt(tema);
+                    
+                    if (Object.keys(query).length > 0) {
+                        url += `?q=${encodeURIComponent(JSON.stringify(query))}`;
+                    }
+                    
+                    console.log('🔍 Cargando preguntas filtradas...');
+                    console.log('📡 URL:', url);
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-apikey': RESTDB_CONFIG.apiKey,
+                            'cache-control': 'no-cache'
+                        }
+                    });
+                    
+                    console.log('📬 Response status:', response.status);
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('Error response:', errorText);
+                        throw new Error(`HTTP ${response.status}: ${errorText}`);
+                    }
+                    
+                    const questions = await response.json();
+                    
+                    // Guardar para uso posterior
+                    app.dbQuestionsForTest = questions;
+                    
+                    if (questions.length === 0) {
+                        listContainer.innerHTML = `
+                            <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; text-align: center;">
+                                <p class="text-muted">No se encontraron preguntas con estos filtros</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Mostrar estadísticas
+                    const byAsignatura = {};
+                    questions.forEach(q => {
+                        const key = q.asignatura_nombre || q.asignatura;
+                        if (!byAsignatura[key]) byAsignatura[key] = 0;
+                        byAsignatura[key]++;
+                    });
+                    
+                    statsContainer.innerHTML = `
+                        <div class="bg-blue-light" style="padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <strong>📊 ${questions.length} preguntas encontradas</strong>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                ${Object.entries(byAsignatura).map(([asig, count]) => 
+                                    `${asig}: ${count}`
+                                ).join(' · ')}
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Mostrar lista de preguntas
+                    let html = '<div style="display: flex; flex-direction: column; gap: 1rem; max-height: 500px; overflow-y: auto;">';
+                    
+                    questions.forEach((q, idx) => {
+                        let opciones = q.opciones;
+                        if (typeof opciones === 'string') {
+                            try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                        }
+                        
+                        const isOwner = q.autor === app.getUserId();
+                        
+                        html += `
+                            <div class="bg-white-box" style="padding: 1rem; border-radius: 6px; border: 1px solid var(--border);">
+                                <div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                            <span class="tag">${q.asignatura_nombre || q.asignatura}</span>
+                                            <span class="tag">Tema ${q.tema}</span>
+                                            ${q.especialidad ? `<span class="tag tag-especialidad">${CONFIG.especialidades[q.especialidad] || q.especialidad}</span>` : ''}
+                                            ${isOwner ? '<span class="tag" style="background: var(--success); color: white;">✓ Tuya</span>' : ''}
+                                        </div>
+                                        <div style="font-weight: 600; margin-bottom: 0.5rem;">${idx + 1}. ${q.pregunta}</div>
+                                        <div style="font-size: 0.85rem; margin-left: 1rem;">
+                                            ${opciones.map((op, i) => `
+                                                <div style="margin-bottom: 0.25rem; ${op === q.respuesta_correcta ? 'color: var(--success); font-weight: 600;' : 'color: var(--text-secondary);'}">
+                                                    ${op === q.respuesta_correcta ? '✓' : '○'} ${op}
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                    listContainer.innerHTML = html;
+                    
+                    // Mostrar botón de test si hay preguntas
+                    if (questions.length > 0) {
+                        actionsContainer.style.display = 'block';
+                    }
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    listContainer.innerHTML = `
+                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; text-align: center;">
+                            <p class="text-muted">⚠️ Error conectando con la base de datos</p>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                Verifica que CORS esté configurado en restdb.io<br>
+                                (Settings → Security & API → CORS → añade <code>*</code>)
+                            </p>
+                            <button class="btn btn-outline" onclick="app.loadDbQuestionsFiltered()" style="margin-top: 1rem;">Reintentar</button>
+                        </div>
+                    `;
+                }
+            },
+            
+            // Preguntas seleccionadas para test
+            dbQuestionsForTest: [],
+            
+            // Iniciar test con preguntas de la BD
+            startDbQuestionsTest: () => {
+                if (!app.dbQuestionsForTest || app.dbQuestionsForTest.length === 0) {
+                    app.showToast('⚠️ No hay preguntas cargadas');
+                    return;
+                }
+                
+                // Convertir preguntas de BD al formato del sistema
+                app.activeQuizQuestions = app.dbQuestionsForTest.map(q => {
+                    let opciones = q.opciones;
+                    if (typeof opciones === 'string') {
+                        try { opciones = JSON.parse(opciones); } catch(e) { opciones = [q.respuesta_correcta]; }
+                    }
+                    
+                    return {
+                        id: q._id,
+                        pregunta: q.pregunta,
+                        opciones: opciones,
+                        respuesta_correcta: q.respuesta_correcta,
+                        subject: q.asignatura_nombre || q.asignatura,
+                        tema: q.tema,
+                        fromDb: true
+                    };
+                });
+                
+                // Resetear estado del quiz
+                app.quiz = {
+                    index: 0,
+                    score: 0,
+                    answered: false,
+                    failedQuestions: [],
+                    answers: []
+                };
+                
+                // Aleatorizar si está configurado
+                if (app.quizSettings.randomOrder) {
+                    app.activeQuizQuestions = app.shuffle([...app.activeQuizQuestions]);
+                }
+                
+                app.showToast(`📝 Iniciando test con ${app.activeQuizQuestions.length} preguntas de la BD`);
+                app.navigate('quiz');
             },
             
             // Renderizar vista de administración
@@ -3564,8 +4319,8 @@
                 app.navigate('home');
             },
             
-            changeAsignatura: (asigId) => {
-                app.selectAsignatura(asigId);
+            changeAsignatura: async (asigId) => {
+                await app.selectAsignatura(asigId);
                 app.savePreferences();
                 app.navigate('home');
             },
