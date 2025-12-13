@@ -1268,7 +1268,7 @@
             },
             
             // Cargar asignaturas de especialidad
-            loadEspecialidadData: async (especialidadId, forceUpdate = false) => {
+            loadEspecialidadData: async (especialidadId) => {
                 const especialidadPath = `data/asignaturas/especialidades/${especialidadId}`;
                 const asignaturasEsp = especialidadId === 'orientacion-educativa' 
                     ? CONFIG.asignaturas.especialidadOrientacion 
@@ -1289,31 +1289,7 @@
                         }
                     }
                 }
-                
-                // Si forceUpdate es true, agregar manualmente las asignaturas de especialidad a asignaturasDisponibles
-                // sin depender de app.currentEspecialidad
-                if (forceUpdate) {
-                    // Remover asignaturas de especialidad anteriores
-                    app.asignaturasDisponibles = app.asignaturasDisponibles.filter(a => a.tipo !== 'especialidad');
-                    
-                    // Agregar las nuevas asignaturas de especialidad
-                    asignaturasEsp.forEach(asig => {
-                        const key = `${especialidadId}-${asig.id}`;
-                        if (app.loadedData[key]) {
-                            app.asignaturasDisponibles.push({
-                                id: key,
-                                nombre: asig.nombre,
-                                tipo: 'especialidad',
-                                especialidad: CONFIG.especialidades[especialidadId],
-                                archivo: asig.archivo,
-                                baseId: asig.id,
-                                data: app.loadedData[key]
-                            });
-                        }
-                    });
-                } else {
-                    app.updateAvailableSubjects();
-                }
+                app.updateAvailableSubjects();
             },
             
             // Actualizar lista de asignaturas disponibles
@@ -2893,40 +2869,63 @@
                 
                 if (!asignaturaSelect) return;
                 
-                console.log('DEBUG updateContribAsignaturas - especialidadId:', especialidadId);
-                
                 let options = '<option value="">Selecciona una asignatura</option>';
                 
                 if (especialidadId) {
                     // Cargar asignaturas de especialidad si no están cargadas
-                    // Usar forceUpdate=true para agregar a asignaturasDisponibles aunque no esté currentEspecialidad
-                    await app.loadEspecialidadData(especialidadId, true);
-                    console.log('DEBUG - Después de loadEspecialidadData, asignaturasDisponibles:', app.asignaturasDisponibles.map(a => ({id: a.id, nombre: a.nombre, tipo: a.tipo})));
-                }
-                
-                // Ahora construir las opciones desde asignaturasDisponibles (que ya está actualizado)
-                const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
-                const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
-                const especialidad = app.asignaturasDisponibles.filter(a => a.tipo === 'especialidad');
-                
-                console.log('DEBUG - Especialidad filtrada:', especialidad.map(a => ({id: a.id, nombre: a.nombre})));
-                
-                if (especialidad.length > 0) {
-                    options += '<optgroup label="📘 Especialidad">';
-                    especialidad.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                    options += '</optgroup>';
-                }
-                
-                if (obligatorias.length > 0) {
-                    options += '<optgroup label="📕 Obligatorias">';
-                    obligatorias.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                    options += '</optgroup>';
-                }
-                
-                if (optativas.length > 0) {
-                    options += '<optgroup label="📗 Optativas Comunes">';
-                    optativas.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                    options += '</optgroup>';
+                    await app.loadEspecialidadData(especialidadId);
+                    
+                    // Obtener la lista de asignaturas de especialidad desde CONFIG
+                    const asignaturasEsp = especialidadId === 'orientacion-educativa' 
+                        ? CONFIG.asignaturas.especialidadOrientacion 
+                        : CONFIG.asignaturas.especialidad;
+                    
+                    // Construir opciones de especialidad directamente desde loadedData
+                    const especialidadOpts = [];
+                    asignaturasEsp.forEach(asig => {
+                        const key = `${especialidadId}-${asig.id}`;
+                        if (app.loadedData[key]) {
+                            especialidadOpts.push({ id: key, nombre: asig.nombre });
+                        }
+                    });
+                    
+                    if (especialidadOpts.length > 0) {
+                        options += '<optgroup label="📘 Especialidad">';
+                        especialidadOpts.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                        options += '</optgroup>';
+                    }
+                    
+                    // También incluir obligatorias y optativas
+                    const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
+                    const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
+                    
+                    if (obligatorias.length > 0) {
+                        options += '<optgroup label="📕 Obligatorias">';
+                        obligatorias.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                        options += '</optgroup>';
+                    }
+                    
+                    if (optativas.length > 0) {
+                        options += '<optgroup label="📗 Optativas Comunes">';
+                        optativas.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                        options += '</optgroup>';
+                    }
+                } else {
+                    // Solo mostrar obligatorias y optativas
+                    const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
+                    const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
+                    
+                    if (obligatorias.length > 0) {
+                        options += '<optgroup label="📕 Obligatorias">';
+                        obligatorias.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                        options += '</optgroup>';
+                    }
+                    
+                    if (optativas.length > 0) {
+                        options += '<optgroup label="📗 Optativas Comunes">';
+                        optativas.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
+                        options += '</optgroup>';
+                    }
                 }
                 
                 asignaturaSelect.innerHTML = options;
@@ -3143,16 +3142,12 @@
                 }
                 
                 // Buscar asignatura en todas las listas
-                console.log('DEBUG - Buscando asignatura con ID:', asignaturaId);
-                console.log('DEBUG - asignaturasDisponibles:', app.asignaturasDisponibles.map(a => ({id: a.id, nombre: a.nombre})));
                 const asignatura = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
                 
                 if (!asignatura) {
-                    console.log('DEBUG - No se encontró la asignatura');
                     app.showToast('❌ Error: Asignatura no encontrada');
                     return;
                 }
-                console.log('DEBUG - Asignatura encontrada:', asignatura.nombre);
                 
                 const options = [option1, option2, option3, option4];
                 const answer = options[parseInt(correctIdx) - 1];
