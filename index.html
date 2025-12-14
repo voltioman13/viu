@@ -413,14 +413,6 @@
             <div class="logo">VIU - Master Profesor</div>
             <div class="nav-buttons">
                 <button class="menu-btn active" onclick="app.navigate('home')">Inicio</button>
-                <div class="dropdown" id="test-dropdown">
-                    <button class="menu-btn" onclick="app.toggleDropdown(event)">📝 Modos ▾</button>
-                    <div class="dropdown-content">
-                        <button onclick="app.closeDropdown(); app.navigate('home'); app.startQuiz();">📝 Test Normal</button>
-                        <button onclick="app.closeDropdown(); app.navigate('exam-mode');">⏱️ Modo Examen</button>
-                        <button onclick="app.closeDropdown(); app.navigate('review-mode');">🔄 Modo Repaso</button>
-                    </div>
-                </div>
                 <button class="menu-btn" onclick="app.navigate('search')">🔍 Buscar</button>
                 <button class="menu-btn" onclick="app.navigate('contribute')" title="Contribuir con preguntas">+
                 <button class="theme-toggle" onclick="app.showHelp()" title="Ayuda y atajos">
@@ -512,11 +504,11 @@
     <!-- Notificación Flotante -->
     <div id="toast">Mensaje</div>
     <script>
-        // --- CONFIGURACIÓN RESTDB.IO ---
-        const RESTDB_CONFIG = {
-            baseUrl: 'https://viuexamenestest-305b.restdb.io/rest',
-            apiKey: '693da0fb093655f0e7408453',
-            collection: 'preguntas'
+        // --- CONFIGURACIÓN SUPABASE ---
+        const SUPABASE_CONFIG = {
+            url: 'https://uhvmvnaxzvytgcmzkyoe.supabase.co',
+            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVodm12bmF4enZ5dGdjbXpreW9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2ODQwNzcsImV4cCI6MjA4MTI2MDA3N30.D-ZcfCIMLSO_K2mJJhVITh7pMxetmGds_rWZ22HTbv4',
+            table: 'preguntas'
         };
         
         // --- CONFIGURACIÓN Y ESTRUCTURA ---
@@ -621,6 +613,91 @@
             
             // ID de pregunta de BD siendo editada (null si es nueva)
             editingDbQuestionId: null,
+            
+            // Constantes de cache
+            CACHE_DURATION: 24 * 60 * 60 * 1000, // 24 horas en ms
+            REFRESH_COOLDOWN: 60 * 1000, // 1 minuto en ms
+            CACHE_KEYS: {
+                questions: 'viu_db_questions_cache',
+                cacheTime: 'viu_db_questions_cache_time',
+                lastRefresh: 'viu_db_last_manual_refresh'
+            },
+            
+            // Verificar si el cooldown del botón está activo
+            isRefreshOnCooldown: () => {
+                const lastRefresh = localStorage.getItem(app.CACHE_KEYS.lastRefresh);
+                if (!lastRefresh) return false;
+                const elapsed = Date.now() - parseInt(lastRefresh);
+                return elapsed < app.REFRESH_COOLDOWN;
+            },
+            
+            // Obtener tiempo restante del cooldown en segundos
+            getCooldownRemaining: () => {
+                const lastRefresh = localStorage.getItem(app.CACHE_KEYS.lastRefresh);
+                if (!lastRefresh) return 0;
+                const elapsed = Date.now() - parseInt(lastRefresh);
+                const remaining = app.REFRESH_COOLDOWN - elapsed;
+                return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
+            },
+            
+            // Obtener info del estado del cache
+            getCacheInfo: () => {
+                const cacheTime = localStorage.getItem(app.CACHE_KEYS.cacheTime);
+                if (!cacheTime) {
+                    return { hasCache: false, age: 0, ageText: 'Sin datos', isExpired: true };
+                }
+                
+                const age = Date.now() - parseInt(cacheTime);
+                const isExpired = age >= app.CACHE_DURATION;
+                
+                // Formatear tiempo transcurrido
+                const minutes = Math.floor(age / 60000);
+                const hours = Math.floor(minutes / 60);
+                
+                let ageText;
+                if (hours >= 24) {
+                    const days = Math.floor(hours / 24);
+                    ageText = `hace ${days} día${days > 1 ? 's' : ''}`;
+                } else if (hours > 0) {
+                    ageText = `hace ${hours}h ${minutes % 60}m`;
+                } else if (minutes > 0) {
+                    ageText = `hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
+                } else {
+                    ageText = 'hace menos de 1 minuto';
+                }
+                
+                return { hasCache: true, age, ageText, isExpired };
+            },
+            
+            // Función para refrescar cache y recargar página (con cooldown)
+            refreshAndReload: async () => {
+                const btn = event.target;
+                
+                // Verificar cooldown
+                if (app.isRefreshOnCooldown()) {
+                    const remaining = app.getCooldownRemaining();
+                    app.showToast(`⏳ Espera ${remaining} segundos antes de actualizar de nuevo`);
+                    return;
+                }
+                
+                btn.disabled = true;
+                btn.innerHTML = '⏳ Actualizando...';
+                
+                const success = await app.refreshDbCache();
+                if (success) {
+                    // Guardar timestamp del refresh manual
+                    localStorage.setItem(app.CACHE_KEYS.lastRefresh, Date.now().toString());
+                    app.showToast('✅ Preguntas actualizadas correctamente');
+                    // Recargar la vista actual
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '🔄 Actualizar Preguntas de la BD';
+                    app.showToast('❌ Error al actualizar. Inténtalo de nuevo.');
+                }
+            },
             
             // Estado para persistir la búsqueda
             searchState: { term: '', resultsHTML: '' },
@@ -952,33 +1029,87 @@
                 return stored;
             },
             
-            // Cargar preguntas de la base de datos
-            loadDbQuestions: async (especialidad = '', asignatura = '') => {
+            // Refrescar cache de preguntas manualmente
+            refreshDbCache: async () => {
                 try {
-                    let url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}`;
-                    const params = [];
+                    const url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&limit=1000`;
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
+                        }
+                    });
                     
-                    // Construir query para filtrar
-                    const query = {};
-                    if (especialidad) query.especialidad = especialidad;
-                    if (asignatura) query.asignatura = asignatura;
-                    
-                    if (Object.keys(query).length > 0) {
-                        params.push(`q=${encodeURIComponent(JSON.stringify(query))}`);
+                    if (response.status === 429) {
+                        app.showToast('⚠️ Límite de BD alcanzado. Intenta más tarde.');
+                        return false;
                     }
                     
-                    if (params.length > 0) {
-                        url += '?' + params.join('&');
+                    if (response.ok) {
+                        const questions = await response.json();
+                        localStorage.setItem(app.CACHE_KEYS.questions, JSON.stringify(questions));
+                        localStorage.setItem(app.CACHE_KEYS.cacheTime, Date.now().toString());
+                        console.log('✅ Cache actualizado:', questions.length, 'preguntas');
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Error actualizando cache:', error);
+                    app.showToast('❌ Error actualizando preguntas');
+                }
+                return false;
+            },
+            
+            // Cargar preguntas de la base de datos (SIEMPRE usa cache si existe, solo descarga si expira)
+            loadDbQuestions: async (especialidad = '', asignatura = '') => {
+                // Usar cache global
+                const cachedData = localStorage.getItem(app.CACHE_KEYS.questions);
+                const cacheTime = localStorage.getItem(app.CACHE_KEYS.cacheTime);
+                const now = Date.now();
+                
+                // Si hay cache válido (menos de 24h), filtrar desde cache
+                if (cachedData && cacheTime && (now - parseInt(cacheTime)) < app.CACHE_DURATION) {
+                    try {
+                        let allQuestions = JSON.parse(cachedData);
+                        // Filtrar por especialidad y asignatura si se especifica
+                        if (especialidad) {
+                            allQuestions = allQuestions.filter(q => q.especialidad === especialidad);
+                        }
+                        if (asignatura) {
+                            allQuestions = allQuestions.filter(q => q.asignatura === asignatura);
+                        }
+                        console.log(`📦 Usando cache local: ${allQuestions.length} preguntas (no se hizo petición al servidor)`);
+                        return allQuestions;
+                    } catch (e) {
+                        console.warn('Error parseando cache:', e);
+                    }
+                }
+                
+                // Si no hay cache, cargar de la BD
+                try {
+                    let url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*`;
+                    
+                    // Construir filtros Supabase
+                    if (especialidad) {
+                        url += `&especialidad=eq.${especialidad}`;
+                    }
+                    if (asignatura) {
+                        url += `&asignatura=eq.${asignatura}`;
                     }
                     
                     const response = await fetch(url, {
                         method: 'GET',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'x-apikey': RESTDB_CONFIG.apiKey,
-                            'cache-control': 'no-cache'
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
                         }
                     });
+                    
+                    if (response.status === 429) {
+                        console.warn('⚠️ Límite de peticiones (429)');
+                        app.showToast('⚠️ Límite de BD alcanzado. Espera unos minutos.');
+                        return [];
+                    }
                     
                     if (!response.ok) {
                         throw new Error(`Error HTTP: ${response.status}`);
@@ -1002,16 +1133,31 @@
                     console.log('💾 Guardando pregunta en BD...');
                     console.log('📦 Datos:', questionData);
                     
-                    const response = await fetch(`${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}`, {
+                    // Convertir opciones a JSONB si es string
+                    const dataToSave = {
+                        ...questionData,
+                        opciones: typeof questionData.opciones === 'string' 
+                            ? JSON.parse(questionData.opciones) 
+                            : questionData.opciones
+                    };
+                    
+                    const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'x-apikey': RESTDB_CONFIG.apiKey
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+                            'Prefer': 'return=representation'
                         },
-                        body: JSON.stringify(questionData)
+                        body: JSON.stringify(dataToSave)
                     });
                     
                     console.log('📬 Response status:', response.status);
+                    
+                    if (response.status === 429) {
+                        app.showToast('⚠️ Límite de BD alcanzado. Espera unos minutos.');
+                        throw new Error('Rate limit exceeded');
+                    }
                     
                     if (!response.ok) {
                         const errorText = await response.text();
@@ -1020,7 +1166,12 @@
                     }
                     
                     const saved = await response.json();
-                    console.log('✅ Pregunta guardada en BD:', saved._id);
+                    console.log('✅ Pregunta guardada en BD:', saved[0]?.id || saved.id);
+                    
+                    // Limpiar cache para que se recargue con la nueva pregunta
+                    localStorage.removeItem(app.CACHE_KEYS.questions);
+                    localStorage.removeItem(app.CACHE_KEYS.cacheTime);
+                    
                     return saved;
                 } catch (error) {
                     console.error('Error guardando pregunta:', error);
@@ -1031,17 +1182,37 @@
             // Eliminar pregunta de la base de datos (solo el autor puede)
             deleteQuestionFromDb: async (questionId) => {
                 try {
-                    const response = await fetch(`${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}/${questionId}`, {
+                    const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?id=eq.${questionId}`, {
                         method: 'DELETE',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'x-apikey': RESTDB_CONFIG.apiKey
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
                         }
                     });
+                    
+                    if (response.status === 429) {
+                        app.showToast('⚠️ Límite de BD alcanzado. Espera unos minutos.');
+                        throw new Error('Rate limit exceeded');
+                    }
                     
                     if (!response.ok) {
                         throw new Error(`Error HTTP: ${response.status}`);
                     }
+                    
+                    // Limpiar cache
+                    localStorage.removeItem(app.CACHE_KEYS.questions);
+                    localStorage.removeItem(app.CACHE_KEYS.cacheTime);
+                    
+                    // Eliminar de arrays locales para evitar preguntas fantasma
+                    app.filteredQuestions = app.filteredQuestions.filter(q => q.id !== questionId);
+                    
+                    // Eliminar de preguntas marcadas (es un Set)
+                    app.markedQuestions.delete(questionId);
+                    app.saveMarkedQuestions();
+                    
+                    // Eliminar del historial de falladas (es un array de objetos)
+                    app.failedQuestionsHistory = app.failedQuestionsHistory.filter(q => q.id !== questionId);
+                    app.saveFailedHistory();
                     
                     console.log('✅ Pregunta eliminada de BD:', questionId);
                     return true;
@@ -1075,7 +1246,7 @@
                     }
                     
                     byTema[tema].preguntas.push({
-                        id: q._id,
+                        id: q.id,
                         pregunta: q.pregunta,
                         opciones: opciones,
                         respuesta_correcta: q.respuesta_correcta,
@@ -1359,11 +1530,9 @@
             // Guardar preferencias del usuario
             savePreferences: () => {
                 try {
-                    const unitSelector = document.getElementById('unit-selector');
                     const prefs = {
                         lastAsignatura: app.currentAsignatura ? app.currentAsignatura.id : null,
                         lastEspecialidad: app.currentEspecialidad,
-                        lastTema: unitSelector ? unitSelector.value : 'all',
                         randomOrder: app.quizSettings.randomOrder,
                         onlyMarked: app.quizSettings.onlyMarked
                     };
@@ -1580,7 +1749,7 @@
                         }
                         
                         app.filteredQuestions.push({
-                            id: q._id,
+                            id: q.id,
                             subject: q.asignatura_nombre || app.currentAsignatura.nombre,
                             unit: q.tema,
                             question: q.pregunta,
@@ -1608,22 +1777,17 @@
                 
                 // SOLO cargar preguntas de la BD (ya no usamos JSON locales)
                 try {
-                    let url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}`;
-                    const query = {
-                        asignatura: app.currentAsignatura.id,
-                        tema: parseInt(temaNum)
-                    };
+                    let url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&asignatura=eq.${app.currentAsignatura.id}&tema=eq.${parseInt(temaNum)}`;
+                    
                     if (app.currentEspecialidad) {
-                        query.especialidad = app.currentEspecialidad;
+                        url += `&especialidad=eq.${app.currentEspecialidad}`;
                     }
-                    url += `?q=${encodeURIComponent(JSON.stringify(query))}`;
                     
                     const response = await fetch(url, {
                         method: 'GET',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'x-apikey': RESTDB_CONFIG.apiKey,
-                            'cache-control': 'no-cache'
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
                         }
                     });
                     
@@ -1636,7 +1800,7 @@
                             }
                             
                             app.filteredQuestions.push({
-                                id: q._id,
+                                id: q.id,
                                 subject: q.asignatura_nombre || app.currentAsignatura.nombre,
                                 unit: q.tema,
                                 question: q.pregunta,
@@ -1703,8 +1867,8 @@
                     case 'home': await app.renderHome(container); break;
                     case 'quiz': app.renderQuiz(container); break;
                     case 'exam-mode': app.renderExamMode(container); break;
-                    case 'review-mode': app.renderReviewMode(container); break;
-                    case 'summary': app.renderSummary(container); break;
+                    case 'review-mode': await app.renderReviewMode(container); break;
+                    case 'summary': await app.renderSummary(container); break;
                     case 'stats-advanced': app.renderAdvancedStats(container); break;
                     case 'search': app.renderSearch(container); break;
                     case 'detail': app.renderDetail(container, param); break;
@@ -1720,27 +1884,49 @@
                 // Mostrar loading mientras cargamos datos de BD
                 container.innerHTML = '<div class="loading-box"><p>⏳ Cargando preguntas...</p></div>';
                 
-                // Cargar TODAS las preguntas de la BD de una sola vez
+                // Usar cache si existe y no es muy antiguo (24 horas)
                 let allDbQuestions = [];
-                try {
-                    const url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}?max=1000`;
-                    const response = await fetch(url, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'x-apikey': RESTDB_CONFIG.apiKey,
-                            'cache-control': 'no-cache'
-                        }
-                    });
-                    if (response.ok) {
-                        allDbQuestions = await response.json();
-                        console.log('📚 Total preguntas en BD:', allDbQuestions.length);
-                        // Debug: mostrar las asignaturas únicas en BD
-                        const asignaturasEnBD = [...new Set(allDbQuestions.map(q => q.asignatura))];
-                        console.log('📋 Asignaturas en BD:', asignaturasEnBD);
+                const cachedData = localStorage.getItem(app.CACHE_KEYS.questions);
+                const cacheTime = localStorage.getItem(app.CACHE_KEYS.cacheTime);
+                const now = Date.now();
+                
+                // Usar cache si existe y es reciente
+                if (cachedData && cacheTime && (now - parseInt(cacheTime)) < app.CACHE_DURATION) {
+                    try {
+                        allDbQuestions = JSON.parse(cachedData);
+                        console.log('📦 Usando cache de BD:', allDbQuestions.length, 'preguntas');
+                    } catch (e) {
+                        console.warn('Error parseando cache:', e);
                     }
-                } catch (e) {
-                    console.warn('Error cargando preguntas de BD:', e);
+                }
+                
+                // Si no hay cache válido, cargar de la BD
+                if (allDbQuestions.length === 0) {
+                    try {
+                        const url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&limit=1000`;
+                        const response = await fetch(url, {
+                            method: 'GET',
+                            headers: {
+                                'apikey': SUPABASE_CONFIG.anonKey,
+                                'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
+                            }
+                        });
+                        if (response.ok) {
+                            allDbQuestions = await response.json();
+                            console.log('📚 Total preguntas en BD:', allDbQuestions.length);
+                            // Guardar en cache
+                            localStorage.setItem(app.CACHE_KEYS.questions, JSON.stringify(allDbQuestions));
+                            localStorage.setItem(app.CACHE_KEYS.cacheTime, now.toString());
+                            // Debug: mostrar las asignaturas únicas en BD
+                            const asignaturasEnBD = [...new Set(allDbQuestions.map(q => q.asignatura))];
+                            console.log('📋 Asignaturas en BD:', asignaturasEnBD);
+                        } else if (response.status === 429) {
+                            console.warn('⚠️ Límite de peticiones alcanzado (429). Usando datos locales.');
+                            app.showToast('⚠️ Límite de BD alcanzado. Espera unos minutos.');
+                        }
+                    } catch (e) {
+                        console.warn('Error cargando preguntas de BD:', e);
+                    }
                 }
                 
                 // Función para contar preguntas por asignatura (desde datos ya cargados)
@@ -1849,18 +2035,12 @@
                                 </select>
                             </div>
                             
-                            ${canStartQuiz ? `
-                            <div class="form-group">
-                                <label class="form-label">📝 Modo de Test:</label>
-                                <select id="unit-selector" class="form-select">
-                                    <option value="all">📚 Todas las preguntas (${totalPreguntas})</option>
-                                    ${unitOptions}
-                                </select>
-                            </div>
+
                             
                             <div class="form-group">
                                 <label class="form-label">⚙️ Configuración:</label>
                                 <div class="bg-light-box border-light" style="display: flex; flex-direction: column; gap: 0.75rem; padding: 0.75rem; border-radius: 8px; border: 1px solid;">
+                                    ${canStartQuiz ? `
                                     <label class="text-dark" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500;">
                                         <input type="checkbox" id="random-order-check" ${app.quizSettings.randomOrder ? 'checked' : ''} 
                                                onchange="app.quizSettings.randomOrder = this.checked" 
@@ -1881,6 +2061,7 @@
                                             🗑️
                                         </button>
                                     </div>
+                                    ` : ''}
                                     <div class="text-dark" style="display: flex; flex-direction: column; gap: 0.5rem;">
                                         <label style="font-weight: 500; display: flex; align-items: center; justify-content: space-between;">
                                             <span>🔤 Tamaño de letra</span>
@@ -1891,10 +2072,9 @@
                                     </div>
                                 </div>
                             </div>
-                            ` : ''}
                         </div>
                         
-                        <div id="quiz-info-box" style="background:${canStartQuiz ? '#dcfce7' : '#fee2e2'}; padding:1rem; border-radius:8px; margin-bottom:2rem; border: 2px solid ${canStartQuiz ? 'var(--success)' : 'var(--error)'};">
+                        <div id="quiz-info-box" style="background:${canStartQuiz ? '#dcfce7' : '#fee2e2'}; padding:1rem; border-radius:8px; margin-bottom:1rem; border: 2px solid ${canStartQuiz ? 'var(--success)' : 'var(--error)'};">
                             <p style="margin:0; font-weight:600; color: ${canStartQuiz ? '#065f46' : '#991b1b'};">
                                 ${canStartQuiz 
                                     ? temaInfo
@@ -1902,21 +2082,59 @@
                             </p>
                         </div>
                         
+                        ${(() => {
+                            const cacheInfo = app.getCacheInfo();
+                            if (cacheInfo.hasCache) {
+                                const bgColor = cacheInfo.isExpired ? '#fef3c7' : '#e0f2fe';
+                                const borderColor = cacheInfo.isExpired ? '#fcd34d' : '#7dd3fc';
+                                const textColor = cacheInfo.isExpired ? '#92400e' : '#0369a1';
+                                const icon = cacheInfo.isExpired ? '⚠️' : '📦';
+                                const status = cacheInfo.isExpired ? '(expirado - se actualizará)' : '(datos locales)';
+                                return `
+                                <div style="background:${bgColor}; padding:0.75rem; border-radius:6px; margin-bottom:1.5rem; border: 1px solid ${borderColor};">
+                                    <p style="margin:0; font-size:0.85rem; color: ${textColor}; text-align: center;">
+                                        ${icon} ${allDbQuestions.length} preguntas · Actualizado ${cacheInfo.ageText} ${status}
+                                    </p>
+                                </div>`;
+                            }
+                            return '';
+                        })()}
+                        
                         <div style="display: grid; gap: 1rem; max-width: 400px; margin: 0 auto;">
                             <button class="btn ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.startQuiz()" ${!canStartQuiz ? 'disabled' : ''}>
                                 📝 Comenzar Test Normal
                             </button>
-                            <button class="btn" style="background: #dc2626; border-color: #dc2626;" onclick="app.navigate('exam-mode')" ${!canStartQuiz ? 'disabled' : ''}>
+                            <button class="btn ${!canStartQuiz ? 'btn-secondary' : ''}" style="background: ${canStartQuiz ? '#dc2626' : ''}; border-color: ${canStartQuiz ? '#dc2626' : ''};" onclick="app.navigate('exam-mode')" ${!canStartQuiz ? 'disabled' : ''}>
                                 📝 Modo Examen (con tiempo)
                             </button>
-                            <button class="btn" style="background: #0891b2; border-color: #0891b2;" onclick="app.navigate('review-mode')" ${app.failedQuestionsHistory.length === 0 ? 'disabled' : ''}>
-                                🔄 Repasar Preguntas Falladas (${app.failedQuestionsHistory.length})
+                            <button class="btn ${(() => {
+                                const asigNombre = app.currentAsignatura?.nombre || '';
+                                const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
+                                return failedForAsig === 0 ? 'btn-secondary' : '';
+                            })()}" style="background: ${(() => {
+                                const asigNombre = app.currentAsignatura?.nombre || '';
+                                const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
+                                return failedForAsig > 0 ? '#0891b2' : '';
+                            })()}; border-color: ${(() => {
+                                const asigNombre = app.currentAsignatura?.nombre || '';
+                                const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
+                                return failedForAsig > 0 ? '#0891b2' : '';
+                            })()};" onclick="app.navigate('review-mode')" ${(() => {
+                                const asigNombre = app.currentAsignatura?.nombre || '';
+                                const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
+                                return failedForAsig === 0 ? 'disabled' : '';
+                            })()}>
+                                🔄 Repasar Preguntas Falladas (${(() => {
+                                    const asigNombre = app.currentAsignatura?.nombre || '';
+                                    return app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
+                                })()})
                             </button>
-                            ${canStartQuiz ? `
-                            <button class="btn btn-outline" onclick="app.navigate('summary')">
+                            <button class="btn btn-outline ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.navigate('summary')" ${!canStartQuiz ? 'disabled' : ''}>
                                 📖 Ver Resumen del Tema
                             </button>
-                            ` : ''}
+                            <button id="refresh-btn" class="btn btn-outline" onclick="app.refreshAndReload()" style="background: #f0fdf4; color: #15803d; border-color: #86efac;" ${app.isRefreshOnCooldown() ? 'disabled' : ''}>
+                                🔄 Actualizar Preguntas ${app.isRefreshOnCooldown() ? `(espera ${app.getCooldownRemaining()}s)` : ''}
+                            </button>
                         </div>
                         
                         ${app.currentAsignatura ? `
@@ -1940,6 +2158,26 @@
                 setTimeout(() => {
                     app.updateMarkedCount();
                     
+                    // Si el botón está en cooldown, iniciar contador regresivo
+                    if (app.isRefreshOnCooldown()) {
+                        const refreshBtn = document.getElementById('refresh-btn');
+                        const updateCooldown = () => {
+                            if (!app.isRefreshOnCooldown()) {
+                                if (refreshBtn) {
+                                    refreshBtn.disabled = false;
+                                    refreshBtn.innerHTML = '🔄 Actualizar Preguntas';
+                                }
+                                return;
+                            }
+                            const remaining = app.getCooldownRemaining();
+                            if (refreshBtn) {
+                                refreshBtn.innerHTML = `🔄 Actualizar Preguntas (espera ${remaining}s)`;
+                            }
+                            setTimeout(updateCooldown, 1000);
+                        };
+                        updateCooldown();
+                    }
+                    
                     // Registrar evento del botón de limpiar marcadas
                     const clearBtn = document.getElementById('clear-marked-btn');
                     if (clearBtn) {
@@ -1953,7 +2191,6 @@
                     // Guardar preferencias cuando cambian los checkboxes
                     const randomCheck = document.getElementById('random-order-check');
                     const onlyMarkedCheck = document.getElementById('only-marked-check');
-                    const unitSelector = document.getElementById('unit-selector');
                     const fontSizeSlider = document.getElementById('font-size-slider');
                     const fontSizeValue = document.getElementById('font-size-value');
                     
@@ -1968,30 +2205,6 @@
                             const value = parseInt(e.target.value);
                             fontSizeValue.textContent = value + '%';
                             app.saveFontSize(value);
-                        });
-                    }
-                    if (unitSelector) {
-                        unitSelector.addEventListener('change', async () => {
-                            const selectedValue = unitSelector.value;
-                            
-                            // Aplicar filtro de tema
-                            await app.applyTemaFilter(selectedValue);
-                            
-                            app.savePreferences();
-                            
-                            // Actualizar el mensaje dinámicamente
-                            const infoBox = document.getElementById('quiz-info-box');
-                            if (infoBox) {
-                                let totalQ = app.filteredQuestions.length;
-                                // Contar temas únicos de las preguntas filtradas
-                                const uniqueTemas = new Set(app.filteredQuestions.map(q => q.unit));
-                                
-                                if (selectedValue === 'all') {
-                                    infoBox.innerHTML = `<p style="margin:0; font-weight:600; color: #065f46;">✅ ${totalQ} preguntas disponibles (${uniqueTemas.size} temas)</p>`;
-                                } else {
-                                    infoBox.innerHTML = `<p style="margin:0; font-weight:600; color: #065f46;">✅ ${totalQ} preguntas disponibles - Tema ${selectedValue}</p>`;
-                                }
-                            }
                         });
                     }
                 }, 0);
@@ -2618,18 +2831,34 @@
             },
             
             // 2. MODO REPASO DE FALLOS
-            renderReviewMode: (container) => {
-                const failedCount = app.failedQuestionsHistory.length;
+            renderReviewMode: async (container) => {
+                // Cargar preguntas de BD para verificar cuáles existen
+                const dbQuestions = await app.loadDbQuestions();
+                const existingIds = new Set(dbQuestions.map(q => String(q.id)));
+                
+                // Limpiar del historial las preguntas que ya no existen en BD
+                const originalCount = app.failedQuestionsHistory.length;
+                if (existingIds.size > 0) {
+                    app.failedQuestionsHistory = app.failedQuestionsHistory.filter(q => existingIds.has(String(q.id)));
+                    if (app.failedQuestionsHistory.length !== originalCount) {
+                        app.saveFailedHistory(); // Guardar historial limpio
+                    }
+                }
+                
+                // Filtrar solo las preguntas falladas de la asignatura actual
+                const asigNombre = app.currentAsignatura?.nombre || '';
+                const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre);
+                const failedCount = failedForAsig.length;
                 
                 if (failedCount === 0) {
                     container.innerHTML = `
                         <div class="card text-center">
                             <h1>🔄 Modo Repaso</h1>
-                            <p class="text-muted">Repasa las preguntas que has fallado anteriormente</p>
+                            <p class="text-muted">Repasa las preguntas que has fallado en ${asigNombre || 'esta asignatura'}</p>
                             <div style="font-size: 3rem; margin: 2rem 0;">✅</div>
-                            <h3 style="color: var(--success);">¡No tienes preguntas falladas!</h3>
+                            <h3 style="color: var(--success);">¡No tienes preguntas falladas en esta asignatura!</h3>
                             <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-                                Completa algunos tests para que aparezcan aquí las preguntas que necesitas repasar.
+                                Completa algunos tests de ${asigNombre || 'esta asignatura'} para que aparezcan aquí las preguntas que necesitas repasar.
                             </p>
                             <button class="btn" onclick="app.navigate('home')">
                                 🏠 Volver al Inicio
@@ -2639,24 +2868,25 @@
                     return;
                 }
                 
-                // Agrupar por asignatura
-                const bySubject = {};
-                app.failedQuestionsHistory.forEach(q => {
-                    if (!bySubject[q.subject]) {
-                        bySubject[q.subject] = [];
+                // Agrupar por tema
+                const byTema = {};
+                failedForAsig.forEach(q => {
+                    const tema = q.unit || 'Sin tema';
+                    if (!byTema[tema]) {
+                        byTema[tema] = [];
                     }
-                    bySubject[q.subject].push(q);
+                    byTema[tema].push(q);
                 });
                 
-                let optionsHTML = Object.keys(bySubject).map(subject => {
-                    const count = bySubject[subject].length;
-                    return `<option value="${subject}">${subject} (${count} pregunta${count > 1 ? 's' : ''})</option>`;
+                let optionsHTML = Object.keys(byTema).map(tema => {
+                    const count = byTema[tema].length;
+                    return `<option value="${tema}">Tema ${tema} (${count} pregunta${count > 1 ? 's' : ''})</option>`;
                 }).join('');
                 
                 container.innerHTML = `
                     <div class="card">
                         <h1>🔄 Modo Repaso</h1>
-                        <p class="text-muted">Preguntas que has fallado anteriormente</p>
+                        <p class="text-muted">Preguntas falladas en ${asigNombre}</p>
                         
                         <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin: 2rem 0; border: 2px solid #0891b2;">
                             <h3 style="margin-top: 0; font-size: 1.1rem; color: #0e7490;">📊 Estadísticas de Repaso</h3>
@@ -2666,17 +2896,17 @@
                                     <div style="font-size: 0.85rem; color: var(--text-secondary);">Preguntas falladas</div>
                                 </div>
                                 <div style="text-align: center; padding: 1rem; background: var(--card); border-radius: 6px;">
-                                    <div style="font-size: 2rem; font-weight: 700; color: #0891b2;">${Object.keys(bySubject).length}</div>
-                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Asignaturas</div>
+                                    <div style="font-size: 2rem; font-weight: 700; color: #0891b2;">${Object.keys(byTema).length}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Temas</div>
                                 </div>
                             </div>
                         </div>
                         
                         <div style="max-width: 500px; margin: 0 auto;">
                             <div class="form-group">
-                                <label class="form-label">📚 Filtrar por asignatura:</label>
+                                <label class="form-label">📚 Filtrar por tema:</label>
                                 <select id="review-subject-filter" class="form-select">
-                                    <option value="all">Todas las asignaturas (${failedCount})</option>
+                                    <option value="all">Todos los temas (${failedCount})</option>
                                     ${optionsHTML}
                                 </select>
                             </div>
@@ -2699,9 +2929,9 @@
                                 </button>
                             </div>
                             
-                            <button class="btn" onclick="app.clearFailedHistory()" 
+                            <button class="btn" onclick="app.clearFailedHistoryForAsig()" 
                                     style="width: 100%; margin-top: 1rem; background: #fef2f2; color: #991b1b; border-color: #fca5a5;">
-                                🗑️ Limpiar historial de fallos
+                                🗑️ Limpiar fallos de ${asigNombre || 'esta asignatura'}
                             </button>
                         </div>
                     </div>
@@ -2722,14 +2952,16 @@
                     timer: null
                 };
                 
-                const subjectFilter = document.getElementById('review-subject-filter').value;
+                const temaFilter = document.getElementById('review-subject-filter').value;
                 const sortBy = document.getElementById('review-sort').value;
                 
-                let questions = [...app.failedQuestionsHistory];
+                // Filtrar solo las de la asignatura actual
+                const asigNombre = app.currentAsignatura?.nombre || '';
+                let questions = app.failedQuestionsHistory.filter(q => q.subject === asigNombre);
                 
-                // Filtrar por asignatura
-                if (subjectFilter !== 'all') {
-                    questions = questions.filter(q => q.subject === subjectFilter);
+                // Filtrar por tema si no es "all"
+                if (temaFilter !== 'all') {
+                    questions = questions.filter(q => q.unit == temaFilter);
                 }
                 
                 // Ordenar
@@ -2766,8 +2998,19 @@
                 }
             },
             
+            // Limpiar solo las preguntas falladas de la asignatura actual
+            clearFailedHistoryForAsig: () => {
+                const asigNombre = app.currentAsignatura?.nombre || '';
+                if (confirm(`¿Seguro que quieres limpiar los fallos de ${asigNombre}?`)) {
+                    app.failedQuestionsHistory = app.failedQuestionsHistory.filter(q => q.subject !== asigNombre);
+                    app.saveFailedHistory();
+                    app.showToast(`✅ Fallos de ${asigNombre} limpiados`);
+                    app.navigate('home');
+                }
+            },
+            
             // 3. MODO RESUMEN DE TEMA
-            renderSummary: (container) => {
+            renderSummary: async (container) => {
                 if (!app.currentAsignatura) {
                     container.innerHTML = `
                         <div class="card text-center">
@@ -2779,7 +3022,59 @@
                     return;
                 }
                 
-                const temas = app.currentAsignatura.data.temas.filter(t => t.preguntas && t.preguntas.length > 0);
+                // Mostrar loading
+                container.innerHTML = `
+                    <div class="card text-center">
+                        <h1>📖 Resumen de Temas</h1>
+                        <div class="loading-box"><p>⏳ Cargando preguntas...</p></div>
+                    </div>
+                `;
+                
+                // Cargar preguntas de la BD (usa cache local)
+                const dbQuestions = await app.loadDbQuestions(app.currentEspecialidad, app.currentAsignatura.id);
+                
+                // Agrupar por tema
+                const temasMap = {};
+                dbQuestions.forEach(q => {
+                    const temaNum = q.tema || 1;
+                    if (!temasMap[temaNum]) {
+                        temasMap[temaNum] = {
+                            numero: temaNum,
+                            nombre: `Tema ${temaNum}`,
+                            preguntas: []
+                        };
+                    }
+                    
+                    let opciones = q.opciones;
+                    if (typeof opciones === 'string') {
+                        try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                    }
+                    
+                    temasMap[temaNum].preguntas.push({
+                        id: q.id,
+                        pregunta: q.pregunta,
+                        opciones: opciones,
+                        respuesta_correcta: q.respuesta_correcta
+                    });
+                });
+                
+                const temas = Object.values(temasMap).sort((a, b) => a.numero - b.numero);
+                
+                if (temas.length === 0) {
+                    container.innerHTML = `
+                        <div class="card text-center">
+                            <h1>📖 Resumen de Temas</h1>
+                            <p class="text-muted">${app.currentAsignatura.nombre}</p>
+                            <div style="font-size: 3rem; margin: 2rem 0;">📭</div>
+                            <p>No hay preguntas disponibles para esta asignatura.</p>
+                            <button class="btn btn-outline" onclick="app.navigate('home')">← Volver al Inicio</button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Guardar temas para showTemaSummary
+                app.currentSummaryTemas = temas;
                 
                 container.innerHTML = `
                     <div class="card">
@@ -2813,8 +3108,12 @@
                     return;
                 }
                 
-                const tema = app.currentAsignatura.data.temas.find(t => t.numero == temaNumero);
-                if (!tema) return;
+                // Usar los temas cargados de la BD
+                const tema = app.currentSummaryTemas?.find(t => t.numero == temaNumero);
+                if (!tema) {
+                    summaryContent.innerHTML = '<p class="text-muted">No se encontró el tema.</p>';
+                    return;
+                }
                 
                 let html = `
                     <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; border: 2px solid var(--primary); text-align: left;">
@@ -2870,10 +3169,6 @@
             
             studyThisTema: async (temaNumero) => {
                 // Aplicar filtro de tema
-                const unitSelector = document.getElementById('unit-selector');
-                if (unitSelector) {
-                    unitSelector.value = temaNumero;
-                }
                 await app.applyTemaFilter(temaNumero);
                 app.savePreferences();
                 
@@ -3477,19 +3772,29 @@
                 
                 try {
                     if (isEditing) {
-                        // Actualizar pregunta existente con PUT
-                        const url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}/${app.editingDbQuestionId}`;
+                        // Actualizar pregunta existente con PATCH
+                        const url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?id=eq.${app.editingDbQuestionId}`;
                         
                         // Eliminar campos undefined
                         if (!questionData.fecha_creacion) delete questionData.fecha_creacion;
                         
+                        // Convertir opciones a array si es string
+                        const dataToUpdate = {
+                            ...questionData,
+                            opciones: typeof questionData.opciones === 'string' 
+                                ? JSON.parse(questionData.opciones) 
+                                : questionData.opciones
+                        };
+                        
                         const response = await fetch(url, {
-                            method: 'PUT',
+                            method: 'PATCH',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'x-apikey': RESTDB_CONFIG.apiKey
+                                'apikey': SUPABASE_CONFIG.anonKey,
+                                'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+                                'Prefer': 'return=representation'
                             },
-                            body: JSON.stringify(questionData)
+                            body: JSON.stringify(dataToUpdate)
                         });
                         
                         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -3550,20 +3855,19 @@
                     const userId = app.getUserId();
                     const query = { autor: userId };
                     
+                    let url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&autor=eq.${userId}`;
+                    
                     // Añadir filtros si están seleccionados
-                    if (especialidadFilter) query.especialidad = especialidadFilter;
-                    if (asignaturaFilter) query.asignatura = asignaturaFilter;
+                    if (especialidadFilter) url += `&especialidad=eq.${especialidadFilter}`;
+                    if (asignaturaFilter) url += `&asignatura=eq.${asignaturaFilter}`;
                     
-                    const url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}?q=${encodeURIComponent(JSON.stringify(query))}`;
-                    
-                    console.log('🔍 Cargando preguntas con filtros:', query);
+                    console.log('🔍 Cargando preguntas filtradas');
                     
                     const response = await fetch(url, {
                         method: 'GET',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'x-apikey': RESTDB_CONFIG.apiKey,
-                            'cache-control': 'no-cache'
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
                         }
                     });
                     
@@ -3611,7 +3915,7 @@
                         
                         // Guardar datos para edición
                         const qDataStr = encodeURIComponent(JSON.stringify({
-                            _id: q._id,
+                            id: q.id,
                             pregunta: q.pregunta,
                             opciones: opciones,
                             respuesta_correcta: q.respuesta_correcta,
@@ -3640,7 +3944,7 @@
                                                 title="Editar pregunta">
                                             ✏️
                                         </button>
-                                        <button onclick="app.deleteMyQuestion('${q._id}')" 
+                                        <button onclick="app.deleteMyQuestion('${q.id}')" 
                                                 style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 4px; padding: 0.5rem; cursor: pointer;"
                                                 title="Eliminar pregunta">
                                             🗑️
@@ -3669,8 +3973,8 @@
             editMyQuestion: (qDataStr) => {
                 const qData = JSON.parse(decodeURIComponent(qDataStr));
                 
-                // Guardar ID para actualización
-                app.editingDbQuestionId = qData._id;
+                // Guardar ID para actualización (Supabase usa 'id' no '_id')
+                app.editingDbQuestionId = qData.id || qData._id;
                 
                 // Configurar selectores
                 const espSelect = document.getElementById('contrib-especialidad');
@@ -3791,15 +4095,10 @@
                 actionsContainer.style.display = 'none';
                 
                 try {
-                    let url = `${RESTDB_CONFIG.baseUrl}/${RESTDB_CONFIG.collection}`;
-                    const query = {};
+                    let url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*`;
                     
-                    if (especialidad) query.especialidad = especialidad;
-                    if (tema) query.tema = parseInt(tema);
-                    
-                    if (Object.keys(query).length > 0) {
-                        url += `?q=${encodeURIComponent(JSON.stringify(query))}`;
-                    }
+                    if (especialidad) url += `&especialidad=eq.${especialidad}`;
+                    if (tema) url += `&tema=eq.${parseInt(tema)}`;
                     
                     console.log('🔍 Cargando preguntas filtradas...');
                     console.log('📡 URL:', url);
@@ -3807,9 +4106,8 @@
                     const response = await fetch(url, {
                         method: 'GET',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'x-apikey': RESTDB_CONFIG.apiKey,
-                            'cache-control': 'no-cache'
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
                         }
                     });
                     
@@ -3930,7 +4228,7 @@
                     }
                     
                     return {
-                        id: q._id,
+                        id: q.id,
                         pregunta: q.pregunta,
                         opciones: opciones,
                         respuesta_correcta: q.respuesta_correcta,
@@ -4249,28 +4547,33 @@
                 `;
             },
             renderDetail: (container, questionId) => {
-                // Buscar en todas las asignaturas cargadas
+                // Buscar en el cache de preguntas de la BD
                 let foundQuestion = null;
-                let foundAsignatura = null;
                 
-                for (const asig of app.asignaturasDisponibles) {
-                    for (const tema of asig.data.temas) {
-                        const pregunta = tema.preguntas.find(p => p.id === questionId);
-                        if (pregunta) {
+                const cachedData = localStorage.getItem(app.CACHE_KEYS.questions);
+                if (cachedData) {
+                    try {
+                        const dbQuestions = JSON.parse(cachedData);
+                        const dbQ = dbQuestions.find(p => p.id == questionId);
+                        if (dbQ) {
+                            let opciones = dbQ.opciones;
+                            if (typeof opciones === 'string') {
+                                try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                            }
+                            
                             foundQuestion = {
-                                id: pregunta.id,
-                                subject: asig.nombre,
-                                unit: tema.numero,
-                                question: pregunta.pregunta,
-                                options: pregunta.opciones,
-                                answer: pregunta.respuesta_correcta,
-                                tipo: asig.tipo
+                                id: dbQ.id,
+                                subject: dbQ.asignatura_nombre || dbQ.asignatura,
+                                unit: dbQ.tema,
+                                question: dbQ.pregunta,
+                                options: opciones || [],
+                                answer: dbQ.respuesta_correcta,
+                                tipo: dbQ.especialidad ? 'especialidad' : 'obligatoria'
                             };
-                            foundAsignatura = asig;
-                            break;
                         }
+                    } catch(e) {
+                        console.error('Error buscando pregunta en cache:', e);
                     }
-                    if (foundQuestion) break;
                 }
                 
                 if (!foundQuestion) return app.navigate('search');
@@ -4543,16 +4846,8 @@
                     timer: null
                 };
                 
-                // Obtener selección de unidad
-                const unitSelector = document.getElementById('unit-selector');
-                const selectedUnit = unitSelector ? unitSelector.value : 'all';
-                
-                // Filtrar preguntas para el test
+                // Usar todas las preguntas de la asignatura actual
                 let questionsForQuiz = [...app.filteredQuestions];
-                
-                if (selectedUnit !== 'all') {
-                    questionsForQuiz = questionsForQuiz.filter(q => q.unit == selectedUnit);
-                }
                 
                 // Filtrar solo preguntas marcadas si está activado
                 if (app.quizSettings.onlyMarked) {
@@ -4622,9 +4917,9 @@
                 
                 // Registrar test completado
                 if (app.currentAsignatura) {
-                    const unitSelector = document.getElementById('unit-selector');
-                    const selectedUnit = unitSelector ? unitSelector.value : 'all';
-                    const temaName = selectedUnit === 'all' ? 'Todos' : `Tema ${selectedUnit}`;
+                    // Determinar el tema basándose en las preguntas del quiz
+                    const uniqueTemas = [...new Set(app.activeQuizQuestions.map(q => q.unit))];
+                    const temaName = uniqueTemas.length === 1 ? `Tema ${uniqueTemas[0]}` : 'Todos';
                     app.recordTestCompletion(app.quiz.score, total, asignaturaName, temaName);
                 }
                 
@@ -4740,7 +5035,7 @@
                 const resultsDiv = document.getElementById('search-results');
                 
                 if (term.length < 2) {
-                    resultsDiv.innerHTML = '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar en preguntas y respuestas de todas las asignaturas cargadas.</p>';
+                    resultsDiv.innerHTML = '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar en preguntas y respuestas de la base de datos.</p>';
                     app.searchState.term = term;
                     app.searchState.resultsHTML = resultsDiv.innerHTML;
                     return;
@@ -4748,23 +5043,41 @@
                 
                 const termLower = term.toLowerCase();
                 
-                // Buscar en todas las asignaturas cargadas
+                // Buscar en el cache de preguntas de la BD
+                const cachedData = localStorage.getItem(app.CACHE_KEYS.questions);
                 let allSearchQuestions = [];
-                app.asignaturasDisponibles.forEach(asig => {
-                    asig.data.temas.forEach(tema => {
-                        tema.preguntas.forEach(p => {
+                
+                if (cachedData) {
+                    try {
+                        const dbQuestions = JSON.parse(cachedData);
+                        dbQuestions.forEach(q => {
+                            let opciones = q.opciones;
+                            if (typeof opciones === 'string') {
+                                try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                            }
+                            
                             allSearchQuestions.push({
-                                id: p.id,
-                                subject: asig.nombre,
-                                unit: tema.numero,
-                                question: p.pregunta,
-                                options: p.opciones,
-                                answer: p.respuesta_correcta,
-                                tipo: asig.tipo
+                                id: q.id,
+                                subject: q.asignatura_nombre || q.asignatura,
+                                unit: q.tema,
+                                question: q.pregunta,
+                                options: opciones || [],
+                                answer: q.respuesta_correcta,
+                                tipo: q.especialidad ? 'especialidad' : 'obligatoria',
+                                especialidad: q.especialidad
                             });
                         });
-                    });
-                });
+                    } catch(e) {
+                        console.error('Error parseando cache para búsqueda:', e);
+                    }
+                }
+                
+                if (allSearchQuestions.length === 0) {
+                    resultsDiv.innerHTML = '<p style="color:var(--warning); text-align:center;">No hay preguntas en cache. Pulsa "Actualizar Preguntas" en el inicio.</p>';
+                    app.searchState.term = term;
+                    app.searchState.resultsHTML = resultsDiv.innerHTML;
+                    return;
+                }
                 
                 const found = allSearchQuestions.filter(q => {
                     if (q.question.toLowerCase().includes(termLower)) return true;
@@ -4774,7 +5087,7 @@
                 let resultsHTML;
                 
                 if (found.length === 0) {
-                    resultsHTML = '<p style="color:var(--error); text-align:center;">No se encontraron resultados en las asignaturas cargadas.</p>';
+                    resultsHTML = '<p style="color:var(--error); text-align:center;">No se encontraron resultados en la base de datos.</p>';
                 } else {
                     resultsHTML = found.map(q => {
                         const isTermInQuestion = q.question.toLowerCase().includes(termLower);
