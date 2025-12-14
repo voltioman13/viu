@@ -392,6 +392,99 @@
         .text-center { text-align: center; }
         .loading-box { text-align: center; padding: 3rem; color: #94a3b8; }
         
+        /* Modal de selección de especialidad */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .especialidad-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .especialidad-option {
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: 500;
+            background: var(--input-bg);
+        }
+        .especialidad-option:hover {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.1);
+        }
+        .especialidad-option.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+        .config-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+        .config-btn:hover {
+            background: var(--border);
+            transform: rotate(45deg);
+        }
+        .especialidad-display {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(99, 102, 241, 0.15) 100%);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        [data-theme="dark"] .especialidad-display {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(129, 140, 248, 0.15) 100%);
+        }
+        .especialidad-display .badge {
+            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            flex: 1;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+        }
+        
         /* Toast Notification */
         #toast {
             visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center;
@@ -780,6 +873,7 @@
             filteredQuestions: [],
             activeQuizQuestions: [],
             currentEspecialidad: '',
+            userEspecialidad: null, // Especialidad fija del usuario (guardada permanentemente)
             currentAsignatura: null,
             currentTema: 'all', // Tema seleccionado ('all' o número de tema)
             asignaturasDisponibles: [],
@@ -972,6 +1066,7 @@
                 app.loadContributions();
                 app.loadContribState();
                 app.loadFailedHistory();
+                app.loadUserEspecialidad(); // Cargar especialidad fija del usuario
                 await app.loadInitialData();
                 
                 // Cerrar dropdown al hacer clic fuera
@@ -982,12 +1077,14 @@
                     }
                 });
                 
-                // Aplicar preferencias guardadas
+                // Si el usuario tiene especialidad guardada, cargarla
+                if (app.userEspecialidad) {
+                    app.currentEspecialidad = app.userEspecialidad;
+                    await app.loadEspecialidadData(app.userEspecialidad);
+                }
+                
+                // Aplicar preferencias guardadas (excepto especialidad que ya está fija)
                 if (app.savedPreferences) {
-                    if (app.savedPreferences.lastEspecialidad) {
-                        app.currentEspecialidad = app.savedPreferences.lastEspecialidad;
-                        await app.loadEspecialidadData(app.savedPreferences.lastEspecialidad);
-                    }
                     if (app.savedPreferences.lastAsignatura) {
                         await app.selectAsignatura(app.savedPreferences.lastAsignatura);
                         // Aplicar filtro de tema si hay uno guardado
@@ -1018,9 +1115,14 @@
                 // Inicializar modal de ayuda
                 app.initHelpModal();
                 
-                // Restaurar vista anterior o ir a home
-                const savedView = localStorage.getItem('viu_current_view') || 'home';
-                app.navigate(savedView);
+                // Si no tiene especialidad, mostrar modal obligatorio
+                if (!app.userEspecialidad) {
+                    app.showEspecialidadModal();
+                } else {
+                    // Restaurar vista anterior o ir a home
+                    const savedView = localStorage.getItem('viu_current_view') || 'home';
+                    app.navigate(savedView);
+                }
             },
             
             // Gestión de tema oscuro/claro
@@ -1047,6 +1149,151 @@
                 }
             },
             
+            // --- GESTIÓN DE ESPECIALIDAD DEL USUARIO ---
+            loadUserEspecialidad: () => {
+                try {
+                    const saved = localStorage.getItem('viu_user_especialidad');
+                    if (saved) {
+                        app.userEspecialidad = saved;
+                        app.currentEspecialidad = saved; // También actualizar currentEspecialidad
+                    }
+                } catch (e) {
+                    console.error('Error cargando especialidad del usuario:', e);
+                }
+            },
+            
+            saveUserEspecialidad: async (especialidadId) => {
+                try {
+                    app.userEspecialidad = especialidadId;
+                    app.currentEspecialidad = especialidadId;
+                    localStorage.setItem('viu_user_especialidad', especialidadId);
+                    // Cargar datos de especialidad para que aparezcan las asignaturas
+                    await app.loadEspecialidadData(especialidadId);
+                } catch (e) {
+                    console.error('Error guardando especialidad del usuario:', e);
+                }
+            },
+            
+            showEspecialidadModal: (isChange = false) => {
+                const especialidadOptions = Object.entries(CONFIG.especialidades).map(([id, nombre]) => 
+                    `<div class="especialidad-option" data-id="${id}" onclick="app.selectEspecialidadOption('${id}')">${nombre}</div>`
+                ).join('');
+                
+                const modalHtml = `
+                    <div id="especialidad-modal" class="modal-overlay">
+                        <div class="modal-content">
+                            <div style="text-align: center; margin-bottom: 1.5rem;">
+                                <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎓</div>
+                                <h2 style="margin: 0;">${isChange ? 'Cambiar Especialidad' : '¡Bienvenido/a!'}</h2>
+                                <p class="text-muted" style="margin-top: 0.5rem;">
+                                    ${isChange ? 'Selecciona tu nueva especialidad' : 'Para comenzar, selecciona tu especialidad del Máster'}
+                                </p>
+                            </div>
+                            
+                            <div class="especialidad-grid">
+                                ${especialidadOptions}
+                            </div>
+                            
+                            <div id="especialidad-confirm-area" style="display: none; margin-top: 1.5rem;">
+                                <p style="text-align: center; font-weight: 600; margin-bottom: 1rem;">
+                                    Has seleccionado: <span id="selected-esp-name" style="color: var(--primary);"></span>
+                                </p>
+                                <button class="btn" onclick="app.confirmEspecialidad()" style="width: 100%;">
+                                    ✅ Confirmar Especialidad
+                                </button>
+                                ${isChange ? `
+                                <button class="btn btn-outline" onclick="app.closeEspecialidadModal()" style="width: 100%; margin-top: 0.5rem;">
+                                    ❌ Cancelar
+                                </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Insertar modal en el body
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            },
+            
+            selectEspecialidadOption: (especialidadId) => {
+                // Quitar selección anterior
+                document.querySelectorAll('.especialidad-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Seleccionar la nueva
+                const selected = document.querySelector(`.especialidad-option[data-id="${especialidadId}"]`);
+                if (selected) {
+                    selected.classList.add('selected');
+                }
+                
+                // Guardar temporalmente y mostrar confirmación
+                app._tempSelectedEspecialidad = especialidadId;
+                const confirmArea = document.getElementById('especialidad-confirm-area');
+                const espName = document.getElementById('selected-esp-name');
+                if (confirmArea && espName) {
+                    espName.textContent = CONFIG.especialidades[especialidadId];
+                    confirmArea.style.display = 'block';
+                }
+            },
+            
+            confirmEspecialidad: async () => {
+                if (!app._tempSelectedEspecialidad) return;
+                
+                // Guardar el valor antes de cerrar el modal (que lo resetea)
+                const selectedEspecialidad = app._tempSelectedEspecialidad;
+                
+                app.closeEspecialidadModal();
+                app.showLoading('Cargando asignaturas de especialidad...');
+                
+                await app.saveUserEspecialidad(selectedEspecialidad);
+                app.currentTema = 'all';
+                app.savePreferences();
+                
+                app.showToast(`✅ Especialidad configurada: ${CONFIG.especialidades[selectedEspecialidad]}`);
+                app.navigate('home');
+            },
+            
+            closeEspecialidadModal: () => {
+                const modal = document.getElementById('especialidad-modal');
+                if (modal) {
+                    modal.remove();
+                }
+                app._tempSelectedEspecialidad = null;
+            },
+            
+            promptChangeEspecialidad: () => {
+                const currentName = CONFIG.especialidades[app.userEspecialidad] || 'No configurada';
+                
+                const confirmHtml = `
+                    <div id="change-esp-confirm" class="modal-overlay">
+                        <div class="modal-content" style="max-width: 400px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⚠️</div>
+                                <h3 style="margin: 0 0 1rem 0;">¿Cambiar especialidad?</h3>
+                                <p class="text-muted">
+                                    Tu especialidad actual es:<br>
+                                    <strong style="color: var(--primary);">${currentName}</strong>
+                                </p>
+                                <p style="font-size: 0.9rem; color: var(--error); margin-top: 1rem;">
+                                    ⚠️ Si cambias de especialidad, asegúrate de que las preguntas que contribuyas correspondan a la nueva especialidad.
+                                </p>
+                                <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+                                    <button class="btn btn-outline" onclick="document.getElementById('change-esp-confirm').remove()" style="flex: 1;">
+                                        Cancelar
+                                    </button>
+                                    <button class="btn" onclick="document.getElementById('change-esp-confirm').remove(); app.showEspecialidadModal(true);" style="flex: 1;">
+                                        Sí, cambiar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', confirmHtml);
+            },
+
             showHelp: () => {
                 const modal = document.getElementById('help-modal');
                 if (modal) {
@@ -1758,13 +2005,6 @@
                 
                 // Esperar a que se renderice y luego cargar los datos
                 setTimeout(async () => {
-                    // Seleccionar especialidad si existe
-                    const espSelect = document.getElementById('contrib-especialidad');
-                    if (espSelect && app.contribState.especialidad) {
-                        espSelect.value = app.contribState.especialidad;
-                        await app.updateContribAsignaturas();
-                    }
-                    
                     // Seleccionar asignatura
                     const asigSelect = document.getElementById('contrib-asignatura');
                     if (asigSelect) {
@@ -2394,11 +2634,6 @@
                     return Object.values(temasMap).sort((a, b) => a.numero - b.numero);
                 };
                 
-                // Opciones de especialidad
-                const especialidadOptions = Object.entries(CONFIG.especialidades).map(([id, nombre]) => 
-                    `<option value="${id}" ${id === app.currentEspecialidad ? 'selected' : ''}>${nombre}</option>`
-                ).join('');
-                
                 // Agrupar asignaturas por tipo
                 const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
                 const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
@@ -2465,11 +2700,13 @@
                         
                         <div style="max-width:500px; margin: 2rem auto; text-align:left;">
                             <div class="form-group">
-                                <label class="form-label">🎓 Especialidad (opcional):</label>
-                                <select id="especialidad-selector" class="form-select" onchange="app.changeEspecialidad(this.value)">
-                                    <option value="">Sin especialidad</option>
-                                    ${especialidadOptions}
-                                </select>
+                                <label class="form-label">🎓 Tu Especialidad:</label>
+                                <div class="especialidad-display">
+                                    <span class="badge">${CONFIG.especialidades[app.userEspecialidad] || 'No configurada'}</span>
+                                    <button class="config-btn" onclick="app.promptChangeEspecialidad()" title="Cambiar especialidad">
+                                        ⚙️
+                                    </button>
+                                </div>
                             </div>
                             
                             <div class="form-group">
@@ -2534,24 +2771,6 @@
                             </p>
                         </div>
                         
-                        ${(() => {
-                            const cacheInfo = app.getCacheInfo();
-                            if (cacheInfo.hasCache) {
-                                const bgColor = cacheInfo.isExpired ? '#fef3c7' : '#e0f2fe';
-                                const borderColor = cacheInfo.isExpired ? '#fcd34d' : '#7dd3fc';
-                                const textColor = cacheInfo.isExpired ? '#92400e' : '#0369a1';
-                                const icon = cacheInfo.isExpired ? '⚠️' : '📦';
-                                const status = cacheInfo.isExpired ? '(expirado - se actualizará)' : '(datos locales)';
-                                return `
-                                <div style="background:${bgColor}; padding:0.75rem; border-radius:6px; margin-bottom:1.5rem; border: 1px solid ${borderColor};">
-                                    <p style="margin:0; font-size:0.85rem; color: ${textColor}; text-align: center;">
-                                        ${icon} ${allDbQuestions.length} preguntas · Actualizado ${cacheInfo.ageText} ${status}
-                                    </p>
-                                </div>`;
-                            }
-                            return '';
-                        })()}
-                        
                         <div style="display: grid; gap: 1rem; max-width: 400px; margin: 0 auto;">
                             <button class="btn ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.startQuiz()" ${!canStartQuiz ? 'disabled' : ''}>
                                 📝 Comenzar Test Normal
@@ -2588,6 +2807,24 @@
                                 🔄 Actualizar Preguntas ${app.isRefreshOnCooldown() ? `(espera ${app.getCooldownRemaining()}s)` : ''}
                             </button>
                         </div>
+                        
+                        ${(() => {
+                            const cacheInfo = app.getCacheInfo();
+                            if (cacheInfo.hasCache) {
+                                const bgColor = cacheInfo.isExpired ? '#fef3c7' : '#e0f2fe';
+                                const borderColor = cacheInfo.isExpired ? '#fcd34d' : '#7dd3fc';
+                                const textColor = cacheInfo.isExpired ? '#92400e' : '#0369a1';
+                                const icon = cacheInfo.isExpired ? '⚠️' : '📦';
+                                const status = cacheInfo.isExpired ? '(expirado - se actualizará)' : '(datos locales)';
+                                return `
+                                <div style="background:${bgColor}; padding:0.75rem; border-radius:6px; margin-top:1rem; border: 1px solid ${borderColor}; max-width: 400px; margin-left: auto; margin-right: auto;">
+                                    <p style="margin:0; font-size:0.85rem; color: ${textColor}; text-align: center;">
+                                        ${icon} ${allDbQuestions.length} preguntas · Actualizado ${cacheInfo.ageText} ${status}
+                                    </p>
+                                </div>`;
+                            }
+                            return '';
+                        })()}
                         
                         ${app.currentAsignatura ? `
                         <div class="bg-light-box" style="margin-top: 2rem; padding: 1rem; border-radius: 8px; text-align: left;">
@@ -3814,14 +4051,10 @@
             
             // Renderizar vista de contribuciones
             renderContribute: (container) => {
-                // Opciones de especialidad
-                const especialidadOptions = Object.entries(CONFIG.especialidades).map(([id, nombre]) => 
-                    `<option value="${id}">${nombre}</option>`
-                ).join('');
-                
                 // Agrupar asignaturas disponibles
                 const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
                 const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
+                const especialidad = app.asignaturasDisponibles.filter(a => a.tipo === 'especialidad');
                 
                 let asignaturaOptions = '';
                 
@@ -3841,6 +4074,14 @@
                     asignaturaOptions += '</optgroup>';
                 }
                 
+                if (especialidad.length > 0) {
+                    asignaturaOptions += `<optgroup label="📘 ${CONFIG.especialidades[app.userEspecialidad] || 'Especialidad'}">`;
+                    especialidad.forEach(a => {
+                        asignaturaOptions += `<option value="${a.id}">${a.nombre}</option>`;
+                    });
+                    asignaturaOptions += '</optgroup>';
+                }
+                
                 container.innerHTML = `
                     <div class="card">
                         <h2>➕ Contribuir con Preguntas</h2>
@@ -3850,11 +4091,13 @@
                             <h3 style="font-size: 1.1rem; margin-top: 0;">1️⃣ Selecciona la Asignatura</h3>
                             
                             <div class="form-group">
-                                <label class="form-label">🎓 Especialidad (opcional):</label>
-                                <select id="contrib-especialidad" class="form-select" onchange="app.updateContribAsignaturas()">
-                                    <option value="">Sin especialidad</option>
-                                    ${especialidadOptions}
-                                </select>
+                                <label class="form-label">🎓 Tu Especialidad:</label>
+                                <div class="especialidad-display">
+                                    <span class="badge">${CONFIG.especialidades[app.userEspecialidad] || 'No configurada'}</span>
+                                    <button class="config-btn" onclick="app.promptChangeEspecialidad()" title="Cambiar especialidad">
+                                        ⚙️
+                                    </button>
+                                </div>
                             </div>
                             
                             <div class="form-group">
@@ -3880,106 +4123,31 @@
                 
                 // Restaurar valores guardados
                 setTimeout(() => {
-                    const espSelect = document.getElementById('contrib-especialidad');
                     const asigSelect = document.getElementById('contrib-asignatura');
-                    
-                    if (espSelect && app.contribState.especialidad) {
-                        espSelect.value = app.contribState.especialidad;
-                        app.updateContribAsignaturas().then(() => {
-                            if (asigSelect && app.contribState.asignatura) {
-                                asigSelect.value = app.contribState.asignatura;
-                            }
-                        });
-                    } else if (asigSelect && app.contribState.asignatura) {
+                    if (asigSelect && app.contribState.asignatura) {
                         asigSelect.value = app.contribState.asignatura;
                     }
                 }, 100);
             },
             
-            // Actualizar asignaturas según especialidad
+            // Actualizar asignaturas (simplificado - usa la especialidad fija del usuario)
             updateContribAsignaturas: async () => {
-                const especialidadId = document.getElementById('contrib-especialidad').value;
-                const asignaturaSelect = document.getElementById('contrib-asignatura');
-                
-                if (!asignaturaSelect) return;
-                
-                let options = '<option value="">Selecciona una asignatura</option>';
-                
-                if (especialidadId) {
-                    // Cargar asignaturas de especialidad si no están cargadas
-                    await app.loadEspecialidadData(especialidadId);
-                    
-                    // Obtener la lista de asignaturas de especialidad desde CONFIG
-                    const asignaturasEsp = especialidadId === 'orientacion-educativa' 
-                        ? CONFIG.asignaturas.especialidadOrientacion 
-                        : CONFIG.asignaturas.especialidad;
-                    
-                    // Construir opciones de especialidad directamente desde loadedData
-                    const especialidadOpts = [];
-                    asignaturasEsp.forEach(asig => {
-                        const key = `${especialidadId}-${asig.id}`;
-                        if (app.loadedData[key]) {
-                            especialidadOpts.push({ id: key, nombre: asig.nombre });
-                        }
-                    });
-                    
-                    if (especialidadOpts.length > 0) {
-                        options += '<optgroup label="📘 Especialidad">';
-                        especialidadOpts.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                        options += '</optgroup>';
-                    }
-                    
-                    // También incluir obligatorias y optativas
-                    const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
-                    const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
-                    
-                    if (obligatorias.length > 0) {
-                        options += '<optgroup label="📕 Obligatorias">';
-                        obligatorias.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                        options += '</optgroup>';
-                    }
-                    
-                    if (optativas.length > 0) {
-                        options += '<optgroup label="📗 Optativas Comunes">';
-                        optativas.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                        options += '</optgroup>';
-                    }
-                } else {
-                    // Solo mostrar obligatorias y optativas
-                    const obligatorias = app.asignaturasDisponibles.filter(a => a.tipo === 'obligatoria');
-                    const optativas = app.asignaturasDisponibles.filter(a => a.tipo === 'optativa');
-                    
-                    if (obligatorias.length > 0) {
-                        options += '<optgroup label="📕 Obligatorias">';
-                        obligatorias.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                        options += '</optgroup>';
-                    }
-                    
-                    if (optativas.length > 0) {
-                        options += '<optgroup label="📗 Optativas Comunes">';
-                        optativas.forEach(a => options += `<option value="${a.id}">${a.nombre}</option>`);
-                        options += '</optgroup>';
-                    }
-                }
-                
-                asignaturaSelect.innerHTML = options;
-                
-                // Actualizar lista de contribuciones con el nuevo filtro
+                // Esta función ya no es necesaria porque la especialidad es fija
+                // Las asignaturas se cargan automáticamente basándose en app.userEspecialidad
                 app.renderDbContributionsList();
             },
             
             // Iniciar proceso de contribución
             startContributing: () => {
                 const asignaturaId = document.getElementById('contrib-asignatura').value;
-                const especialidadId = document.getElementById('contrib-especialidad').value;
                 
                 if (!asignaturaId) {
                     app.showToast('⚠️ Selecciona una asignatura');
                     return;
                 }
                 
-                // Guardar estado
-                app.contribState.especialidad = especialidadId;
+                // Guardar estado (usar especialidad fija del usuario)
+                app.contribState.especialidad = app.userEspecialidad;
                 app.contribState.asignatura = asignaturaId;
                 app.saveContribState();
                 
@@ -4141,7 +4309,7 @@
             // Enviar contribución
             submitContribution: async () => {
                 const asignaturaId = document.getElementById('contrib-asignatura').value;
-                const especialidadId = document.getElementById('contrib-especialidad').value;
+                const especialidadId = app.userEspecialidad; // Usar especialidad fija del usuario
                 const tema = document.getElementById('contrib-tema').value;
                 const question = document.getElementById('contrib-question').value.trim();
                 const option1 = document.getElementById('contrib-option-1').value.trim();
@@ -4306,10 +4474,9 @@
                 const listContainer = document.getElementById('contributions-list');
                 if (!listContainer) return;
                 
-                // Obtener filtros seleccionados
-                const especialidadSelect = document.getElementById('contrib-especialidad');
+                // Obtener filtros seleccionados (usar especialidad fija del usuario)
                 const asignaturaSelect = document.getElementById('contrib-asignatura');
-                const especialidadFilter = especialidadSelect ? especialidadSelect.value : '';
+                const especialidadFilter = app.userEspecialidad || '';
                 const asignaturaFilter = asignaturaSelect ? asignaturaSelect.value : '';
                 
                 listContainer.innerHTML = '<div class="loading-box"><p>⏳ Cargando tus preguntas...</p></div>';
@@ -4440,13 +4607,8 @@
                 // Guardar ID para actualización (Supabase usa 'id' no '_id')
                 app.editingDbQuestionId = qData.id || qData._id;
                 
-                // Configurar selectores
-                const espSelect = document.getElementById('contrib-especialidad');
+                // Configurar selector de asignatura
                 const asigSelect = document.getElementById('contrib-asignatura');
-                
-                if (espSelect && qData.especialidad) {
-                    espSelect.value = qData.especialidad;
-                }
                 
                 // Mostrar formulario
                 app.startContributing();
@@ -5077,9 +5239,11 @@
                 if (especialidadId && especialidadId !== app.currentEspecialidad) {
                     app.showLoading('Cargando asignaturas de especialidad...');
                     app.currentEspecialidad = especialidadId;
+                    app.currentTema = 'all'; // Resetear tema al cambiar de especialidad
                     await app.loadEspecialidadData(especialidadId);
                 } else if (!especialidadId) {
                     app.currentEspecialidad = '';
+                    app.currentTema = 'all'; // Resetear tema al quitar especialidad
                     app.updateAvailableSubjects();
                 }
                 app.savePreferences();
