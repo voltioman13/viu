@@ -749,7 +749,8 @@
                 'educacion-fisica': 'Educación Física',
                 'economia-administracion': 'Economía y Administración',
                 'dibujo': 'Dibujo',
-                'biologia-geologia': 'Biología y Geología'
+                'biologia-geologia': 'Biología y Geología',
+                'matematicas': 'Matemáticas'
             },
             asignaturas: {
                 obligatorias: [
@@ -780,6 +781,7 @@
             activeQuizQuestions: [],
             currentEspecialidad: '',
             currentAsignatura: null,
+            currentTema: 'all', // Tema seleccionado ('all' o número de tema)
             asignaturasDisponibles: [],
             loadedData: {},
             
@@ -989,8 +991,11 @@
                     if (app.savedPreferences.lastAsignatura) {
                         await app.selectAsignatura(app.savedPreferences.lastAsignatura);
                         // Aplicar filtro de tema si hay uno guardado
-                        if (app.savedPreferences.lastTema && app.savedPreferences.lastTema !== 'all') {
-                            await app.applyTemaFilter(app.savedPreferences.lastTema);
+                        if (app.savedPreferences.lastTema) {
+                            app.currentTema = app.savedPreferences.lastTema;
+                            if (app.savedPreferences.lastTema !== 'all') {
+                                await app.applyTemaFilter(app.savedPreferences.lastTema);
+                            }
                         }
                     }
                     if (app.savedPreferences.randomOrder !== undefined) {
@@ -1967,6 +1972,7 @@
                     const prefs = {
                         lastAsignatura: app.currentAsignatura ? app.currentAsignatura.id : null,
                         lastEspecialidad: app.currentEspecialidad,
+                        lastTema: app.currentTema,
                         randomOrder: app.quizSettings.randomOrder,
                         onlyMarked: app.quizSettings.onlyMarked
                     };
@@ -2436,19 +2442,19 @@
                 
                 // Obtener temas disponibles para la asignatura actual
                 let temasDisponibles = [];
+                let totalPreguntasAsignatura = 0;
                 if (app.currentAsignatura) {
                     temasDisponibles = getTemasForAsignatura(app.currentAsignatura.id);
+                    totalPreguntasAsignatura = countByAsignatura(app.currentAsignatura.id);
                 }
                 
-                const savedTema = app.savedPreferences?.lastTema || 'all';
                 const unitOptions = temasDisponibles.map(tema => 
-                    `<option value="${tema.numero}" ${savedTema == tema.numero ? 'selected' : ''}>${tema.nombre} (${tema.count} preguntas)</option>`
+                    `<option value="${tema.numero}" ${app.currentTema == tema.numero ? 'selected' : ''}>${tema.nombre} (${tema.count} preguntas)</option>`
                 ).join('');
                 
                 // Determinar el tema seleccionado para mostrar en el mensaje
-                const currentTema = savedTema === 'all' ? 'all' : savedTema;
-                const temaInfo = currentTema !== 'all' 
-                    ? `✅ ${totalPreguntas} preguntas disponibles - Tema ${currentTema}`
+                const temaInfo = app.currentTema !== 'all' 
+                    ? `✅ ${totalPreguntas} preguntas disponibles - Tema ${app.currentTema}`
                     : `✅ ${totalPreguntas} preguntas disponibles (${temasDisponibles.length} temas)`;
                 
                 container.innerHTML = `
@@ -2473,7 +2479,15 @@
                                 </select>
                             </div>
                             
-
+                            ${temasDisponibles.length > 0 ? `
+                            <div class="form-group">
+                                <label class="form-label">📑 Tema:</label>
+                                <select id="tema-selector" class="form-select" onchange="app.changeTema(this.value)">
+                                    <option value="all" ${app.currentTema === 'all' ? 'selected' : ''}>Todos los temas (${totalPreguntasAsignatura} preguntas)</option>
+                                    ${unitOptions}
+                                </select>
+                            </div>
+                            ` : ''}
                             
                             <div class="form-group">
                                 <label class="form-label">⚙️ Configuración:</label>
@@ -5074,6 +5088,14 @@
             
             changeAsignatura: async (asigId) => {
                 await app.selectAsignatura(asigId);
+                app.currentTema = 'all'; // Resetear tema al cambiar de asignatura
+                app.savePreferences();
+                app.navigate('home');
+            },
+            
+            changeTema: async (temaValue) => {
+                app.currentTema = temaValue;
+                await app.applyTemaFilter(temaValue);
                 app.savePreferences();
                 app.navigate('home');
             },

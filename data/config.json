@@ -47,6 +47,10 @@
     {
       "id": "biologia-geologia",
       "nombre": "Biología y Geología"
+    },
+    {
+      "id": "matematicas",
+      "nombre": "Matemáticas"
     }
   ],
   "asignaturas": [
@@ -337,6 +341,27 @@
       "tipo": "especialidad",
       "ramas": ["biologia-geologia"],
       "archivo": "aprendizaje-ensenanza-biologia.json"
+    },
+    {
+      "id": "innovacion-docente-matematicas",
+      "nombre": "Innovación docente e iniciación a la investigación",
+      "tipo": "especialidad",
+      "ramas": ["matematicas"],
+      "archivo": "innovacion-docente-matematicas.json"
+    },
+    {
+      "id": "complementos-formacion-matematicas",
+      "nombre": "Complementos para la formación disciplinar",
+      "tipo": "especialidad",
+      "ramas": ["matematicas"],
+      "archivo": "complementos-formacion-matematicas.json"
+    },
+    {
+      "id": "aprendizaje-ensenanza-matematicas",
+      "nombre": "Aprendizaje y enseñanza",
+      "tipo": "especialidad",
+      "ramas": ["matematicas"],
+      "archivo": "aprendizaje-ensenanza-matematicas.json"
     }
   ]
 }
