@@ -1758,8 +1758,9 @@
                     try {
                         let allQuestions = JSON.parse(cachedData);
                         // Filtrar por especialidad y asignatura si se especifica
+                        // IMPORTANTE: Incluir también preguntas sin especialidad (obligatorias/comunes)
                         if (especialidad) {
-                            allQuestions = allQuestions.filter(q => q.especialidad === especialidad);
+                            allQuestions = allQuestions.filter(q => q.especialidad === especialidad || q.especialidad === '' || !q.especialidad);
                         }
                         if (asignatura) {
                             allQuestions = allQuestions.filter(q => q.asignatura === asignatura);
@@ -1776,8 +1777,9 @@
                     let url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*`;
                     
                     // Construir filtros Supabase
+                    // Para especialidad, usar OR para incluir preguntas comunes (especialidad vacía)
                     if (especialidad) {
-                        url += `&especialidad=eq.${especialidad}`;
+                        url += `&or=(especialidad.eq.${especialidad},especialidad.eq.,especialidad.is.null)`;
                     }
                     if (asignatura) {
                         url += `&asignatura=eq.${asignatura}`;
@@ -1949,8 +1951,13 @@
                 // AHORA SOLO USAMOS PREGUNTAS DE LA BASE DE DATOS
                 // Los archivos JSON ya no se usan para los tests
                 
+                // Detectar si es asignatura obligatoria (no filtrar por especialidad)
+                const asignaturaInfo = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
+                const esObligatoria = asignaturaInfo && asignaturaInfo.tipo === 'obligatoria';
+                const especialidadFiltro = esObligatoria ? '' : especialidadId;
+                
                 // Cargar preguntas de la BD para esta asignatura
-                const dbQuestions = await app.loadDbQuestions(especialidadId, asignaturaId);
+                const dbQuestions = await app.loadDbQuestions(especialidadFiltro, asignaturaId);
                 const dbTemas = app.convertDbQuestionsToFormat(dbQuestions);
                 
                 // Ordenar temas por número
@@ -2421,7 +2428,10 @@
                 
                 // SOLO cargar preguntas de la BD (ya no usamos JSON locales)
                 try {
-                    const dbQuestions = await app.loadDbQuestions(app.currentEspecialidad, app.currentAsignatura.id);
+                    // Para asignaturas obligatorias, no filtrar por especialidad (son comunes a todas)
+                    const esObligatoria = app.currentAsignatura.tipo === 'obligatoria';
+                    const especialidadFiltro = esObligatoria ? '' : app.currentEspecialidad;
+                    const dbQuestions = await app.loadDbQuestions(especialidadFiltro, app.currentAsignatura.id);
                     dbQuestions.forEach(q => {
                         let opciones = q.opciones;
                         if (typeof opciones === 'string') {
@@ -2457,12 +2467,68 @@
                 
                 app.filteredQuestions = [];
                 
-                // SOLO cargar preguntas de la BD (ya no usamos JSON locales)
+                // Para asignaturas obligatorias, no filtrar por especialidad (son comunes a todas)
+                const esObligatoria = app.currentAsignatura.tipo === 'obligatoria';
+                const especialidadFiltro = esObligatoria ? '' : app.currentEspecialidad;
+                
+                // Primero intentar usar el caché local
+                const cachedData = localStorage.getItem(app.CACHE_KEYS.questions);
+                const cacheTime = localStorage.getItem(app.CACHE_KEYS.cacheTime);
+                const now = Date.now();
+                
+                if (cachedData && cacheTime && (now - parseInt(cacheTime)) < app.CACHE_DURATION) {
+                    try {
+                        let allQuestions = JSON.parse(cachedData);
+                        
+                        // Filtrar por asignatura
+                        allQuestions = allQuestions.filter(q => q.asignatura === app.currentAsignatura.id);
+                        
+                        // Filtrar por tema
+                        allQuestions = allQuestions.filter(q => q.tema === parseInt(temaNum));
+                        
+                        // Filtrar por especialidad solo si NO es obligatoria
+                        if (!esObligatoria && especialidadFiltro) {
+                            allQuestions = allQuestions.filter(q => 
+                                q.especialidad === especialidadFiltro || 
+                                q.especialidad === '' || 
+                                !q.especialidad
+                            );
+                        }
+                        
+                        allQuestions.forEach(q => {
+                            let opciones = q.opciones;
+                            if (typeof opciones === 'string') {
+                                try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                            }
+                            
+                            app.filteredQuestions.push({
+                                id: q.id,
+                                subject: q.asignatura_nombre || app.currentAsignatura.nombre,
+                                unit: q.tema,
+                                question: q.pregunta,
+                                options: opciones,
+                                answer: q.respuesta_correcta,
+                                fromDb: true,
+                                autor: q.autor,
+                                votos_positivos: q.votos_positivos || 0,
+                                votos_negativos: q.votos_negativos || 0
+                            });
+                        });
+                        
+                        console.log(`📦 Tema ${temaNum}: ${app.filteredQuestions.length} preguntas desde caché`);
+                        return;
+                    } catch (e) {
+                        console.warn('Error parseando cache en applyTemaFilter:', e);
+                    }
+                }
+                
+                // Si no hay caché, cargar de la BD
                 try {
                     let url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&asignatura=eq.${app.currentAsignatura.id}&tema=eq.${parseInt(temaNum)}`;
                     
-                    if (app.currentEspecialidad) {
-                        url += `&especialidad=eq.${app.currentEspecialidad}`;
+                    // Solo filtrar por especialidad para asignaturas de especialidad
+                    if (!esObligatoria && especialidadFiltro) {
+                        url += `&or=(especialidad.eq.${especialidadFiltro},especialidad.eq.,especialidad.is.null)`;
                     }
                     
                     const response = await fetch(url, {
@@ -3732,7 +3798,10 @@
                 `;
                 
                 // Cargar preguntas de la BD (usa cache local)
-                const dbQuestions = await app.loadDbQuestions(app.currentEspecialidad, app.currentAsignatura.id);
+                // Para asignaturas obligatorias, no filtrar por especialidad (son comunes a todas)
+                const esObligatoria = app.currentAsignatura.tipo === 'obligatoria';
+                const especialidadFiltro = esObligatoria ? '' : app.currentEspecialidad;
+                const dbQuestions = await app.loadDbQuestions(especialidadFiltro, app.currentAsignatura.id);
                 
                 // Agrupar por tema
                 const temasMap = {};
@@ -4381,12 +4450,16 @@
                 // Verificar si estamos editando una pregunta existente
                 const isEditing = !!app.editingDbQuestionId;
                 
+                // Determinar si es asignatura obligatoria (no tiene especialidad en su ID)
+                const esObligatoria = asignatura && asignatura.tipo === 'obligatoria';
+                
                 // Crear objeto para guardar en la BD
+                // Para obligatorias, especialidad vacía para que sea compartida entre todas
                 const questionData = {
                     pregunta: question,
                     opciones: JSON.stringify(options), // Guardar como JSON string
                     respuesta_correcta: answer,
-                    especialidad: especialidadId || '',
+                    especialidad: esObligatoria ? '' : (especialidadId || ''),
                     asignatura: asignaturaId,
                     asignatura_nombre: asignaturaNombre,
                     tema: temaNum,
@@ -4489,7 +4562,10 @@
                     let url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&autor=eq.${userId}`;
                     
                     // Añadir filtros si están seleccionados
-                    if (especialidadFilter) url += `&especialidad=eq.${especialidadFilter}`;
+                    // Para especialidad, incluir también preguntas sin especialidad (obligatorias)
+                    if (especialidadFilter) {
+                        url += `&or=(especialidad.eq.${especialidadFilter},especialidad.eq.,especialidad.is.null)`;
+                    }
                     if (asignaturaFilter) url += `&asignatura=eq.${asignaturaFilter}`;
                     
                     console.log('🔍 Cargando preguntas filtradas');
