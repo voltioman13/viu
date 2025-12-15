@@ -546,34 +546,34 @@
             </div>
             
             <!-- Contenido de las pestañas -->
-            <div style="overflow-y: auto; flex: 1; padding-right: 8px; font-size: 0.9rem;">
+            <div style="overflow-y: auto; flex: 1; padding-right: 8px; font-size: 0.9rem; color: var(--text-primary);">
                 <!-- Pestaña: Inicio Rápido -->
                 <div id="help-content-inicio" class="help-content">
-                    <div style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem;">
+                    <div style="background: var(--primary); padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem; color: white;">
                         <p style="margin: 0; font-weight: 600;">1️⃣ Elige especialidad → 2️⃣ Elige asignatura → 3️⃣ ¡Comienza el test!</p>
                     </div>
                     
                     <p style="margin: 0 0 0.75rem 0; font-size: 0.85rem; color: var(--text-secondary);">Funciones principales:</p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                         <div style="padding: 0.5rem; background: var(--card); border-radius: 6px; border-left: 3px solid #10b981;">
-                            <strong style="font-size: 0.8rem;">🔄 Modo Repaso</strong><br>
+                            <strong style="font-size: 0.8rem; color: var(--text-primary);">🔄 Modo Repaso</strong><br>
                             <span style="font-size: 0.75rem; color: var(--text-secondary);">Solo preguntas falladas</span>
                         </div>
                         <div style="padding: 0.5rem; background: var(--card); border-radius: 6px; border-left: 3px solid #ef4444;">
-                            <strong style="font-size: 0.8rem;">⏱️ Modo Examen</strong><br>
+                            <strong style="font-size: 0.8rem; color: var(--text-primary);">⏱️ Modo Examen</strong><br>
                             <span style="font-size: 0.75rem; color: var(--text-secondary);">Con tiempo límite</span>
                         </div>
                         <div style="padding: 0.5rem; background: var(--card); border-radius: 6px; border-left: 3px solid #8b5cf6;">
-                            <strong style="font-size: 0.8rem;">📊 Estadísticas</strong><br>
+                            <strong style="font-size: 0.8rem; color: var(--text-primary);">📊 Estadísticas</strong><br>
                             <span style="font-size: 0.75rem; color: var(--text-secondary);">Tu progreso y predicciones</span>
                         </div>
                         <div style="padding: 0.5rem; background: var(--card); border-radius: 6px; border-left: 3px solid #3b82f6;">
-                            <strong style="font-size: 0.8rem;">👍👎 Votación</strong><br>
+                            <strong style="font-size: 0.8rem; color: var(--text-primary);">👍👎 Votación</strong><br>
                             <span style="font-size: 0.75rem; color: var(--text-secondary);">Valida las preguntas</span>
                         </div>
                     </div>
                     
-                    <div style="background: #dbeafe; padding: 0.6rem; border-radius: 6px; margin-top: 0.75rem; font-size: 0.8rem;">
+                    <div style="background: var(--card); border: 1px solid var(--border); padding: 0.6rem; border-radius: 6px; margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-primary);">
                         <strong>💡 Tip:</strong> Vota 👍/👎 en cada pregunta para ayudar a verificar si están correctas.
                     </div>
                 </div>
@@ -581,17 +581,17 @@
                 <!-- Pestaña: Tests -->
                 <div id="help-content-tests" class="help-content" style="display: none;">
                     <div style="display: grid; gap: 0.5rem;">
-                        <div style="padding: 0.6rem; background: #f0fdf4; border-radius: 6px; border-left: 3px solid #10b981;">
-                            <strong style="color: #065f46;">✅ Test Normal</strong> — Feedback inmediato al responder. Ideal para <em>aprender</em>.
+                        <div style="padding: 0.6rem; background: var(--card); border-radius: 6px; border-left: 3px solid #10b981; color: var(--text-primary);">
+                            <strong style="color: #10b981;">✅ Test Normal</strong> — Feedback inmediato al responder. Ideal para <em>aprender</em>.
                         </div>
-                        <div style="padding: 0.6rem; background: #fef2f2; border-radius: 6px; border-left: 3px solid #ef4444;">
-                            <strong style="color: #991b1b;">⏱️ Modo Examen</strong> — Con temporizador, sin feedback hasta el final. Para <em>simulacros</em>.
+                        <div style="padding: 0.6rem; background: var(--card); border-radius: 6px; border-left: 3px solid #ef4444; color: var(--text-primary);">
+                            <strong style="color: #ef4444;">⏱️ Modo Examen</strong> — Con temporizador, sin feedback hasta el final. Para <em>simulacros</em>.
                         </div>
-                        <div style="padding: 0.6rem; background: #eff6ff; border-radius: 6px; border-left: 3px solid #3b82f6;">
-                            <strong style="color: #1e40af;">🔄 Modo Repaso</strong> — Solo tus preguntas falladas. Para <em>mejorar</em>.
+                        <div style="padding: 0.6rem; background: var(--card); border-radius: 6px; border-left: 3px solid #3b82f6; color: var(--text-primary);">
+                            <strong style="color: #3b82f6;">🔄 Modo Repaso</strong> — Solo tus preguntas falladas. Para <em>mejorar</em>.
                         </div>
-                        <div style="padding: 0.6rem; background: #faf5ff; border-radius: 6px; border-left: 3px solid #a855f7;">
-                            <strong style="color: #6b21a8;">📖 Ver Resumen</strong> — Todas las preguntas con respuestas. Para <em>estudiar</em>.
+                        <div style="padding: 0.6rem; background: var(--card); border-radius: 6px; border-left: 3px solid #a855f7; color: var(--text-primary);">
+                            <strong style="color: #a855f7;">📖 Ver Resumen</strong> — Todas las preguntas con respuestas. Para <em>estudiar</em>.
                         </div>
                     </div>
                     
@@ -605,47 +605,47 @@
                 
                 <!-- Pestaña: Votos -->
                 <div id="help-content-votos" class="help-content" style="display: none;">
-                    <div style="background: #dbeafe; padding: 0.6rem; border-radius: 6px; margin-bottom: 0.75rem; font-size: 0.85rem;">
+                    <div style="background: var(--card); border: 1px solid var(--border); padding: 0.6rem; border-radius: 6px; margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-primary);">
                         <strong>¿Para qué sirve?</strong> Las preguntas las añade cualquiera, así que votamos entre todos para verificar si están bien.
                     </div>
                     
-                    <p style="margin: 0 0 0.4rem 0; font-weight: 600; font-size: 0.85rem;">🏷️ Niveles de verificación:</p>
+                    <p style="margin: 0 0 0.4rem 0; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">🏷️ Niveles de verificación:</p>
                     <div style="display: grid; gap: 0.35rem; font-size: 0.8rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: #dcfce7; border-radius: 4px;">
-                            <span style="background: #bbf7d0; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">✅ Verificada</span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-left: 3px solid #10b981; border-radius: 4px; color: var(--text-primary);">
+                            <span style="background: #10b981; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">✅ Verificada</span>
                             <span>80%+ votos positivos → <strong>Fiable</strong></span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: #dbeafe; border-radius: 4px;">
-                            <span style="background: #bfdbfe; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">🟢 Prob. correcta</span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-left: 3px solid #3b82f6; border-radius: 4px; color: var(--text-primary);">
+                            <span style="background: #3b82f6; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">🟢 Prob. correcta</span>
                             <span>60%+ positivos → <strong>Bastante fiable</strong></span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: #fef3c7; border-radius: 4px;">
-                            <span style="background: #fde68a; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">🟡 Dudosa</span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-left: 3px solid #f59e0b; border-radius: 4px; color: var(--text-primary);">
+                            <span style="background: #f59e0b; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">🟡 Dudosa</span>
                             <span>Votos divididos → <strong>Verifica tú</strong></span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: #fee2e2; border-radius: 4px;">
-                            <span style="background: #fecaca; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">🔴 Posible error</span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-left: 3px solid #ef4444; border-radius: 4px; color: var(--text-primary);">
+                            <span style="background: #ef4444; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">🔴 Posible error</span>
                             <span>Mayoría negativos → <strong>¡Cuidado!</strong></span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: #f3f4f6; border-radius: 4px;">
-                            <span style="background: #e5e7eb; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">⚪ Sin verificar</span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-left: 3px solid var(--text-secondary); border-radius: 4px; color: var(--text-primary);">
+                            <span style="background: var(--text-secondary); color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">⚪ Sin verificar</span>
                             <span>Pocos votos → <strong>¡Vota tú!</strong></span>
                         </div>
                     </div>
                     
-                    <div style="background: #fef3c7; padding: 0.5rem; border-radius: 6px; margin-top: 0.6rem; font-size: 0.8rem;">
+                    <div style="background: var(--card); border: 1px solid var(--border); padding: 0.5rem; border-radius: 6px; margin-top: 0.6rem; font-size: 0.8rem; color: var(--text-primary);">
                         <strong>💡 Tip:</strong> Vota después de ver la respuesta. Si coincide con el temario → 👍. Si no estás seguro → no votes.
                     </div>
                 </div>
                 
                 <!-- Pestaña: Contribuir -->
                 <div id="help-content-contribuir" class="help-content" style="display: none;">
-                    <div style="background: #fef3c7; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.6rem; font-size: 0.85rem;">
+                    <div style="background: var(--card); border: 1px solid #f59e0b; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.6rem; font-size: 0.85rem; color: var(--text-primary);">
                         <strong>⚠️ Solo envía preguntas de las que estés 100% seguro de la respuesta correcta.</strong>
                     </div>
                     
-                    <p style="margin: 0 0 0.4rem 0; font-weight: 600; font-size: 0.85rem;">📋 Pasos:</p>
-                    <ol style="margin: 0; padding-left: 1.3rem; font-size: 0.85rem; line-height: 1.5;">
+                    <p style="margin: 0 0 0.4rem 0; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">📋 Pasos:</p>
+                    <ol style="margin: 0; padding-left: 1.3rem; font-size: 0.85rem; line-height: 1.5; color: var(--text-primary);">
                         <li>Pulsa <strong>"+"</strong> en el menú</li>
                         <li>Selecciona especialidad y asignatura</li>
                         <li>Escribe nº de tema, pregunta y 4 opciones</li>
@@ -653,65 +653,65 @@
                         <li>¡Enviar!</li>
                     </ol>
                     
-                    <p style="margin: 0.6rem 0 0.4rem 0; font-weight: 600; font-size: 0.85rem;">📝 Tipos de pregunta:</p>
+                    <p style="margin: 0.6rem 0 0.4rem 0; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">📝 Tipos de pregunta:</p>
                     <div style="display: grid; gap: 0.35rem; font-size: 0.8rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-radius: 4px; color: var(--text-primary);">
                             <span>📝</span><strong>Test</strong> — Pregunta normal tipo test
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-radius: 4px; color: var(--text-primary);">
                             <span>🤖</span><strong>Test IA</strong> — Generada con ChatGPT/IA
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-radius: 4px; color: var(--text-primary);">
                             <span>📄</span><strong>Desarrollo</strong> — Pregunta abierta con respuesta modelo
                         </div>
                     </div>
                     
-                    <div style="background: #dcfce7; padding: 0.5rem; border-radius: 6px; margin-top: 0.6rem; font-size: 0.8rem;">
+                    <div style="background: var(--card); border: 1px solid var(--border); padding: 0.5rem; border-radius: 6px; margin-top: 0.6rem; font-size: 0.8rem; color: var(--text-primary);">
                         <strong>🛠️ Editar/Eliminar:</strong> Ve a <strong>"+" → Mis Contribuciones</strong>
                     </div>
                 </div>
                 
                 <!-- Pestaña: Atajos -->
                 <div id="help-content-atajos" class="help-content" style="display: none;">
-                    <p style="margin: 0 0 0.5rem 0; font-weight: 600; font-size: 0.85rem;">⌨️ Durante el test:</p>
+                    <p style="margin: 0 0 0.5rem 0; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">⌨️ Durante el test:</p>
                     <div style="display: grid; gap: 0.4rem; font-size: 0.85rem;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem; background: var(--card); border-radius: 4px; color: var(--text-primary);">
                             <div style="display: flex; gap: 0.25rem;">
-                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">1</kbd>
-                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">2</kbd>
-                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">3</kbd>
-                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">4</kbd>
+                                <kbd style="background: var(--border); padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid var(--text-secondary); font-size: 0.75rem; color: var(--text-primary);">1</kbd>
+                                <kbd style="background: var(--border); padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid var(--text-secondary); font-size: 0.75rem; color: var(--text-primary);">2</kbd>
+                                <kbd style="background: var(--border); padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid var(--text-secondary); font-size: 0.75rem; color: var(--text-primary);">3</kbd>
+                                <kbd style="background: var(--border); padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid var(--text-secondary); font-size: 0.75rem; color: var(--text-primary);">4</kbd>
                             </div>
                             <span>→ Respuesta A, B, C, D</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
-                            <kbd style="background: #e5e7eb; padding: 0.2rem 0.6rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">Enter</kbd>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem; background: var(--card); border-radius: 4px; color: var(--text-primary);">
+                            <kbd style="background: var(--border); padding: 0.2rem 0.6rem; border-radius: 3px; border: 1px solid var(--text-secondary); font-size: 0.75rem; color: var(--text-primary);">Enter</kbd>
                             <span>→ Siguiente pregunta</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem; background: var(--card); border-radius: 4px; color: var(--text-primary);">
                             <div style="display: flex; gap: 0.25rem;">
-                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">←</kbd>
-                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">→</kbd>
+                                <kbd style="background: var(--border); padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid var(--text-secondary); font-size: 0.75rem; color: var(--text-primary);">←</kbd>
+                                <kbd style="background: var(--border); padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid var(--text-secondary); font-size: 0.75rem; color: var(--text-primary);">→</kbd>
                             </div>
                             <span>→ Navegar preguntas</span>
                         </div>
                     </div>
                     
-                    <p style="margin: 0.75rem 0 0.4rem 0; font-weight: 600; font-size: 0.85rem;">🎨 Personalización:</p>
-                    <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; line-height: 1.5;">
+                    <p style="margin: 0.75rem 0 0.4rem 0; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">🎨 Personalización:</p>
+                    <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; line-height: 1.5; color: var(--text-primary);">
                         <li><strong>🌙 Tema oscuro:</strong> Botón en barra superior</li>
                         <li><strong>🔤 Tamaño letra:</strong> Slider en pantalla inicio</li>
                     </ul>
                     
-                    <p style="margin: 0.75rem 0 0.4rem 0; font-weight: 600; font-size: 0.85rem;">💾 Se guarda automáticamente:</p>
-                    <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; line-height: 1.5;">
+                    <p style="margin: 0.75rem 0 0.4rem 0; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">💾 Se guarda automáticamente:</p>
+                    <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; line-height: 1.5; color: var(--text-primary);">
                         <li>Notas personales y preguntas marcadas</li>
                         <li>Historial y estadísticas</li>
                         <li>Preguntas falladas (para repaso)</li>
                         <li>Tema, tamaño letra, preferencias</li>
                     </ul>
                     
-                    <div style="background: #fef2f2; padding: 0.5rem; border-radius: 6px; margin-top: 0.6rem; font-size: 0.8rem;">
+                    <div style="background: var(--card); border: 1px solid #ef4444; padding: 0.5rem; border-radius: 6px; margin-top: 0.6rem; font-size: 0.8rem; color: var(--text-primary);">
                         <strong>⚠️ Ojo:</strong> Los datos están en tu navegador. Si limpias caché, los pierdes.
                     </div>
                 </div>
@@ -5537,12 +5537,111 @@
                 // Usar el estado de búsqueda guardado
                 const initialTerm = app.searchState.term;
                 const initialResults = app.searchState.resultsHTML || '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar en preguntas y respuestas.</p>';
+                
+                // Inicializar filtros de búsqueda si no existen
+                if (!app.searchFilters) {
+                    app.searchFilters = {
+                        especialidad: app.userEspecialidad || '',
+                        asignatura: ''
+                    };
+                }
+                
+                // Generar opciones de asignaturas basadas en la especialidad seleccionada
+                const getAsignaturasOptions = () => {
+                    let options = '<option value="">Todas las asignaturas</option>';
+                    const filtroEsp = app.searchFilters.especialidad;
+                    
+                    // Si no hay filtro o es "todas", mostrar todas las categorías
+                    if (!filtroEsp) {
+                        // Obligatorias
+                        options += '<optgroup label="📘 Obligatorias">';
+                        CONFIG.asignaturas.obligatorias.forEach(a => {
+                            const selected = app.searchFilters.asignatura === a.nombre ? 'selected' : '';
+                            options += `<option value="${a.nombre}" ${selected}>${a.nombre}</option>`;
+                        });
+                        options += '</optgroup>';
+                        
+                        // Optativas
+                        options += '<optgroup label="📖 Optativas">';
+                        CONFIG.asignaturas.optativas.forEach(a => {
+                            const selected = app.searchFilters.asignatura === a.nombre ? 'selected' : '';
+                            options += `<option value="${a.nombre}" ${selected}>${a.nombre}</option>`;
+                        });
+                        options += '</optgroup>';
+                        
+                        return options;
+                    }
+                    
+                    // Si el filtro es "obligatorias"
+                    if (filtroEsp === 'obligatorias') {
+                        CONFIG.asignaturas.obligatorias.forEach(a => {
+                            const selected = app.searchFilters.asignatura === a.nombre ? 'selected' : '';
+                            options += `<option value="${a.nombre}" ${selected}>${a.nombre}</option>`;
+                        });
+                        return options;
+                    }
+                    
+                    // Si el filtro es "optativas"
+                    if (filtroEsp === 'optativas') {
+                        CONFIG.asignaturas.optativas.forEach(a => {
+                            const selected = app.searchFilters.asignatura === a.nombre ? 'selected' : '';
+                            options += `<option value="${a.nombre}" ${selected}>${a.nombre}</option>`;
+                        });
+                        return options;
+                    }
+                    
+                    // Si es una especialidad específica
+                    const espNombre = CONFIG.especialidades[filtroEsp] || filtroEsp;
+                    const asigEsp = filtroEsp === 'orientacion-educativa' 
+                        ? CONFIG.asignaturas.especialidadOrientacion 
+                        : CONFIG.asignaturas.especialidad;
+                    
+                    asigEsp.forEach(a => {
+                        const selected = app.searchFilters.asignatura === a.nombre ? 'selected' : '';
+                        options += `<option value="${a.nombre}" ${selected}>${a.nombre}</option>`;
+                    });
+                    
+                    return options;
+                };
+                
+                // Generar opciones de especialidades
+                const getEspecialidadesOptions = () => {
+                    let options = '<option value="">Todas las especialidades</option>';
+                    // Opciones especiales para obligatorias y optativas
+                    options += '<option value="obligatorias"' + (app.searchFilters.especialidad === 'obligatorias' ? ' selected' : '') + '>📘 Obligatorias</option>';
+                    options += '<option value="optativas"' + (app.searchFilters.especialidad === 'optativas' ? ' selected' : '') + '>📖 Optativas</option>';
+                    // Especialidades
+                    Object.entries(CONFIG.especialidades).forEach(([id, nombre]) => {
+                        const selected = app.searchFilters.especialidad === id ? 'selected' : '';
+                        options += `<option value="${id}" ${selected}>🎓 ${nombre}</option>`;
+                    });
+                    return options;
+                };
 
                 container.innerHTML = `
                     <div class="card">
                         <h2>🔍 Buscador Global</h2>
+                        
+                        <!-- Filtros -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">🎓 Especialidad</label>
+                                <select id="search-filter-especialidad" class="form-input" style="padding: 0.5rem; font-size: 0.9rem;"
+                                        onchange="app.changeSearchFilter('especialidad', this.value)">
+                                    ${getEspecialidadesOptions()}
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">📚 Asignatura</label>
+                                <select id="search-filter-asignatura" class="form-input" style="padding: 0.5rem; font-size: 0.9rem;"
+                                        onchange="app.changeSearchFilter('asignatura', this.value)">
+                                    ${getAsignaturasOptions()}
+                                </select>
+                            </div>
+                        </div>
+                        
                         <input type="text" id="search-input" class="form-input" 
-                                placeholder="Busca en todas las asignaturas..." 
+                                placeholder="Busca en preguntas y respuestas..." 
                                 oninput="app.handleSearch(this.value)"
                                 value="${initialTerm}">
                         <div id="search-results" style="margin-top:1rem;">
@@ -5573,7 +5672,8 @@
                                 question: dbQ.pregunta,
                                 options: opciones || [],
                                 answer: dbQ.respuesta_correcta,
-                                tipo: dbQ.especialidad ? 'especialidad' : 'obligatoria'
+                                tipo: dbQ.especialidad ? 'especialidad' : 'obligatoria',
+                                especialidad: dbQ.especialidad
                             };
                         }
                     } catch(e) {
@@ -5585,15 +5685,24 @@
                 
                 const q = foundQuestion;
                 let tipoClass = 'tag';
-                if (q.tipo === 'obligatoria') tipoClass += ' tag-obligatoria';
-                else if (q.tipo === 'optativa') tipoClass += ' tag-optativa';
-                else if (q.tipo === 'especialidad') tipoClass += ' tag-especialidad';
+                let tipoLabel = q.tipo;
+                if (q.tipo === 'obligatoria') {
+                    tipoClass += ' tag-obligatoria';
+                    tipoLabel = 'Obligatoria';
+                } else if (q.tipo === 'optativa') {
+                    tipoClass += ' tag-optativa';
+                    tipoLabel = 'Optativa';
+                } else if (q.tipo === 'especialidad') {
+                    tipoClass += ' tag-especialidad';
+                    const espNombre = q.especialidad ? (CONFIG.especialidades[q.especialidad] || q.especialidad) : 'Especialidad';
+                    tipoLabel = espNombre;
+                }
                 
                 container.innerHTML = `
                     <div class="card">
                         <button class="btn btn-outline" style="width:auto; margin-bottom:1rem;" onclick="app.navigate('search')">⬅ Volver al Buscador</button>
                         <div style="margin-bottom:1rem;">
-                            <span class="${tipoClass}">${q.tipo}</span>
+                            <span class="${tipoClass}">${tipoLabel}</span>
                             <span class="tag tag-subject">${q.subject}</span>
                             <span class="tag">Tema ${q.unit}</span>
                             <small style="color:#94a3b8; display:block; margin-top:8px;">ID: ${q.id}</small>
@@ -6111,9 +6220,36 @@
                 // Usa una función de reemplazo para mantener las mayúsculas/minúsculas del texto original
                 return text.replace(regex, match => `<span class="highlight">${match}</span>`);
             },
+            
+            // Cambiar filtro de búsqueda
+            changeSearchFilter: (filterType, value) => {
+                if (!app.searchFilters) {
+                    app.searchFilters = { especialidad: '', asignatura: '' };
+                }
+                
+                app.searchFilters[filterType] = value;
+                
+                // Si cambiamos especialidad, resetear asignatura y regenerar el select
+                if (filterType === 'especialidad') {
+                    app.searchFilters.asignatura = '';
+                    app.navigate('search'); // Recargar para actualizar opciones de asignatura
+                    return;
+                }
+                
+                // Re-ejecutar la búsqueda actual si hay término
+                const searchInput = document.getElementById('search-input');
+                if (searchInput && searchInput.value.length >= 2) {
+                    app.handleSearch(searchInput.value);
+                }
+            },
 
             handleSearch: (term) => {
                 const resultsDiv = document.getElementById('search-results');
+                
+                // Inicializar filtros si no existen
+                if (!app.searchFilters) {
+                    app.searchFilters = { especialidad: app.userEspecialidad || '', asignatura: '' };
+                }
                 
                 if (term.length < 2) {
                     resultsDiv.innerHTML = '<p style="color:#94a3b8; text-align:center;">Empieza a escribir para buscar en preguntas y respuestas de la base de datos.</p>';
@@ -6131,10 +6267,22 @@
                 if (cachedData) {
                     try {
                         const dbQuestions = JSON.parse(cachedData);
+                        
+                        // Lista de nombres de optativas para detectar tipo
+                        const nombresOptativas = CONFIG.asignaturas.optativas.map(a => a.nombre);
+                        
                         dbQuestions.forEach(q => {
                             let opciones = q.opciones;
                             if (typeof opciones === 'string') {
                                 try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                            }
+                            
+                            // Determinar tipo: especialidad, optativa u obligatoria
+                            let tipo = 'obligatoria';
+                            if (q.especialidad) {
+                                tipo = 'especialidad';
+                            } else if (nombresOptativas.includes(q.asignatura_nombre)) {
+                                tipo = 'optativa';
                             }
                             
                             allSearchQuestions.push({
@@ -6144,7 +6292,7 @@
                                 question: q.pregunta,
                                 options: opciones || [],
                                 answer: q.respuesta_correcta,
-                                tipo: q.especialidad ? 'especialidad' : 'obligatoria',
+                                tipo: tipo,
                                 especialidad: q.especialidad,
                                 is_ai: q.is_ai === true,
                                 question_tipo: q.tipo || 'test' // test o desarrollo
@@ -6160,6 +6308,32 @@
                     app.searchState.term = term;
                     app.searchState.resultsHTML = resultsDiv.innerHTML;
                     return;
+                }
+                
+                // Aplicar filtro de especialidad
+                const filtroEsp = app.searchFilters.especialidad;
+                if (filtroEsp) {
+                    allSearchQuestions = allSearchQuestions.filter(q => {
+                        // Si el filtro es una especialidad específica
+                        if (filtroEsp !== 'obligatorias' && filtroEsp !== 'optativas') {
+                            return q.especialidad === filtroEsp;
+                        }
+                        // Si el filtro es "obligatorias"
+                        if (filtroEsp === 'obligatorias') {
+                            return q.tipo === 'obligatoria';
+                        }
+                        // Si el filtro es "optativas"
+                        if (filtroEsp === 'optativas') {
+                            return q.tipo === 'optativa';
+                        }
+                        return true;
+                    });
+                }
+                
+                // Aplicar filtro de asignatura
+                const filtroAsig = app.searchFilters.asignatura;
+                if (filtroAsig) {
+                    allSearchQuestions = allSearchQuestions.filter(q => q.subject === filtroAsig);
                 }
                 
                 const found = allSearchQuestions.filter(q => {
@@ -6209,11 +6383,21 @@
                         
                         snippetsHTML += '</div>';
 
-                        // Determinar el tag de tipo
+                        // Determinar el tag de tipo y nombre a mostrar
                         let tipoClass = 'tag';
-                        if (q.tipo === 'obligatoria') tipoClass += ' tag-obligatoria';
-                        else if (q.tipo === 'optativa') tipoClass += ' tag-optativa';
-                        else if (q.tipo === 'especialidad') tipoClass += ' tag-especialidad';
+                        let tipoLabel = q.tipo;
+                        if (q.tipo === 'obligatoria') {
+                            tipoClass += ' tag-obligatoria';
+                            tipoLabel = 'Obligatoria';
+                        } else if (q.tipo === 'optativa') {
+                            tipoClass += ' tag-optativa';
+                            tipoLabel = 'Optativa';
+                        } else if (q.tipo === 'especialidad') {
+                            tipoClass += ' tag-especialidad';
+                            // Mostrar el nombre de la especialidad si existe
+                            const espNombre = q.especialidad ? (CONFIG.especialidades[q.especialidad] || q.especialidad) : 'Especialidad';
+                            tipoLabel = espNombre;
+                        }
                         
                         // Badges de tipo de pregunta
                         let tipoBadges = '';
@@ -6228,7 +6412,7 @@
                         return `
                             <div class="result-item" onclick="app.navigate('detail', '${q.id}')" style="${q.is_ai ? 'border-left: 3px solid #8b5cf6;' : q.question_tipo === 'desarrollo' ? 'border-left: 3px solid #f59e0b;' : ''}">
                                 <div style="margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center;">
-                                    <span class="${tipoClass}">${q.tipo}</span>
+                                    <span class="${tipoClass}">${tipoLabel}</span>
                                     <span class="tag tag-subject">${q.subject}</span>
                                     <span class="tag">Tema ${q.unit}</span>
                                     ${tipoBadges}
