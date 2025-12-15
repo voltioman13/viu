@@ -506,8 +506,9 @@
             <div class="logo">VIU - Master Profesor</div>
             <div class="nav-buttons">
                 <button class="menu-btn active" onclick="app.navigate('home')">Inicio</button>
-                <button class="menu-btn" onclick="app.navigate('search')">🔍 Buscar</button>
-                <button class="menu-btn" onclick="app.navigate('contribute')" title="Contribuir con preguntas">+
+                <button class="menu-btn" onclick="app.navigate('stats')">📊</button>
+                <button class="menu-btn" onclick="app.navigate('search')">🔍</button>
+                <button class="menu-btn" onclick="app.navigate('contribute')" title="Contribuir con preguntas">➕
                 <button class="theme-toggle" onclick="app.showHelp()" title="Ayuda y atajos">
                     ℹ️
                 </button>
@@ -2619,6 +2620,7 @@
                     case 'exam-mode': app.renderExamMode(container); break;
                     case 'review-mode': await app.renderReviewMode(container); break;
                     case 'summary': await app.renderSummary(container); break;
+                    case 'stats': await app.renderStatsPage(container); break;
                     case 'stats-advanced': app.renderAdvancedStats(container); break;
                     case 'search': app.renderSearch(container); break;
                     case 'detail': app.renderDetail(container, param); break;
@@ -2891,21 +2893,6 @@
                             }
                             return '';
                         })()}
-                        
-                        ${app.currentAsignatura ? `
-                        <div class="bg-light-box" style="margin-top: 2rem; padding: 1rem; border-radius: 8px; text-align: left;">
-                            <h3 style="font-size: 1rem; margin-top:0;">ℹ️ Información de la asignatura:</h3>
-                            <ul style="margin:0; padding-left: 1.5rem;">
-                                <li><strong>Nombre:</strong> ${app.currentAsignatura.nombre}</li>
-                                <li><strong>Tipo:</strong> ${app.currentAsignatura.tipo}</li>
-                                ${app.currentAsignatura.especialidad ? `<li><strong>Especialidad:</strong> ${app.currentAsignatura.especialidad}</li>` : ''}
-                                <li><strong>Temas:</strong> ${temasDisponibles.length}</li>
-                                <li><strong>Preguntas:</strong> ${totalPreguntas}</li>
-                            </ul>
-                        </div>
-                        ` : ''}
-                        
-                        ${app.renderStatsSection()}
                     </div>
                 `;
                 
@@ -3152,7 +3139,142 @@
                 }
             },
             
-            // Renderizar sección de estadísticas
+            // Nueva página de estadísticas completa
+            renderStatsPage: async (container) => {
+                const totalTests = app.testHistory.length;
+                const totalPreguntas = app.testHistory.reduce((sum, t) => sum + t.total, 0);
+                const totalCorrectas = app.testHistory.reduce((sum, t) => sum + t.score, 0);
+                const promedioGlobal = totalPreguntas > 0 ? Math.round((totalCorrectas / totalPreguntas) * 100) : 0;
+                
+                // Estadísticas por asignatura
+                const statsByAsig = {};
+                app.testHistory.forEach(test => {
+                    if (!statsByAsig[test.asignatura]) {
+                        statsByAsig[test.asignatura] = { nombre: test.asignatura, tests: 0, preguntas: 0, correctas: 0 };
+                    }
+                    statsByAsig[test.asignatura].tests++;
+                    statsByAsig[test.asignatura].preguntas += test.total;
+                    statsByAsig[test.asignatura].correctas += test.score;
+                });
+                
+                const asignaturasOrdenadas = Object.values(statsByAsig).sort((a, b) => b.tests - a.tests);
+                
+                // Preguntas falladas
+                const falladasPorAsig = {};
+                app.failedQuestionsHistory.forEach(q => {
+                    falladasPorAsig[q.subject] = (falladasPorAsig[q.subject] || 0) + 1;
+                });
+                
+                container.innerHTML = `
+                    <div class="card">
+                        <h2 style="margin-bottom: 1rem;">📊 Estadísticas y Progreso</h2>
+                        
+                        ${totalTests === 0 ? `
+                            <div style="padding: 2rem; text-align: center;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">📈</div>
+                                <p class="text-muted">Completa algunos tests para ver tu progreso.</p>
+                                <button class="btn" onclick="app.navigate('home')" style="margin-top: 1rem;">🏠 Ir al Inicio</button>
+                            </div>
+                        ` : `
+                            <!-- Métricas principales -->
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+                                <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 0.6rem; border-radius: 6px; text-align: center; color: white;">
+                                    <div style="font-size: 1.3rem; font-weight: 700;">${totalTests}</div>
+                                    <div style="font-size: 0.65rem; opacity: 0.9;">Tests</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); padding: 0.6rem; border-radius: 6px; text-align: center; color: white;">
+                                    <div style="font-size: 1.3rem; font-weight: 700;">${totalPreguntas}</div>
+                                    <div style="font-size: 0.65rem; opacity: 0.9;">Preguntas</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #22c55e, #15803d); padding: 0.6rem; border-radius: 6px; text-align: center; color: white;">
+                                    <div style="font-size: 1.3rem; font-weight: 700;">${totalCorrectas}</div>
+                                    <div style="font-size: 0.65rem; opacity: 0.9;">Correctas</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, ${promedioGlobal >= 70 ? '#22c55e' : promedioGlobal >= 50 ? '#f59e0b' : '#ef4444'}, ${promedioGlobal >= 70 ? '#15803d' : promedioGlobal >= 50 ? '#d97706' : '#dc2626'}); padding: 0.6rem; border-radius: 6px; text-align: center; color: white;">
+                                    <div style="font-size: 1.3rem; font-weight: 700;">${promedioGlobal}%</div>
+                                    <div style="font-size: 0.65rem; opacity: 0.9;">Media</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Gráfico de Tendencia -->
+                            <div style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem;">
+                                <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem;">📈 Tendencia (últimos 15)</div>
+                                <div style="display: flex; align-items: flex-end; height: 60px; gap: 2px;">
+                                    ${app.testHistory.slice(0, 15).reverse().map(test => {
+                                        const color = test.percentage >= 70 ? '#22c55e' : test.percentage >= 50 ? '#f59e0b' : '#ef4444';
+                                        return `<div style="flex: 1; height: ${test.percentage}%; background: ${color}; border-radius: 2px 2px 0 0; min-height: 2px;" title="${test.asignatura}: ${test.percentage}%"></div>`;
+                                    }).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- Por Asignatura compacto -->
+                            <div style="margin-bottom: 1rem;">
+                                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">📚 Por Asignatura</div>
+                                <div style="display: flex; flex-direction: column; gap: 0.4rem; max-height: 200px; overflow-y: auto;">
+                                    ${asignaturasOrdenadas.map(asig => {
+                                        const prom = Math.round((asig.correctas / asig.preguntas) * 100);
+                                        const color = prom >= 70 ? '#22c55e' : prom >= 50 ? '#f59e0b' : '#ef4444';
+                                        const falladas = falladasPorAsig[asig.nombre] || 0;
+                                        return `
+                                            <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem; background: var(--bg-secondary); border-radius: 4px; border-left: 3px solid ${color};">
+                                                <div style="flex: 1; min-width: 0;">
+                                                    <div style="font-size: 0.8rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${asig.nombre}</div>
+                                                    <div style="font-size: 0.65rem; color: var(--text-secondary);">${asig.tests} tests · ${asig.correctas}/${asig.preguntas}${falladas > 0 ? ` · <span style="color:#ef4444">${falladas} repasar</span>` : ''}</div>
+                                                </div>
+                                                <div style="font-size: 1rem; font-weight: 700; color: ${color};">${prom}%</div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- Actividad reciente compacta -->
+                            <div style="margin-bottom: 1rem;">
+                                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">🕒 Últimos Tests</div>
+                                <div style="display: grid; gap: 0.3rem; max-height: 150px; overflow-y: auto;">
+                                    ${app.testHistory.slice(0, 8).map(test => {
+                                        const date = new Date(test.date);
+                                        const dateStr = date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                                        const color = test.percentage >= 70 ? '#22c55e' : test.percentage >= 50 ? '#f59e0b' : '#ef4444';
+                                        return `
+                                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.35rem 0.5rem; background: var(--bg-secondary); border-radius: 4px; font-size: 0.75rem;">
+                                                <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${test.asignatura}</span>
+                                                <span style="color: var(--text-secondary); margin: 0 0.5rem;">${dateStr}</span>
+                                                <span style="font-weight: 700; color: ${color};">${test.percentage}%</span>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- Pendientes de repasar -->
+                            ${app.failedQuestionsHistory.length > 0 ? `
+                                <div style="background: #fef2f2; padding: 0.6rem; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #fca5a5;">
+                                    <div style="font-size: 0.8rem; font-weight: 600; color: #dc2626; margin-bottom: 0.3rem;">🔄 ${app.failedQuestionsHistory.length} preguntas por repasar</div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                                        ${Object.entries(falladasPorAsig).slice(0, 5).map(([asig, count]) => `
+                                            <span style="background: #fee2e2; color: #991b1b; padding: 0.15rem 0.5rem; border-radius: 9999px; font-size: 0.65rem;">${asig.substring(0,20)}${asig.length > 20 ? '...' : ''}: ${count}</span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            <!-- Acciones -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                <button class="btn btn-outline" onclick="app.navigate('history')" style="padding: 0.5rem; font-size: 0.85rem;">📜 Historial</button>
+                                <button class="btn btn-outline" onclick="app.navigate('stats-advanced')" style="padding: 0.5rem; font-size: 0.85rem;">📊 Avanzadas</button>
+                            </div>
+                            
+                            <button onclick="app.confirmResetAllData()" 
+                                    style="width: 100%; margin-top: 0.75rem; padding: 0.4rem; background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">
+                                🗑️ Reiniciar datos
+                            </button>
+                        `}
+                    </div>
+                `;
+            },
+            
+            // Renderizar sección de estadísticas (legacy - para compatibilidad)
             renderStatsSection: () => {
                 const currentAsigName = app.currentAsignatura ? app.currentAsignatura.nombre : null;
                 const asigStats = currentAsigName && app.stats[currentAsigName] ? app.stats[currentAsigName] : null;
@@ -3339,9 +3461,9 @@
                 if (app.testHistory.length === 0) {
                     container.innerHTML = `
                         <div class="card text-center">
-                            <h2>📈 Historial de Tests</h2>
-                            <p style="color: #94a3b8; margin: 2rem 0;">No has completado ningún test todavía.</p>
-                            <button class="btn" onclick="app.navigate('home')">🏠 Volver al Inicio</button>
+                            <h2 style="margin-bottom: 1rem;">📈 Historial</h2>
+                            <p class="text-muted">No has completado ningún test todavía.</p>
+                            <button class="btn" onclick="app.navigate('stats')" style="margin-top: 1rem;">📊 Volver</button>
                         </div>
                     `;
                     return;
@@ -3350,92 +3472,64 @@
                 // Agrupar por asignatura
                 const byAsignatura = {};
                 app.testHistory.forEach(test => {
-                    if (!byAsignatura[test.asignatura]) {
-                        byAsignatura[test.asignatura] = [];
-                    }
+                    if (!byAsignatura[test.asignatura]) byAsignatura[test.asignatura] = [];
                     byAsignatura[test.asignatura].push(test);
                 });
                 
-                let historyHTML = `
+                container.innerHTML = `
                     <div class="card">
-                        <h2>📈 Historial Completo</h2>
-                        <p style="color: #64748b; margin-bottom: 2rem;">Total de tests realizados: <strong>${app.testHistory.length}</strong></p>
-                `;
-                
-                // Gráfica simple de progreso (últimos 10 tests)
-                const last10 = app.testHistory.slice(0, 10).reverse();
-                historyHTML += '<div style="margin-bottom: 2rem; padding: 1rem; background: #f8fafc; border-radius: 8px;">';
-                historyHTML += '<h3 style="font-size: 1rem; margin-top: 0;">📊 Progreso reciente (últimos 10 tests)</h3>';
-                historyHTML += '<div style="display: flex; align-items: flex-end; justify-content: space-between; height: 120px; gap: 4px;">';
-                
-                last10.forEach((test, idx) => {
-                    const height = test.percentage;
-                    const color = test.percentage >= 70 ? 'var(--success)' : test.percentage >= 50 ? '#f59e0b' : 'var(--error)';
-                    historyHTML += `
-                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-                            <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 2px;">${test.percentage}%</div>
-                            <div style="width: 100%; height: ${height}%; background: ${color}; border-radius: 4px 4px 0 0; min-height: 5px; transition: all 0.3s;"></div>
-                        </div>
-                    `;
-                });
-                
-                historyHTML += '</div></div>';
-                
-                // Lista por asignatura
-                Object.keys(byAsignatura).forEach(asigName => {
-                    const tests = byAsignatura[asigName];
-                    const totalTests = tests.length;
-                    const avgPercentage = Math.round(tests.reduce((sum, t) => sum + t.percentage, 0) / totalTests);
-                    
-                    historyHTML += `
-                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f0f9ff; border-radius: 8px; border: 2px solid #0ea5e9;">
-                            <h3 style="font-size: 1rem; margin: 0 0 0.5rem 0; color: #0369a1;">${asigName}</h3>
-                            <p style="margin: 0 0 1rem 0; font-size: 0.9rem; color: #64748b;">
-                                ${totalTests} test${totalTests > 1 ? 's' : ''} · Promedio: <strong style="color: ${avgPercentage >= 70 ? 'var(--success)' : avgPercentage >= 50 ? '#f59e0b' : 'var(--error)'};">${avgPercentage}%</strong>
-                            </p>
-                            <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 300px; overflow-y: auto;">
-                    `;
-                    
-                    tests.forEach(test => {
-                        const date = new Date(test.date);
-                        const dateStr = date.toLocaleDateString('es-ES', { 
-                            day: '2-digit', 
-                            month: '2-digit', 
-                            year: '2-digit',
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                        });
-                        const percentColor = test.percentage >= 70 ? 'var(--success)' : test.percentage >= 50 ? '#f59e0b' : 'var(--error)';
+                        <h2 style="margin-bottom: 0.75rem;">📈 Historial (${app.testHistory.length} tests)</h2>
                         
-                        historyHTML += `
-                            <div style="padding: 0.75rem; background: white; border-radius: 6px; font-size: 0.9rem; border-left: 4px solid ${percentColor};">
-                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 600; margin-bottom: 0.25rem;">${test.tema}</div>
-                                        <div style="color: #64748b; font-size: 0.85rem;">${dateStr} · ${test.score}/${test.total} correctas</div>
-                                    </div>
-                                    <div style="font-weight: 700; font-size: 1.2rem; color: ${percentColor}; min-width: 60px; text-align: right;">
-                                        ${test.percentage}%
-                                    </div>
-                                </div>
+                        <!-- Gráfico compacto -->
+                        <div style="background: var(--bg-secondary); padding: 0.6rem; border-radius: 6px; margin-bottom: 1rem;">
+                            <div style="font-size: 0.75rem; font-weight: 600; margin-bottom: 0.4rem;">Últimos 10 tests</div>
+                            <div style="display: flex; align-items: flex-end; height: 50px; gap: 2px;">
+                                ${app.testHistory.slice(0, 10).reverse().map(test => {
+                                    const color = test.percentage >= 70 ? '#22c55e' : test.percentage >= 50 ? '#f59e0b' : '#ef4444';
+                                    return `<div style="flex: 1; height: ${test.percentage}%; background: ${color}; border-radius: 2px 2px 0 0; min-height: 2px;" title="${test.percentage}%"></div>`;
+                                }).join('')}
                             </div>
-                        `;
-                    });
-                    
-                    historyHTML += '</div></div>';
-                });
-                
-                historyHTML += `
-                        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-                            <button class="btn btn-outline" onclick="app.navigate('home')" style="flex: 1;">🏠 Volver al Inicio</button>
-                            <button class="btn" onclick="if(confirm('¿Eliminar todo el historial?')) { app.clearHistory(); }" style="flex: 1; background: var(--error); border-color: var(--error);">
-                                🗑️ Limpiar Historial
-                            </button>
+                        </div>
+                        
+                        <!-- Por asignatura -->
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 400px; overflow-y: auto;">
+                            ${Object.entries(byAsignatura).map(([asigName, tests]) => {
+                                const avg = Math.round(tests.reduce((sum, t) => sum + t.percentage, 0) / tests.length);
+                                const color = avg >= 70 ? '#22c55e' : avg >= 50 ? '#f59e0b' : '#ef4444';
+                                return `
+                                    <details style="background: #f0f9ff; border-radius: 6px; border-left: 3px solid ${color};">
+                                        <summary style="padding: 0.6rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+                                            <span style="font-weight: 600;">${asigName}</span>
+                                            <span style="font-size: 0.75rem; color: var(--text-secondary);">${tests.length} tests · <span style="color: ${color}; font-weight: 700;">${avg}%</span></span>
+                                        </summary>
+                                        <div style="padding: 0.5rem; display: flex; flex-direction: column; gap: 0.3rem;">
+                                            ${tests.map(test => {
+                                                const date = new Date(test.date);
+                                                const dateStr = date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                                                const pColor = test.percentage >= 70 ? '#22c55e' : test.percentage >= 50 ? '#f59e0b' : '#ef4444';
+                                                return `
+                                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0.6rem; background: white; border-radius: 4px; font-size: 0.75rem; border-left: 2px solid ${pColor};">
+                                                        <div style="flex: 1;">
+                                                            <div style="font-weight: 500;">${test.tema}</div>
+                                                            <div style="color: var(--text-secondary); font-size: 0.7rem;">${dateStr} · ${test.score}/${test.total}</div>
+                                                        </div>
+                                                        <div style="font-weight: 700; color: ${pColor};">${test.percentage}%</div>
+                                                    </div>
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                    </details>
+                                `;
+                            }).join('')}
+                        </div>
+                        
+                        <!-- Acciones -->
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                            <button class="btn btn-outline" onclick="app.navigate('stats')" style="flex: 1; padding: 0.5rem; font-size: 0.85rem;">📊 Volver</button>
+                            <button class="btn" onclick="if(confirm('¿Eliminar historial?')) app.clearHistory();" style="flex: 1; padding: 0.5rem; font-size: 0.85rem; background: var(--error); border-color: var(--error);">🗑️ Limpiar</button>
                         </div>
                     </div>
                 `;
-                
-                container.innerHTML = historyHTML;
             },
             
             // Limpiar historial
@@ -3956,162 +4050,217 @@
                         <div class="card text-center">
                             <h1>📊 Estadísticas Avanzadas</h1>
                             <p class="text-muted">Completa algunos tests para ver tus estadísticas avanzadas</p>
-                            <button class="btn" onclick="app.navigate('home')">🏠 Volver al Inicio</button>
+                            <button class="btn" onclick="app.navigate('stats')">📊 Volver a Estadísticas</button>
                         </div>
                     `;
                     return;
                 }
                 
-                // Calcular predicción basada en últimos 10 tests
-                const last10 = app.testHistory.slice(0, 10);
-                const avgLast10 = Math.round(last10.reduce((sum, t) => sum + t.percentage, 0) / last10.length);
+                // Calcular métricas globales
+                const totalTests = app.testHistory.length;
+                const totalPreguntas = app.testHistory.reduce((sum, t) => sum + t.total, 0);
+                const totalCorrectas = app.testHistory.reduce((sum, t) => sum + t.score, 0);
+                const promedioGlobal = Math.round((totalCorrectas / totalPreguntas) * 100);
                 
-                // Calcular tendencia (mejorando/empeorando)
+                // Calcular tendencias
                 const last5 = app.testHistory.slice(0, 5);
                 const prev5 = app.testHistory.slice(5, 10);
                 const avgLast5 = last5.length > 0 ? Math.round(last5.reduce((sum, t) => sum + t.percentage, 0) / last5.length) : 0;
-                const avgPrev5 = prev5.length > 0 ? Math.round(prev5.reduce((sum, t) => sum + t.percentage, 0) / prev5.length) : 0;
+                const avgPrev5 = prev5.length > 0 ? Math.round(prev5.reduce((sum, t) => sum + t.percentage, 0) / prev5.length) : avgLast5;
                 const trend = avgLast5 - avgPrev5;
                 
-                // Predictor de examen
-                let prediction = avgLast10;
-                let predictionText = '';
-                let predictionColor = '';
+                // Mejor y peor test
+                const bestTest = app.testHistory.reduce((best, t) => t.percentage > best.percentage ? t : best, app.testHistory[0]);
+                const worstTest = app.testHistory.reduce((worst, t) => t.percentage < worst.percentage ? t : worst, app.testHistory[0]);
                 
-                if (trend > 5) {
-                    prediction = Math.min(100, avgLast10 + 5);
-                    predictionText = 'Tendencia al alza 📈';
-                    predictionColor = '#22c55e';
-                } else if (trend < -5) {
-                    prediction = Math.max(0, avgLast10 - 5);
-                    predictionText = 'Necesitas repasar más 📉';
-                    predictionColor = '#ef4444';
-                } else {
-                    predictionText = 'Rendimiento estable ➡️';
-                    predictionColor = '#f59e0b';
+                // Racha actual (tests consecutivos >= 70%)
+                let rachaActual = 0;
+                for (const t of app.testHistory) {
+                    if (t.percentage >= 70) rachaActual++;
+                    else break;
                 }
                 
-                // Estadísticas por asignatura
+                // Mejor racha histórica
+                let mejorRacha = 0, rachaTemp = 0;
+                app.testHistory.slice().reverse().forEach(t => {
+                    if (t.percentage >= 70) { rachaTemp++; mejorRacha = Math.max(mejorRacha, rachaTemp); }
+                    else rachaTemp = 0;
+                });
+                
+                // Estadísticas por asignatura con temas
                 let byAsignatura = {};
                 app.testHistory.forEach(t => {
                     if (!byAsignatura[t.asignatura]) {
-                        byAsignatura[t.asignatura] = {
-                            tests: [],
-                            total: 0,
-                            correct: 0
-                        };
+                        byAsignatura[t.asignatura] = { tests: 0, total: 0, correct: 0, temas: {}, fechas: [] };
                     }
-                    byAsignatura[t.asignatura].tests.push(t);
+                    byAsignatura[t.asignatura].tests++;
                     byAsignatura[t.asignatura].total += t.total;
                     byAsignatura[t.asignatura].correct += t.score;
+                    byAsignatura[t.asignatura].fechas.push(t.date);
+                    
+                    const tema = t.tema || 'General';
+                    if (!byAsignatura[t.asignatura].temas[tema]) {
+                        byAsignatura[t.asignatura].temas[tema] = { total: 0, correct: 0 };
+                    }
+                    byAsignatura[t.asignatura].temas[tema].total += t.total;
+                    byAsignatura[t.asignatura].temas[tema].correct += t.score;
                 });
                 
-                let asignaturasHTML = '';
-                Object.keys(byAsignatura).sort((a, b) => {
-                    const avgA = (byAsignatura[a].correct / byAsignatura[a].total) * 100;
-                    const avgB = (byAsignatura[b].correct / byAsignatura[b].total) * 100;
-                    return avgB - avgA;
-                }).forEach(asigName => {
-                    const data = byAsignatura[asigName];
-                    const avg = Math.round((data.correct / data.total) * 100);
-                    const color = avg >= 70 ? '#22c55e' : avg >= 50 ? '#f59e0b' : '#ef4444';
-                    
-                    asignaturasHTML += `
-                        <div class="bg-white-box" style="padding: 1rem; border-radius: 8px; border-left: 4px solid ${color};">
-                            <h4 style="margin: 0 0 0.5rem 0; font-size: 0.95rem;">${asigName}</h4>
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
-                                <div style="flex: 1;">
-                                    <div style="background: #f1f5f9; border-radius: 4px; overflow: hidden; height: 12px;">
-                                        <div style="background: ${color}; height: 100%; width: ${avg}%; transition: width 0.3s;"></div>
-                                    </div>
-                                </div>
-                                <div style="font-weight: 700; font-size: 1.1rem; color: ${color}; min-width: 50px; text-align: right;">
-                                    ${avg}%
-                                </div>
-                            </div>
-                            <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
-                                ${data.tests.length} test${data.tests.length > 1 ? 's' : ''} · ${data.correct}/${data.total} correctas
-                            </div>
-                        </div>
-                    `;
+                // Ordenar asignaturas
+                const asignaturasSorted = Object.entries(byAsignatura).sort((a, b) => 
+                    (b[1].correct / b[1].total) - (a[1].correct / a[1].total)
+                );
+                
+                // Predicción
+                const prediction = Math.round(avgLast5 + (trend * 0.5));
+                const predictionClamped = Math.max(0, Math.min(100, prediction));
+                const predColor = predictionClamped >= 70 ? '#22c55e' : predictionClamped >= 50 ? '#f59e0b' : '#ef4444';
+                
+                // Distribución de notas
+                const distribucion = { excelente: 0, bien: 0, regular: 0, mal: 0 };
+                app.testHistory.forEach(t => {
+                    if (t.percentage >= 80) distribucion.excelente++;
+                    else if (t.percentage >= 60) distribucion.bien++;
+                    else if (t.percentage >= 40) distribucion.regular++;
+                    else distribucion.mal++;
                 });
+                
+                // Tiempo de estudio (estimación basada en tests)
+                const tiempoEstimado = totalPreguntas * 0.5; // 30 segundos por pregunta aprox
                 
                 container.innerHTML = `
                     <div class="card">
-                        <h1>📊 Estadísticas Avanzadas</h1>
-                        <p class="text-muted">Análisis detallado de tu rendimiento</p>
+                        <h2 style="margin-bottom: 1rem;">📊 Estadísticas Avanzadas</h2>
                         
-                        <!-- Predictor de examen -->
-                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; border: 3px solid ${predictionColor}; margin: 2rem 0;">
-                            <h2 style="margin-top: 0; font-size: 1.2rem; color: ${predictionColor};">🔮 Predictor de Examen</h2>
-                            <div style="text-align: center; margin: 1.5rem 0;">
-                                <div style="font-size: 3rem; font-weight: 800; color: ${predictionColor};">
-                                    ${prediction}%
-                                </div>
-                                <div style="font-size: 1.1rem; margin-top: 0.5rem; color: var(--text-secondary);">
-                                    ${predictionText}
-                                </div>
+                        <!-- Métricas principales en grid compacto -->
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
+                            <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 0.75rem; border-radius: 8px; text-align: center; color: white;">
+                                <div style="font-size: 1.5rem; font-weight: 700;">${totalTests}</div>
+                                <div style="font-size: 0.7rem; opacity: 0.9;">Tests</div>
                             </div>
-                            <div style="background: var(--card); padding: 1rem; border-radius: 6px;">
-                                <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">
-                                    Basado en tus últimos ${last10.length} tests, tu rendimiento promedio es del <strong>${avgLast10}%</strong>.
-                                    ${trend > 0 ? `Has mejorado un <strong>${trend}%</strong> en las últimas sesiones. ¡Sigue así! 🎉` : 
-                                      trend < 0 ? `Has bajado un <strong>${Math.abs(trend)}%</strong>. Dedica más tiempo al repaso. 💪` :
-                                      'Mantienes un rendimiento constante. 👍'}
-                                </p>
+                            <div style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); padding: 0.75rem; border-radius: 8px; text-align: center; color: white;">
+                                <div style="font-size: 1.5rem; font-weight: 700;">${totalPreguntas}</div>
+                                <div style="font-size: 0.7rem; opacity: 0.9;">Preguntas</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, ${promedioGlobal >= 70 ? '#22c55e' : promedioGlobal >= 50 ? '#f59e0b' : '#ef4444'}, ${promedioGlobal >= 70 ? '#15803d' : promedioGlobal >= 50 ? '#d97706' : '#dc2626'}); padding: 0.75rem; border-radius: 8px; text-align: center; color: white;">
+                                <div style="font-size: 1.5rem; font-weight: 700;">${promedioGlobal}%</div>
+                                <div style="font-size: 0.7rem; opacity: 0.9;">Media</div>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 0.75rem; border-radius: 8px; text-align: center; color: white;">
+                                <div style="font-size: 1.5rem; font-weight: 700;">${rachaActual}🔥</div>
+                                <div style="font-size: 0.7rem; opacity: 0.9;">Racha</div>
                             </div>
                         </div>
                         
-                        <!-- Gráfico de evolución -->
-                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-                            <h3 style="margin-top: 0; font-size: 1.1rem;">📈 Evolución Temporal</h3>
-                            <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 150px; gap: 4px; padding: 1rem; background: var(--card); border-radius: 6px;">
-                                ${app.testHistory.slice(0, 20).reverse().map((test, idx) => {
-                                    const height = test.percentage;
+                        <!-- Predictor y Tendencia lado a lado -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                            <!-- Predictor -->
+                            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; border: 2px solid ${predColor}; text-align: center;">
+                                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">🔮 Predicción Examen</div>
+                                <div style="font-size: 2.5rem; font-weight: 800; color: ${predColor};">${predictionClamped}%</div>
+                                <div style="font-size: 0.75rem; color: ${predColor};">
+                                    ${trend > 3 ? '📈 Subiendo' : trend < -3 ? '📉 Bajando' : '➡️ Estable'}
+                                </div>
+                            </div>
+                            
+                            <!-- Mejor/Peor -->
+                            <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary);">🏆 Mejor</span>
+                                    <span style="font-weight: 700; color: #22c55e;">${bestTest.percentage}%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary);">📉 Peor</span>
+                                    <span style="font-weight: 700; color: #ef4444;">${worstTest.percentage}%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary);">🔥 Mejor racha</span>
+                                    <span style="font-weight: 700; color: #f59e0b;">${mejorRacha}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary);">⏱️ Tiempo est.</span>
+                                    <span style="font-weight: 700; color: #3b82f6;">${Math.round(tiempoEstimado)}min</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Distribución de notas -->
+                        <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                            <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem;">📊 Distribución de Resultados</div>
+                            <div style="display: flex; gap: 0.25rem; height: 24px; border-radius: 4px; overflow: hidden;">
+                                ${distribucion.excelente > 0 ? `<div style="flex: ${distribucion.excelente}; background: #22c55e;" title="Excelente (≥80%): ${distribucion.excelente}"></div>` : ''}
+                                ${distribucion.bien > 0 ? `<div style="flex: ${distribucion.bien}; background: #84cc16;" title="Bien (60-79%): ${distribucion.bien}"></div>` : ''}
+                                ${distribucion.regular > 0 ? `<div style="flex: ${distribucion.regular}; background: #f59e0b;" title="Regular (40-59%): ${distribucion.regular}"></div>` : ''}
+                                ${distribucion.mal > 0 ? `<div style="flex: ${distribucion.mal}; background: #ef4444;" title="Bajo (<40%): ${distribucion.mal}"></div>` : ''}
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.7rem;">
+                                <span style="color: #22c55e;">●Excelente: ${distribucion.excelente}</span>
+                                <span style="color: #84cc16;">●Bien: ${distribucion.bien}</span>
+                                <span style="color: #f59e0b;">●Regular: ${distribucion.regular}</span>
+                                <span style="color: #ef4444;">●Bajo: ${distribucion.mal}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Gráfico de evolución compacto -->
+                        <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                            <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">📈 Evolución (últimos 20 tests)</div>
+                            <div style="display: flex; align-items: flex-end; height: 80px; gap: 2px;">
+                                ${app.testHistory.slice(0, 20).reverse().map(test => {
                                     const color = test.percentage >= 70 ? '#22c55e' : test.percentage >= 50 ? '#f59e0b' : '#ef4444';
+                                    return `<div style="flex: 1; height: ${test.percentage}%; background: ${color}; border-radius: 2px 2px 0 0; min-height: 2px;" title="${test.asignatura}: ${test.percentage}%"></div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Rendimiento por asignatura compacto -->
+                        <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                            <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem;">📚 Por Asignatura</div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto;">
+                                ${asignaturasSorted.map(([nombre, data]) => {
+                                    const avg = Math.round((data.correct / data.total) * 100);
+                                    const color = avg >= 70 ? '#22c55e' : avg >= 50 ? '#f59e0b' : '#ef4444';
+                                    const temaKeys = Object.keys(data.temas);
                                     return `
-                                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;" title="${test.asignatura}: ${test.percentage}%">
-                                            <div style="font-size: 0.65rem; font-weight: 600; margin-bottom: 3px;">${test.percentage}%</div>
-                                            <div style="width: 100%; height: ${height}%; background: ${color}; border-radius: 4px 4px 0 0; min-height: 5px; transition: all 0.3s; box-shadow: 0 -2px 4px rgba(0,0,0,0.1);"></div>
+                                        <div style="padding: 0.5rem; background: var(--card); border-radius: 6px; border-left: 3px solid ${color};">
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                <div style="flex: 1; min-width: 0;">
+                                                    <div style="font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${nombre}</div>
+                                                    <div style="font-size: 0.7rem; color: var(--text-secondary);">${data.tests} tests · ${data.correct}/${data.total} · ${temaKeys.length} tema${temaKeys.length > 1 ? 's' : ''}</div>
+                                                </div>
+                                                <div style="font-size: 1.1rem; font-weight: 700; color: ${color}; margin-left: 0.5rem;">${avg}%</div>
+                                            </div>
+                                            ${temaKeys.length > 1 ? `
+                                                <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.5rem;">
+                                                    ${temaKeys.slice(0, 6).map(tema => {
+                                                        const tAvg = Math.round((data.temas[tema].correct / data.temas[tema].total) * 100);
+                                                        const tColor = tAvg >= 70 ? '#22c55e' : tAvg >= 50 ? '#f59e0b' : '#ef4444';
+                                                        return `<span style="font-size: 0.65rem; padding: 0.15rem 0.4rem; background: ${tColor}20; color: ${tColor}; border-radius: 4px;">${tema}: ${tAvg}%</span>`;
+                                                    }).join('')}
+                                                    ${temaKeys.length > 6 ? `<span style="font-size: 0.65rem; color: var(--text-secondary);">+${temaKeys.length - 6} más</span>` : ''}
+                                                </div>
+                                            ` : ''}
                                         </div>
                                     `;
                                 }).join('')}
                             </div>
-                            <p style="margin: 1rem 0 0 0; font-size: 0.85rem; text-align: center; color: var(--text-secondary);">
-                                Últimos ${Math.min(20, app.testHistory.length)} tests (más recientes a la derecha)
-                            </p>
                         </div>
                         
-                        <!-- Rendimiento por asignatura -->
-                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-                            <h3 style="margin-top: 0; font-size: 1.1rem;">📚 Rendimiento por Asignatura</h3>
-                            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                                ${asignaturasHTML}
+                        <!-- Recomendaciones compactas -->
+                        <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 1rem; border-radius: 8px; border-left: 4px solid #3b82f6; margin-bottom: 1rem;">
+                            <div style="font-size: 0.85rem; font-weight: 600; color: #1e40af; margin-bottom: 0.5rem;">💡 Recomendaciones</div>
+                            <div style="font-size: 0.8rem; color: #1e40af; line-height: 1.5;">
+                                ${app.failedQuestionsHistory.length > 0 ? 
+                                    `• Repasa las <strong>${app.failedQuestionsHistory.length}</strong> preguntas falladas<br>` : ''}
+                                ${trend < -3 ? '• Tu rendimiento baja, toma un descanso<br>' : ''}
+                                ${trend > 5 ? '• ¡Excelente progreso! Sigue así<br>' : ''}
+                                ${promedioGlobal < 60 ? '• Céntrate en los temas con peor puntuación<br>' : ''}
+                                ${promedioGlobal >= 70 ? '• Estás listo para el modo examen<br>' : ''}
+                                ${rachaActual >= 3 ? `• ¡Racha de ${rachaActual}! No la pierdas` : '• Intenta conseguir una racha de 3+'}
                             </div>
                         </div>
                         
-                        <!-- Recomendaciones -->
-                        <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; border-left: 4px solid #3b82f6;">
-                            <h3 style="margin-top: 0; font-size: 1.1rem; color: #1e40af;">💡 Recomendaciones</h3>
-                            <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-secondary);">
-                                ${app.failedQuestionsHistory.length > 0 ? 
-                                    `<li>Tienes <strong>${app.failedQuestionsHistory.length} preguntas falladas</strong>. Usa el modo repaso para mejorarlas.</li>` : 
-                                    '<li>¡Excelente! No tienes preguntas pendientes de repasar.</li>'}
-                                ${trend < 0 ? 
-                                    '<li>Tu rendimiento ha bajado. Considera tomar un descanso y luego repasar conceptos básicos.</li>' : 
-                                    trend > 5 ? 
-                                    '<li>¡Vas muy bien! Mantén el ritmo de estudio.</li>' :
-                                    '<li>Rendimiento estable. Considera aumentar la dificultad o probar el modo examen.</li>'}
-                                <li>Usa el <strong>modo resumen</strong> para repasar antes de hacer tests.</li>
-                                ${avgLast10 < 70 ? 
-                                    '<li>Intenta hacer más tests en modo normal antes del examen simulado.</li>' :
-                                    '<li>Estás listo para probar el modo examen simulado con límite de tiempo.</li>'}
-                            </ul>
-                        </div>
-                        
-                        <div style="text-align: center; margin-top: 2rem;">
-                            <button class="btn btn-outline" onclick="app.navigate('home')">← Volver al Inicio</button>
-                        </div>
+                        <!-- Botón Volver al final -->
+                        <button class="btn btn-outline" onclick="app.navigate('stats')" style="width: 100%; padding: 0.5rem; font-size: 0.85rem;">📊 Volver a Estadísticas</button>
                     </div>
                 `;
             },
