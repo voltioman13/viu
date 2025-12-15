@@ -521,294 +521,204 @@
     
     <!-- Modal de Ayuda -->
     <div id="help-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
-        <div class="card bg-white-box" style="max-width: 700px; max-height: 85vh; margin: 20px; position: relative; display: flex; flex-direction: column;">
-            <button onclick="app.hideHelp()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary); z-index: 10;">&times;</button>
+        <div class="card bg-white-box" style="max-width: 600px; max-height: 80vh; margin: 20px; position: relative; display: flex; flex-direction: column;">
+            <button onclick="app.hideHelp()" style="position: absolute; top: 10px; right: 12px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary); z-index: 10;">&times;</button>
             
-            <h2 style="margin-bottom: 1rem; padding-right: 30px;">📚 Guía de Uso</h2>
+            <h2 style="margin-bottom: 0.75rem; padding-right: 30px; font-size: 1.3rem;">📚 Guía Rápida</h2>
             
             <!-- Pestañas -->
-            <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; flex-wrap: wrap;">
-                <button onclick="app.showHelpTab('inicio')" id="help-tab-inicio" class="help-tab active" style="background: none; border: none; padding: 0.75rem 1rem; cursor: pointer; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
+            <div style="display: flex; gap: 0.25rem; border-bottom: 2px solid var(--border); margin-bottom: 1rem; flex-wrap: wrap;">
+                <button onclick="app.showHelpTab('inicio')" id="help-tab-inicio" class="help-tab active" style="background: none; border: none; padding: 0.5rem 0.75rem; cursor: pointer; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s; font-size: 0.85rem;">
                     🚀 Inicio
                 </button>
-                <button onclick="app.showHelpTab('tests')" id="help-tab-tests" class="help-tab" style="background: none; border: none; padding: 0.75rem 1rem; cursor: pointer; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
+                <button onclick="app.showHelpTab('tests')" id="help-tab-tests" class="help-tab" style="background: none; border: none; padding: 0.5rem 0.75rem; cursor: pointer; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s; font-size: 0.85rem;">
                     📝 Tests
                 </button>
-                <button onclick="app.showHelpTab('votos')" id="help-tab-votos" class="help-tab" style="background: none; border: none; padding: 0.75rem 1rem; cursor: pointer; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
+                <button onclick="app.showHelpTab('votos')" id="help-tab-votos" class="help-tab" style="background: none; border: none; padding: 0.5rem 0.75rem; cursor: pointer; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s; font-size: 0.85rem;">
                     👍 Votos
                 </button>
-                <button onclick="app.showHelpTab('contribuir')" id="help-tab-contribuir" class="help-tab" style="background: none; border: none; padding: 0.75rem 1rem; cursor: pointer; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
+                <button onclick="app.showHelpTab('contribuir')" id="help-tab-contribuir" class="help-tab" style="background: none; border: none; padding: 0.5rem 0.75rem; cursor: pointer; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s; font-size: 0.85rem;">
                     ➕ Contribuir
                 </button>
-                <button onclick="app.showHelpTab('atajos')" id="help-tab-atajos" class="help-tab" style="background: none; border: none; padding: 0.75rem 1rem; cursor: pointer; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
+                <button onclick="app.showHelpTab('atajos')" id="help-tab-atajos" class="help-tab" style="background: none; border: none; padding: 0.5rem 0.75rem; cursor: pointer; font-weight: 600; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s; font-size: 0.85rem;">
                     ⌨️ Atajos
                 </button>
             </div>
             
             <!-- Contenido de las pestañas -->
-            <div style="overflow-y: auto; flex: 1; padding-right: 10px;">
+            <div style="overflow-y: auto; flex: 1; padding-right: 8px; font-size: 0.9rem;">
                 <!-- Pestaña: Inicio Rápido -->
                 <div id="help-content-inicio" class="help-content">
-                    <h3 style="color: var(--primary); margin-top: 0;">👋 ¡Bienvenido!</h3>
-                    <p style="font-size: 1rem; line-height: 1.6;">Esta aplicación te ayuda a estudiar para el Máster de Profesorado de la VIU con preguntas tipo test.</p>
-                    
-                    <div style="background: #f0f9ff; padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #0ea5e9;">
-                        <h4 style="margin-top: 0; color: #0c4a6e;">📖 Primeros pasos</h4>
-                        <ol style="margin: 0.5rem 0 0 1.5rem; line-height: 1.8;">
-                            <li>Selecciona tu <strong>especialidad</strong> y <strong>asignatura</strong></li>
-                            <li>Pulsa <strong>"Comenzar Test"</strong> para practicar</li>
-                            <li>Responde las preguntas y aprende de los errores</li>
-                            <li>Revisa el <strong>"Resumen"</strong> para estudiar antes de hacer tests</li>
-                        </ol>
+                    <div style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem;">
+                        <p style="margin: 0; font-weight: 600;">1️⃣ Elige especialidad → 2️⃣ Elige asignatura → 3️⃣ ¡Comienza el test!</p>
                     </div>
                     
-                    <h4 style="color: var(--primary); margin-top: 1.5rem;">🎯 Características principales</h4>
-                    <div style="display: grid; gap: 1rem; margin-top: 1rem;">
-                        <div style="padding: 1rem; background: var(--card); border-radius: 8px; border-left: 3px solid #10b981;">
-                            <strong>🔄 Modo Repaso:</strong> Practica solo las preguntas que has fallado
+                    <p style="margin: 0 0 0.75rem 0; font-size: 0.85rem; color: var(--text-secondary);">Funciones principales:</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <div style="padding: 0.5rem; background: var(--card); border-radius: 6px; border-left: 3px solid #10b981;">
+                            <strong style="font-size: 0.8rem;">🔄 Modo Repaso</strong><br>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">Solo preguntas falladas</span>
                         </div>
-                        <div style="padding: 1rem; background: var(--card); border-radius: 8px; border-left: 3px solid #f59e0b;">
-                            <strong>⏱️ Modo Examen:</strong> Simulacro con tiempo límite
+                        <div style="padding: 0.5rem; background: var(--card); border-radius: 6px; border-left: 3px solid #ef4444;">
+                            <strong style="font-size: 0.8rem;">⏱️ Modo Examen</strong><br>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">Con tiempo límite</span>
                         </div>
-                        <div style="padding: 1rem; background: var(--card); border-radius: 8px; border-left: 3px solid #8b5cf6;">
-                            <strong>📊 Estadísticas:</strong> Sigue tu progreso y predicciones
+                        <div style="padding: 0.5rem; background: var(--card); border-radius: 6px; border-left: 3px solid #8b5cf6;">
+                            <strong style="font-size: 0.8rem;">📊 Estadísticas</strong><br>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">Tu progreso y predicciones</span>
                         </div>
-                        <div style="padding: 1rem; background: var(--card); border-radius: 8px; border-left: 3px solid #3b82f6;">
-                            <strong>👍👎 Votación:</strong> Valora si las preguntas están bien
+                        <div style="padding: 0.5rem; background: var(--card); border-radius: 6px; border-left: 3px solid #3b82f6;">
+                            <strong style="font-size: 0.8rem;">👍👎 Votación</strong><br>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">Valida las preguntas</span>
                         </div>
                     </div>
                     
-                    <div style="background: #dbeafe; padding: 1rem; border-radius: 8px; margin: 1.5rem 0; border-left: 4px solid #3b82f6;">
-                        <p style="margin: 0;"><strong>🗳️ Sistema de votación:</strong> Cada pregunta tiene 👍/👎 para que entre todos verifiquemos si las preguntas están correctas.</p>
+                    <div style="background: #dbeafe; padding: 0.6rem; border-radius: 6px; margin-top: 0.75rem; font-size: 0.8rem;">
+                        <strong>💡 Tip:</strong> Vota 👍/👎 en cada pregunta para ayudar a verificar si están correctas.
                     </div>
                 </div>
                 
                 <!-- Pestaña: Tests -->
                 <div id="help-content-tests" class="help-content" style="display: none;">
-                    <h3 style="color: var(--primary); margin-top: 0;">📝 Tipos de Tests</h3>
-                    
-                    <div style="margin-bottom: 1.5rem;">
-                        <div style="background: #f0fdf4; padding: 1.25rem; border-radius: 8px; border-left: 4px solid #10b981; margin-bottom: 1rem;">
-                            <h4 style="margin: 0 0 0.5rem 0; color: #065f46;">✅ Test Normal</h4>
-                            <p style="margin: 0.5rem 0; line-height: 1.6;">
-                                Práctica con <strong>feedback inmediato</strong>. Al responder cada pregunta verás si es correcta o incorrecta. 
-                                Puedes navegar libremente entre preguntas y añadir notas personales.
-                            </p>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #059669;">
-                                <strong>📌 Ideal para:</strong> Estudiar y aprender de los errores
-                            </p>
+                    <div style="display: grid; gap: 0.5rem;">
+                        <div style="padding: 0.6rem; background: #f0fdf4; border-radius: 6px; border-left: 3px solid #10b981;">
+                            <strong style="color: #065f46;">✅ Test Normal</strong> — Feedback inmediato al responder. Ideal para <em>aprender</em>.
                         </div>
-                        
-                        <div style="background: #fef2f2; padding: 1.25rem; border-radius: 8px; border-left: 4px solid #ef4444; margin-bottom: 1rem;">
-                            <h4 style="margin: 0 0 0.5rem 0; color: #991b1b;">⏱️ Modo Examen</h4>
-                            <p style="margin: 0.5rem 0; line-height: 1.6;">
-                                Simulacro de examen real con <strong>tiempo límite</strong> (configurable). Sin feedback durante el test, solo al finalizar. 
-                                Incluye temporizador y revisión completa de todas tus respuestas.
-                            </p>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #dc2626;">
-                                <strong>📌 Ideal para:</strong> Prepararte para el examen oficial
-                            </p>
+                        <div style="padding: 0.6rem; background: #fef2f2; border-radius: 6px; border-left: 3px solid #ef4444;">
+                            <strong style="color: #991b1b;">⏱️ Modo Examen</strong> — Con temporizador, sin feedback hasta el final. Para <em>simulacros</em>.
                         </div>
-                        
-                        <div style="background: #eff6ff; padding: 1.25rem; border-radius: 8px; border-left: 4px solid #3b82f6; margin-bottom: 1rem;">
-                            <h4 style="margin: 0 0 0.5rem 0; color: #1e40af;">🔄 Modo Repaso</h4>
-                            <p style="margin: 0.5rem 0; line-height: 1.6;">
-                                Practica <strong>solo las preguntas que has fallado</strong> anteriormente. Se actualiza automáticamente según tus resultados.
-                            </p>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #2563eb;">
-                                <strong>📌 Ideal para:</strong> Mejorar en tus puntos débiles
-                            </p>
+                        <div style="padding: 0.6rem; background: #eff6ff; border-radius: 6px; border-left: 3px solid #3b82f6;">
+                            <strong style="color: #1e40af;">🔄 Modo Repaso</strong> — Solo tus preguntas falladas. Para <em>mejorar</em>.
                         </div>
-                        
-                        <div style="background: #faf5ff; padding: 1.25rem; border-radius: 8px; border-left: 4px solid #a855f7;">
-                            <h4 style="margin: 0 0 0.5rem 0; color: #6b21a8;">📖 Ver Resumen</h4>
-                            <p style="margin: 0.5rem 0; line-height: 1.6;">
-                                Visualiza todas las preguntas con sus respuestas correctas. Perfecto para <strong>estudiar antes de hacer tests</strong>.
-                            </p>
-                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #9333ea;">
-                                <strong>📌 Ideal para:</strong> Repasar conceptos rápidamente
-                            </p>
+                        <div style="padding: 0.6rem; background: #faf5ff; border-radius: 6px; border-left: 3px solid #a855f7;">
+                            <strong style="color: #6b21a8;">📖 Ver Resumen</strong> — Todas las preguntas con respuestas. Para <em>estudiar</em>.
                         </div>
                     </div>
                     
-                    <h4 style="color: var(--primary); margin-top: 1.5rem;">⭐ Funciones Extras</h4>
-                    <ul style="margin: 1rem 0 0 1.5rem; line-height: 1.8;">
-                        <li><strong>🔖 Marcar preguntas:</strong> Marca las difíciles para repasarlas después. Activa "Solo marcadas" para hacer tests solo con ellas.</li>
-                        <li><strong>📝 Notas personales:</strong> Escribe apuntes en cada pregunta. Se guardan automáticamente en tu navegador.</li>
-                        <li><strong>🎲 Orden aleatorio:</strong> Activa esta opción para que las preguntas aparezcan en orden aleatorio cada vez.</li>
-                        <li><strong>📊 Estadísticas:</strong> Ve tu historial, progreso y predicciones de éxito.</li>
+                    <p style="margin: 0.75rem 0 0.4rem 0; font-weight: 600; font-size: 0.85rem;">⭐ Extras:</p>
+                    <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; line-height: 1.6;">
+                        <li><strong>🔖 Marcar</strong> — Guarda preguntas difíciles para repasarlas</li>
+                        <li><strong>📝 Notas</strong> — Escribe apuntes en cada pregunta</li>
+                        <li><strong>🎲 Orden aleatorio</strong> — Mezcla las preguntas cada vez</li>
                     </ul>
                 </div>
                 
                 <!-- Pestaña: Votos -->
                 <div id="help-content-votos" class="help-content" style="display: none;">
-                    <h3 style="color: var(--primary); margin-top: 0;">👍👎 Sistema de Votación</h3>
-                    <p style="font-size: 1rem; line-height: 1.6;">
-                        Las preguntas las añade cualquier usuario, por eso tenemos un <strong>sistema de votación comunitaria</strong> 
-                        para verificar entre todos si las preguntas están bien.
-                    </p>
-                    
-                    <div style="background: #dbeafe; padding: 1.25rem; border-radius: 8px; margin: 1.5rem 0; border-left: 4px solid #3b82f6;">
-                        <h4 style="margin: 0 0 0.75rem 0; color: #1e40af;">🗳️ ¿Cómo funciona?</h4>
-                        <p style="margin: 0; line-height: 1.6;">
-                            En cada pregunta verás botones <strong>👍</strong> y <strong>👎</strong>. 
-                            Si crees que la pregunta y su respuesta están bien, dale al 👍. 
-                            Si crees que tiene algún error, dale al 👎.
-                        </p>
+                    <div style="background: #dbeafe; padding: 0.6rem; border-radius: 6px; margin-bottom: 0.75rem; font-size: 0.85rem;">
+                        <strong>¿Para qué sirve?</strong> Las preguntas las añade cualquiera, así que votamos entre todos para verificar si están bien.
                     </div>
                     
-                    <h4 style="color: var(--primary); margin-top: 1.5rem;">🏷️ Niveles de verificación</h4>
-                    <div style="display: grid; gap: 0.75rem; margin-top: 1rem;">
-                        <div style="padding: 0.75rem 1rem; background: #dcfce7; border-radius: 8px; display: flex; align-items: center; gap: 1rem;">
-                            <span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; white-space: nowrap;">✅ Verificada</span>
-                            <span style="font-size: 0.9rem;">Muchos votos positivos (80%+ con mínimo 5 votos). <strong>Fiable.</strong></span>
+                    <p style="margin: 0 0 0.4rem 0; font-weight: 600; font-size: 0.85rem;">🏷️ Niveles de verificación:</p>
+                    <div style="display: grid; gap: 0.35rem; font-size: 0.8rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: #dcfce7; border-radius: 4px;">
+                            <span style="background: #bbf7d0; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">✅ Verificada</span>
+                            <span>80%+ votos positivos → <strong>Fiable</strong></span>
                         </div>
-                        <div style="padding: 0.75rem 1rem; background: #dbeafe; border-radius: 8px; display: flex; align-items: center; gap: 1rem;">
-                            <span style="background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; white-space: nowrap;">🟢 Probablemente correcta</span>
-                            <span style="font-size: 0.9rem;">Mayoría de votos positivos (60%+). <strong>Bastante fiable.</strong></span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: #dbeafe; border-radius: 4px;">
+                            <span style="background: #bfdbfe; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">🟢 Prob. correcta</span>
+                            <span>60%+ positivos → <strong>Bastante fiable</strong></span>
                         </div>
-                        <div style="padding: 0.75rem 1rem; background: #fef3c7; border-radius: 8px; display: flex; align-items: center; gap: 1rem;">
-                            <span style="background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; white-space: nowrap;">🟡 Dudosa</span>
-                            <span style="font-size: 0.9rem;">Votos divididos. <strong>Verifica por tu cuenta.</strong></span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: #fef3c7; border-radius: 4px;">
+                            <span style="background: #fde68a; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">🟡 Dudosa</span>
+                            <span>Votos divididos → <strong>Verifica tú</strong></span>
                         </div>
-                        <div style="padding: 0.75rem 1rem; background: #fee2e2; border-radius: 8px; display: flex; align-items: center; gap: 1rem;">
-                            <span style="background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; white-space: nowrap;">🔴 Posible error</span>
-                            <span style="font-size: 0.9rem;">Mayoría de votos negativos. <strong>¡Cuidado!</strong></span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: #fee2e2; border-radius: 4px;">
+                            <span style="background: #fecaca; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">🔴 Posible error</span>
+                            <span>Mayoría negativos → <strong>¡Cuidado!</strong></span>
                         </div>
-                        <div style="padding: 0.75rem 1rem; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; gap: 1rem;">
-                            <span style="background: #e5e7eb; color: #6b7280; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; white-space: nowrap;">⚪ Sin verificar</span>
-                            <span style="font-size: 0.9rem;">Pocos votos todavía. <strong>¡Sé el primero en votar!</strong></span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: #f3f4f6; border-radius: 4px;">
+                            <span style="background: #e5e7eb; padding: 1px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;">⚪ Sin verificar</span>
+                            <span>Pocos votos → <strong>¡Vota tú!</strong></span>
                         </div>
                     </div>
                     
-                    <h4 style="color: var(--primary); margin-top: 1.5rem;">📋 Reglas de votación</h4>
-                    <ul style="margin: 1rem 0 0 1.5rem; line-height: 1.8;">
-                        <li>Solo puedes votar <strong>una vez por pregunta</strong></li>
-                        <li>Puedes <strong>cambiar tu voto</strong> pulsando el otro botón</li>
-                        <li>Puedes <strong>quitar tu voto</strong> pulsando el mismo botón de nuevo</li>
-                        <li>Tu voto se guarda en tu navegador</li>
-                    </ul>
-                    
-                    <div style="background: #fef3c7; padding: 1rem; border-radius: 8px; margin: 1.5rem 0; border-left: 4px solid #f59e0b;">
-                        <p style="margin: 0;"><strong>💡 Consejo:</strong> Vota después de ver la respuesta correcta. 
-                        Si coincide con lo que sabes del temario, dale 👍. Si no estás seguro, mejor no votes.</p>
-                    </div>
-                    
-                    <div style="background: #dcfce7; padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #10b981;">
-                        <p style="margin: 0;"><strong>💚 ¡Vota mucho!</strong> Cuantos más votos tengamos, más fiables serán las preguntas para todos. 
-                        ¡Ayuda a la comunidad!</p>
+                    <div style="background: #fef3c7; padding: 0.5rem; border-radius: 6px; margin-top: 0.6rem; font-size: 0.8rem;">
+                        <strong>💡 Tip:</strong> Vota después de ver la respuesta. Si coincide con el temario → 👍. Si no estás seguro → no votes.
                     </div>
                 </div>
                 
                 <!-- Pestaña: Contribuir -->
                 <div id="help-content-contribuir" class="help-content" style="display: none;">
-                    <h3 style="color: var(--primary); margin-top: 0;">➕ ¿Cómo contribuir con preguntas?</h3>
-                    <p style="font-size: 1rem; line-height: 1.6;">¡Ayuda a la comunidad añadiendo preguntas! Cuantas más preguntas tengamos, mejor preparados estaremos todos. 🎓</p>
-                    
-                    <div style="background: #fef3c7; padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #f59e0b;">
-                        <p style="margin: 0;"><strong>⚠️ Importante:</strong> Solo envía preguntas de las que estés <strong>100% seguro</strong> de la respuesta correcta.</p>
+                    <div style="background: #fef3c7; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.6rem; font-size: 0.85rem;">
+                        <strong>⚠️ Solo envía preguntas de las que estés 100% seguro de la respuesta correcta.</strong>
                     </div>
                     
-                    <h4 style="color: var(--primary); margin-top: 1.5rem;">📋 Pasos para añadir una pregunta:</h4>
-                    <ol style="margin: 1rem 0 0 1.5rem; line-height: 2; font-size: 0.95rem;">
-                        <li>Pulsa el botón <strong>"+"</strong> en el menú superior</li>
-                        <li>Selecciona tu <strong>especialidad</strong> (Ej: Tecnologías e Informática)</li>
-                        <li>Selecciona la <strong>asignatura</strong> (Ej: Aprendizaje y enseñanza)</li>
-                        <li>Escribe el <strong>número del tema</strong> (Ej: 1, 2, 3...)</li>
-                        <li>Escribe la <strong>pregunta</strong> completa y clara</li>
-                        <li>Añade las <strong>4 opciones de respuesta</strong> (A, B, C, D)</li>
-                        <li>Marca cuál es la <strong>respuesta correcta</strong></li>
-                        <li>Pulsa <strong>"Enviar Pregunta"</strong></li>
+                    <p style="margin: 0 0 0.4rem 0; font-weight: 600; font-size: 0.85rem;">📋 Pasos:</p>
+                    <ol style="margin: 0; padding-left: 1.3rem; font-size: 0.85rem; line-height: 1.5;">
+                        <li>Pulsa <strong>"+"</strong> en el menú</li>
+                        <li>Selecciona especialidad y asignatura</li>
+                        <li>Escribe nº de tema, pregunta y 4 opciones</li>
+                        <li>Marca la respuesta correcta</li>
+                        <li>¡Enviar!</li>
                     </ol>
                     
-                    <div style="background: #dcfce7; padding: 1.25rem; border-radius: 8px; margin: 1.5rem 0; border-left: 4px solid #10b981;">
-                        <h4 style="margin: 0 0 0.75rem 0; color: #065f46;">✨ Ejemplo de pregunta bien hecha:</h4>
-                        <div style="background: white; padding: 1rem; border-radius: 6px; font-size: 0.9rem;">
-                            <p style="margin: 0 0 0.5rem 0; font-weight: 600;">¿Cuál es el principal objetivo del aprendizaje significativo según Ausubel?</p>
-                            <p style="margin: 0.25rem 0; color: #666;">A) Memorizar contenidos de forma literal</p>
-                            <p style="margin: 0.25rem 0; color: #666;">B) Conectar nueva información con conocimientos previos ✓</p>
-                            <p style="margin: 0.25rem 0; color: #666;">C) Repetir mecánicamente la información</p>
-                            <p style="margin: 0.25rem 0; color: #666;">D) Trabajar siempre en grupo</p>
+                    <p style="margin: 0.6rem 0 0.4rem 0; font-weight: 600; font-size: 0.85rem;">📝 Tipos de pregunta:</p>
+                    <div style="display: grid; gap: 0.35rem; font-size: 0.8rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
+                            <span>📝</span><strong>Test</strong> — Pregunta normal tipo test
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
+                            <span>🤖</span><strong>Test IA</strong> — Generada con ChatGPT/IA
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
+                            <span>📄</span><strong>Desarrollo</strong> — Pregunta abierta con respuesta modelo
                         </div>
                     </div>
                     
-                    <h4 style="color: var(--primary); margin-top: 1.5rem;">✅ Consejos para buenas preguntas:</h4>
-                    <ul style="margin: 1rem 0 0 1.5rem; line-height: 1.8;">
-                        <li>Sé <strong>claro y conciso</strong> en la redacción</li>
-                        <li>Asegúrate de que la respuesta correcta es <strong>100% verificable</strong></li>
-                        <li>Las 4 opciones deben ser <strong>plausibles</strong> (que tengan sentido)</li>
-                        <li>Evita preguntas ambiguas o con truco</li>
-                        <li>Basa las preguntas en el <strong>contenido oficial del temario</strong></li>
-                    </ul>
-                    
-                    <h4 style="color: var(--primary); margin-top: 1.5rem;">🛠️ Gestionar tus preguntas:</h4>
-                    <p style="margin: 0.5rem 0 0 0; line-height: 1.6;">
-                        Desde el botón <strong>"+"</strong> → <strong>"Mis Contribuciones"</strong> puedes ver todas las preguntas que has enviado. 
-                        Allí podrás <strong>editarlas</strong> o <strong>eliminarlas</strong> si encuentras algún error.
-                    </p>
-                    
-                    <div style="background: #dbeafe; padding: 1rem; border-radius: 8px; margin: 1.5rem 0; border-left: 4px solid #3b82f6;">
-                        <p style="margin: 0;"><strong>💙 Gracias por contribuir:</strong> Cada pregunta que añades ayuda a toda la comunidad a prepararse mejor. ¡Eres parte del éxito de todos!</p>
+                    <div style="background: #dcfce7; padding: 0.5rem; border-radius: 6px; margin-top: 0.6rem; font-size: 0.8rem;">
+                        <strong>🛠️ Editar/Eliminar:</strong> Ve a <strong>"+" → Mis Contribuciones</strong>
                     </div>
                 </div>
                 
                 <!-- Pestaña: Atajos -->
                 <div id="help-content-atajos" class="help-content" style="display: none;">
-                    <h3 style="color: var(--primary); margin-top: 0;">⌨️ Atajos de Teclado</h3>
-                    <p style="font-size: 1rem; line-height: 1.6; margin-bottom: 1.5rem;">Usa el teclado para navegar más rápido por los tests:</p>
-                    
-                    <div style="background: var(--card); padding: 1.25rem; border-radius: 8px; margin-bottom: 1rem;">
-                        <h4 style="margin: 0 0 1rem 0; color: var(--primary);">Durante el test:</h4>
-                        <div style="display: grid; gap: 0.75rem;">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <kbd style="background: #e5e7eb; padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #9ca3af; font-weight: 600; min-width: 35px; text-align: center;">1</kbd>
-                                    <kbd style="background: #e5e7eb; padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #9ca3af; font-weight: 600; min-width: 35px; text-align: center;">2</kbd>
-                                    <kbd style="background: #e5e7eb; padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #9ca3af; font-weight: 600; min-width: 35px; text-align: center;">3</kbd>
-                                    <kbd style="background: #e5e7eb; padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #9ca3af; font-weight: 600; min-width: 35px; text-align: center;">4</kbd>
-                                </div>
-                                <span>Seleccionar respuesta A, B, C o D</span>
+                    <p style="margin: 0 0 0.5rem 0; font-weight: 600; font-size: 0.85rem;">⌨️ Durante el test:</p>
+                    <div style="display: grid; gap: 0.4rem; font-size: 0.85rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
+                            <div style="display: flex; gap: 0.25rem;">
+                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">1</kbd>
+                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">2</kbd>
+                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">3</kbd>
+                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">4</kbd>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <kbd style="background: #e5e7eb; padding: 0.4rem 1rem; border-radius: 4px; border: 1px solid #9ca3af; font-weight: 600;">Enter</kbd>
-                                <span>Siguiente pregunta</span>
+                            <span>→ Respuesta A, B, C, D</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
+                            <kbd style="background: #e5e7eb; padding: 0.2rem 0.6rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">Enter</kbd>
+                            <span>→ Siguiente pregunta</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem; background: var(--card); border-radius: 4px;">
+                            <div style="display: flex; gap: 0.25rem;">
+                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">←</kbd>
+                                <kbd style="background: #e5e7eb; padding: 0.2rem 0.5rem; border-radius: 3px; border: 1px solid #9ca3af; font-size: 0.75rem;">→</kbd>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <kbd style="background: #e5e7eb; padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #9ca3af; font-weight: 600;">←</kbd>
-                                    <kbd style="background: #e5e7eb; padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #9ca3af; font-weight: 600;">→</kbd>
-                                </div>
-                                <span>Navegar entre preguntas</span>
-                            </div>
+                            <span>→ Navegar preguntas</span>
                         </div>
                     </div>
                     
-                    <h4 style="color: var(--primary); margin-top: 1.5rem;">🎨 Personalización</h4>
-                    <ul style="margin: 1rem 0 0 1.5rem; line-height: 1.8;">
-                        <li><strong>🌙 Tema oscuro/claro:</strong> Botón en la barra superior. Tu preferencia se guarda automáticamente.</li>
-                        <li><strong>🔤 Tamaño de letra:</strong> Ajústalo desde el slider en la pantalla de inicio. Útil para estudiar en diferentes dispositivos.</li>
+                    <p style="margin: 0.75rem 0 0.4rem 0; font-weight: 600; font-size: 0.85rem;">🎨 Personalización:</p>
+                    <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; line-height: 1.5;">
+                        <li><strong>🌙 Tema oscuro:</strong> Botón en barra superior</li>
+                        <li><strong>🔤 Tamaño letra:</strong> Slider en pantalla inicio</li>
                     </ul>
                     
-                    <h4 style="color: var(--primary); margin-top: 1.5rem;">💾 Guardado Automático</h4>
-                    <p style="margin: 0.5rem 0 0 0; line-height: 1.6;">
-                        La aplicación guarda automáticamente en tu navegador:
-                    </p>
-                    <ul style="margin: 0.5rem 0 0 1.5rem; line-height: 1.8;">
-                        <li>Tus notas personales en cada pregunta</li>
-                        <li>Las preguntas que has marcado como difíciles</li>
-                        <li>Tu historial de tests y estadísticas</li>
-                        <li>Las preguntas que has fallado (para modo repaso)</li>
-                        <li>Tus preferencias de tema y tamaño de letra</li>
+                    <p style="margin: 0.75rem 0 0.4rem 0; font-weight: 600; font-size: 0.85rem;">💾 Se guarda automáticamente:</p>
+                    <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; line-height: 1.5;">
+                        <li>Notas personales y preguntas marcadas</li>
+                        <li>Historial y estadísticas</li>
+                        <li>Preguntas falladas (para repaso)</li>
+                        <li>Tema, tamaño letra, preferencias</li>
                     </ul>
                     
-                    <div style="background: #fef2f2; padding: 1rem; border-radius: 8px; margin: 1.5rem 0; border-left: 4px solid #ef4444;">
-                        <p style="margin: 0;"><strong>⚠️ Importante:</strong> Los datos se guardan en tu navegador. Si limpias el caché o cambias de navegador, perderás tu progreso.</p>
+                    <div style="background: #fef2f2; padding: 0.5rem; border-radius: 6px; margin-top: 0.6rem; font-size: 0.8rem;">
+                        <strong>⚠️ Ojo:</strong> Los datos están en tu navegador. Si limpias caché, los pierdes.
                     </div>
                 </div>
             </div>
             
-            <div style="text-align: center; padding: 1.5rem 0 0 0; border-top: 1px solid var(--border); margin-top: 1rem;">
-                <button class="btn" onclick="app.hideHelp()" style="min-width: 150px;">¡Entendido!</button>
+            <div style="text-align: center; padding: 1rem 0 0 0; border-top: 1px solid var(--border); margin-top: 0.75rem;">
+                <button class="btn" onclick="app.hideHelp()" style="min-width: 120px; padding: 0.5rem 1rem;">¡Entendido!</button>
             </div>
         </div>
     </div>
@@ -899,7 +809,10 @@
             // Configuración de quiz
             quizSettings: {
                 randomOrder: false, // false = orden original, true = orden aleatorio
-                onlyMarked: false   // mostrar solo preguntas marcadas
+                onlyMarked: false,  // mostrar solo preguntas marcadas
+                includeTest: true,  // incluir preguntas de test normal
+                includeAI: true,    // incluir preguntas generadas con IA
+                includeDesarrollo: true // incluir preguntas de desarrollo
             },
             
             // Preguntas marcadas como difíciles (guardadas en localStorage)
@@ -1101,6 +1014,16 @@
                     }
                     if (app.savedPreferences.onlyMarked !== undefined) {
                         app.quizSettings.onlyMarked = app.savedPreferences.onlyMarked;
+                    }
+                    // Cargar filtros de tipo de pregunta
+                    if (app.savedPreferences.includeTest !== undefined) {
+                        app.quizSettings.includeTest = app.savedPreferences.includeTest;
+                    }
+                    if (app.savedPreferences.includeAI !== undefined) {
+                        app.quizSettings.includeAI = app.savedPreferences.includeAI;
+                    }
+                    if (app.savedPreferences.includeDesarrollo !== undefined) {
+                        app.quizSettings.includeDesarrollo = app.savedPreferences.includeDesarrollo;
                     }
                 }
                 
@@ -2222,7 +2145,11 @@
                         lastEspecialidad: app.currentEspecialidad,
                         lastTema: app.currentTema,
                         randomOrder: app.quizSettings.randomOrder,
-                        onlyMarked: app.quizSettings.onlyMarked
+                        onlyMarked: app.quizSettings.onlyMarked,
+                        // Filtros de tipo de pregunta
+                        includeTest: app.quizSettings.includeTest,
+                        includeAI: app.quizSettings.includeAI,
+                        includeDesarrollo: app.quizSettings.includeDesarrollo
                     };
                     localStorage.setItem('viu_preferences', JSON.stringify(prefs));
                 } catch (e) {
@@ -2449,7 +2376,10 @@
                             fromDb: true,
                             autor: q.autor,
                             votos_positivos: q.votos_positivos || 0,
-                            votos_negativos: q.votos_negativos || 0
+                            votos_negativos: q.votos_negativos || 0,
+                            // Nuevos campos para tipo de pregunta
+                            is_ai: q.is_ai === true,
+                            tipo: q.tipo || 'test' // 'test' o 'desarrollo'
                         });
                     });
                     
@@ -2512,7 +2442,9 @@
                                 fromDb: true,
                                 autor: q.autor,
                                 votos_positivos: q.votos_positivos || 0,
-                                votos_negativos: q.votos_negativos || 0
+                                votos_negativos: q.votos_negativos || 0,
+                                is_ai: q.is_ai === true,
+                                tipo: q.tipo || 'test'
                             });
                         });
                         
@@ -2558,7 +2490,9 @@
                                 fromDb: true,
                                 autor: q.autor,
                                 votos_positivos: q.votos_positivos || 0,
-                                votos_negativos: q.votos_negativos || 0
+                                votos_negativos: q.votos_negativos || 0,
+                                is_ai: q.is_ai === true,
+                                tipo: q.tipo || 'test'
                             });
                         });
                     }
@@ -2695,11 +2629,31 @@
                     questions.forEach(q => {
                         const tema = q.tema || 1;
                         if (!temasMap[tema]) {
-                            temasMap[tema] = { numero: tema, nombre: `Tema ${tema}`, count: 0 };
+                            temasMap[tema] = { numero: tema, nombre: `Tema ${tema}`, count: 0, countTest: 0, countIA: 0, countDesarrollo: 0 };
                         }
                         temasMap[tema].count++;
+                        // Conteo por tipo
+                        if (q.tipo === 'desarrollo') {
+                            temasMap[tema].countDesarrollo++;
+                        } else if (q.is_ai === true) {
+                            temasMap[tema].countIA++;
+                        } else {
+                            temasMap[tema].countTest++;
+                        }
                     });
                     return Object.values(temasMap).sort((a, b) => a.numero - b.numero);
+                };
+                
+                // Función para contar preguntas por tipo de toda la asignatura
+                const countByTipo = (asignaturaId) => {
+                    const questions = allDbQuestions.filter(q => q.asignatura === asignaturaId);
+                    let countTest = 0, countIA = 0, countDesarrollo = 0;
+                    questions.forEach(q => {
+                        if (q.tipo === 'desarrollo') countDesarrollo++;
+                        else if (q.is_ai === true) countIA++;
+                        else countTest++;
+                    });
+                    return { test: countTest, ia: countIA, desarrollo: countDesarrollo, total: questions.length };
                 };
                 
                 // Agrupar asignaturas por tipo
@@ -2746,14 +2700,22 @@
                 // Obtener temas disponibles para la asignatura actual
                 let temasDisponibles = [];
                 let totalPreguntasAsignatura = 0;
+                let tiposCounts = { test: 0, ia: 0, desarrollo: 0, total: 0 };
                 if (app.currentAsignatura) {
                     temasDisponibles = getTemasForAsignatura(app.currentAsignatura.id);
                     totalPreguntasAsignatura = countByAsignatura(app.currentAsignatura.id);
+                    tiposCounts = countByTipo(app.currentAsignatura.id);
                 }
                 
-                const unitOptions = temasDisponibles.map(tema => 
-                    `<option value="${tema.numero}" ${app.currentTema == tema.numero ? 'selected' : ''}>${tema.nombre} (${tema.count} preguntas)</option>`
-                ).join('');
+                // Opciones de temas con detalle de tipos
+                const unitOptions = temasDisponibles.map(tema => {
+                    let tipoDetail = [];
+                    if (tema.countTest > 0) tipoDetail.push(`📝${tema.countTest}`);
+                    if (tema.countIA > 0) tipoDetail.push(`🤖${tema.countIA}`);
+                    if (tema.countDesarrollo > 0) tipoDetail.push(`📄${tema.countDesarrollo}`);
+                    const tipoStr = tipoDetail.length > 0 ? ` [${tipoDetail.join(' ')}]` : '';
+                    return `<option value="${tema.numero}" ${app.currentTema == tema.numero ? 'selected' : ''}>${tema.nombre} (${tema.count})${tipoStr}</option>`;
+                }).join('');
                 
                 // Determinar el tema seleccionado para mostrar en el mensaje
                 const temaInfo = app.currentTema !== 'all' 
@@ -2817,6 +2779,40 @@
                                                 title="Limpiar todas las preguntas marcadas">
                                             🗑️
                                         </button>
+                                    </div>
+                                    <!-- Filtros de tipo de pregunta -->
+                                    <div style="border-top: 1px solid var(--border); padding-top: 0.75rem; margin-top: 0.25rem;">
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">📋 Tipos de pregunta a incluir:</div>
+                                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;">
+                                            <!-- Test Normal -->
+                                            <label class="tipo-filter-btn" style="display: flex; flex-direction: column; align-items: center; padding: 0.5rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: 2px solid ${app.quizSettings.includeTest !== false ? 'var(--primary)' : 'var(--border)'}; background: ${app.quizSettings.includeTest !== false ? 'rgba(79, 70, 229, 0.1)' : 'transparent'};">
+                                                <input type="checkbox" id="include-test-check" ${app.quizSettings.includeTest !== false ? 'checked' : ''} 
+                                                       onchange="app.quizSettings.includeTest = this.checked; app.updateTipoFilters(); app.savePreferences()" 
+                                                       style="display: none;">
+                                                <span style="font-size: 1.3rem;">📝</span>
+                                                <span style="font-size: 0.75rem; font-weight: 600; color: var(--primary);">Test</span>
+                                                <span style="font-size: 0.7rem; color: var(--text-secondary);">${tiposCounts.test}</span>
+                                            </label>
+                                            <!-- Test IA -->
+                                            <label class="tipo-filter-btn" style="display: flex; flex-direction: column; align-items: center; padding: 0.5rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: 2px solid ${app.quizSettings.includeAI !== false ? '#8b5cf6' : 'var(--border)'}; background: ${app.quizSettings.includeAI !== false ? 'rgba(139, 92, 246, 0.1)' : 'transparent'};">
+                                                <input type="checkbox" id="include-ai-check" ${app.quizSettings.includeAI !== false ? 'checked' : ''} 
+                                                       onchange="app.quizSettings.includeAI = this.checked; app.updateTipoFilters(); app.savePreferences()" 
+                                                       style="display: none;">
+                                                <span style="font-size: 1.3rem;">🤖</span>
+                                                <span style="font-size: 0.75rem; font-weight: 600; color: #8b5cf6;">IA</span>
+                                                <span style="font-size: 0.7rem; color: var(--text-secondary);">${tiposCounts.ia}</span>
+                                            </label>
+                                            <!-- Desarrollo -->
+                                            <label class="tipo-filter-btn" style="display: flex; flex-direction: column; align-items: center; padding: 0.5rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: 2px solid ${app.quizSettings.includeDesarrollo !== false ? '#f59e0b' : 'var(--border)'}; background: ${app.quizSettings.includeDesarrollo !== false ? 'rgba(245, 158, 11, 0.1)' : 'transparent'};">
+                                                <input type="checkbox" id="include-desarrollo-check" ${app.quizSettings.includeDesarrollo !== false ? 'checked' : ''} 
+                                                       onchange="app.quizSettings.includeDesarrollo = this.checked; app.updateTipoFilters(); app.savePreferences()" 
+                                                       style="display: none;">
+                                                <span style="font-size: 1.3rem;">📄</span>
+                                                <span style="font-size: 0.75rem; font-weight: 600; color: #f59e0b;">Desarrollo</span>
+                                                <span style="font-size: 0.7rem; color: var(--text-secondary);">${tiposCounts.desarrollo}</span>
+                                            </label>
+                                        </div>
+                                        <p id="tipo-filter-warning" style="display: none; font-size: 0.75rem; color: #dc2626; margin: 0.5rem 0 0 0; text-align: center;">⚠️ Selecciona al menos un tipo</p>
                                     </div>
                                     ` : ''}
                                     <div class="text-dark" style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -2996,7 +2992,11 @@
                         ` : ''}
                         <div class="quiz-header">
                             <span>Pregunta ${app.quiz.index + 1} de ${questions.length}</span>
-                            <span class="tag tag-subject">${q.subject} - U${q.unit}</span>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                ${q.is_ai ? '<span style="background: #ede9fe; color: #6d28d9; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">🤖 IA</span>' : ''}
+                                ${q.tipo === 'desarrollo' ? '<span style="background: #fef3c7; color: #92400e; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">📄 Desarrollo</span>' : ''}
+                                <span class="tag tag-subject">${q.subject} - U${q.unit}</span>
+                            </div>
                         </div>
                         <div class="quiz-progress"><div class="progress-bar" style="width: ${progress}%"></div></div>
                         
@@ -3622,11 +3622,29 @@
             },
             
             startExamMode: () => {
+                // Validar que al menos un tipo de pregunta esté seleccionado
+                if (!app.quizSettings.includeTest && !app.quizSettings.includeAI && !app.quizSettings.includeDesarrollo) {
+                    app.showToast("⚠️ Selecciona al menos un tipo de pregunta (Test, IA o Desarrollo)");
+                    return;
+                }
+                
                 const questionCount = parseInt(document.getElementById('exam-question-count').value);
                 const timeLimit = parseInt(document.getElementById('exam-time-limit').value);
                 
-                if (questionCount < 5 || questionCount > app.filteredQuestions.length) {
-                    app.showToast('⚠️ Número de preguntas inválido');
+                // Filtrar por tipo de pregunta antes de contar
+                let availableQuestions = [...app.filteredQuestions].filter(q => {
+                    const isTestNormal = q.tipo !== 'desarrollo' && !q.is_ai;
+                    const isIA = q.is_ai === true;
+                    const isDesarrollo = q.tipo === 'desarrollo';
+                    
+                    if (isDesarrollo && app.quizSettings.includeDesarrollo) return true;
+                    if (isIA && app.quizSettings.includeAI) return true;
+                    if (isTestNormal && app.quizSettings.includeTest) return true;
+                    return false;
+                });
+                
+                if (questionCount < 5 || questionCount > availableQuestions.length) {
+                    app.showToast('⚠️ Número de preguntas inválido (máximo ' + availableQuestions.length + ' disponibles)');
                     return;
                 }
                 
@@ -3642,8 +3660,8 @@
                 app.examMode.startTime = Date.now();
                 app.examMode.endTime = Date.now() + (timeLimit * 60 * 1000);
                 
-                // Seleccionar preguntas aleatorias
-                const shuffled = app.shuffle([...app.filteredQuestions]);
+                // Seleccionar preguntas aleatorias de las filtradas
+                const shuffled = app.shuffle(availableQuestions);
                 app.activeQuizQuestions = shuffled.slice(0, questionCount);
                 
                 // Reiniciar quiz
@@ -4378,8 +4396,30 @@
                             Asignatura seleccionada: <strong id="selected-asig-name"></strong>
                         </p>
                         
+                        <!-- Tipo de pregunta -->
                         <div class="form-group">
-                            <label class="form-label">📚 Número de Tema (1-50):</label>
+                            <label class="form-label">🎯 Tipo de Pregunta:</label>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;" id="contrib-tipo-btns">
+                                <button type="button" class="tipo-btn active" data-tipo="test" onclick="app.setContribTipo('test')" 
+                                    style="padding: 0.75rem; border: 2px solid var(--primary); background: var(--primary); color: white; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
+                                    📝 Test
+                                </button>
+                                <button type="button" class="tipo-btn" data-tipo="ia" onclick="app.setContribTipo('ia')"
+                                    style="padding: 0.75rem; border: 2px solid #8b5cf6; background: transparent; color: #8b5cf6; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
+                                    🤖 Test IA
+                                </button>
+                                <button type="button" class="tipo-btn" data-tipo="desarrollo" onclick="app.setContribTipo('desarrollo')"
+                                    style="padding: 0.75rem; border: 2px solid #f59e0b; background: transparent; color: #f59e0b; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
+                                    📄 Desarrollo
+                                </button>
+                            </div>
+                            <p id="tipo-hint" style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.5rem 0 0 0;">
+                                Preguntas de test tipo examen con 4 opciones
+                            </p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">📚 Número de Tema (<span id="tema-range">1-50</span>):</label>
                             <input type="number" id="contrib-tema" class="form-select" placeholder="Ej: 1, 2, 3..." min="1" max="50" step="1" value="${app.contribState.tema || ''}" style="font-size: 1.1rem; font-weight: 600;">
                         </div>
                         
@@ -4388,23 +4428,37 @@
                             <textarea id="contrib-question" class="form-select" rows="3" placeholder="Escribe la pregunta aquí..." style="resize: vertical;"></textarea>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">📝 Opciones de respuesta:</label>
-                            <input type="text" id="contrib-option-1" class="form-select" placeholder="Opción 1" style="margin-bottom: 0.5rem;">
-                            <input type="text" id="contrib-option-2" class="form-select" placeholder="Opción 2" style="margin-bottom: 0.5rem;">
-                            <input type="text" id="contrib-option-3" class="form-select" placeholder="Opción 3" style="margin-bottom: 0.5rem;">
-                            <input type="text" id="contrib-option-4" class="form-select" placeholder="Opción 4">
+                        <!-- Opciones para TEST -->
+                        <div id="test-options-section">
+                            <div class="form-group">
+                                <label class="form-label">📝 Opciones de respuesta:</label>
+                                <input type="text" id="contrib-option-1" class="form-select" placeholder="Opción 1" style="margin-bottom: 0.5rem;">
+                                <input type="text" id="contrib-option-2" class="form-select" placeholder="Opción 2" style="margin-bottom: 0.5rem;">
+                                <input type="text" id="contrib-option-3" class="form-select" placeholder="Opción 3" style="margin-bottom: 0.5rem;">
+                                <input type="text" id="contrib-option-4" class="form-select" placeholder="Opción 4">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">✅ Respuesta correcta:</label>
+                                <select id="contrib-correct" class="form-select">
+                                    <option value="">Selecciona la opción correcta</option>
+                                    <option value="1">Opción 1</option>
+                                    <option value="2">Opción 2</option>
+                                    <option value="3">Opción 3</option>
+                                    <option value="4">Opción 4</option>
+                                </select>
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">✅ Respuesta correcta:</label>
-                            <select id="contrib-correct" class="form-select">
-                                <option value="">Selecciona la opción correcta</option>
-                                <option value="1">Opción 1</option>
-                                <option value="2">Opción 2</option>
-                                <option value="3">Opción 3</option>
-                                <option value="4">Opción 4</option>
-                            </select>
+                        <!-- Respuesta para DESARROLLO -->
+                        <div id="desarrollo-section" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label">📖 Respuesta modelo:</label>
+                                <textarea id="contrib-respuesta-desarrollo" class="form-select" rows="6" placeholder="Escribe la respuesta modelo o guía de estudio aquí..." style="resize: vertical;"></textarea>
+                                <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.5rem 0 0 0;">
+                                    Esta respuesta servirá como guía de estudio para los usuarios
+                                </p>
+                            </div>
                         </div>
                         
                         <div style="display: flex; gap: 1rem;">
@@ -4418,6 +4472,9 @@
                     </div>
                 `;
                 
+                // Inicializar tipo seleccionado
+                app.contribTipo = 'test';
+                
                 // Obtener nombre de asignatura
                 const asig = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
                 const nameElement = document.getElementById('selected-asig-name');
@@ -4427,6 +4484,56 @@
                 
                 // Scroll al formulario
                 formArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            },
+            
+            // Cambiar tipo de contribución
+            setContribTipo: (tipo) => {
+                app.contribTipo = tipo;
+                
+                // Actualizar botones
+                document.querySelectorAll('#contrib-tipo-btns .tipo-btn').forEach(btn => {
+                    const btnTipo = btn.dataset.tipo;
+                    if (btnTipo === tipo) {
+                        btn.classList.add('active');
+                        if (tipo === 'test') {
+                            btn.style.background = 'var(--primary)';
+                            btn.style.color = 'white';
+                        } else if (tipo === 'ia') {
+                            btn.style.background = '#8b5cf6';
+                            btn.style.color = 'white';
+                        } else {
+                            btn.style.background = '#f59e0b';
+                            btn.style.color = 'white';
+                        }
+                    } else {
+                        btn.classList.remove('active');
+                        btn.style.background = 'transparent';
+                        if (btnTipo === 'test') btn.style.color = 'var(--primary)';
+                        else if (btnTipo === 'ia') btn.style.color = '#8b5cf6';
+                        else btn.style.color = '#f59e0b';
+                    }
+                });
+                
+                // Mostrar/ocultar secciones
+                const testSection = document.getElementById('test-options-section');
+                const desarrolloSection = document.getElementById('desarrollo-section');
+                const temaRange = document.getElementById('tema-range');
+                const temaInput = document.getElementById('contrib-tema');
+                const tipoHint = document.getElementById('tipo-hint');
+                
+                if (tipo === 'desarrollo') {
+                    testSection.style.display = 'none';
+                    desarrolloSection.style.display = 'block';
+                    tipoHint.textContent = 'Preguntas de desarrollo con respuesta modelo para estudio';
+                } else {
+                    testSection.style.display = 'block';
+                    desarrolloSection.style.display = 'none';
+                    if (tipo === 'ia') {
+                        tipoHint.textContent = '🤖 Preguntas generadas con IA - se mostrarán con badge especial';
+                    } else {
+                        tipoHint.textContent = 'Preguntas de test tipo examen con 4 opciones';
+                    }
+                }
             },
             
             // Finalizar contribuciones
@@ -4530,13 +4637,9 @@
                 const especialidadId = app.userEspecialidad; // Usar especialidad fija del usuario
                 const tema = document.getElementById('contrib-tema').value;
                 const question = document.getElementById('contrib-question').value.trim();
-                const option1 = document.getElementById('contrib-option-1').value.trim();
-                const option2 = document.getElementById('contrib-option-2').value.trim();
-                const option3 = document.getElementById('contrib-option-3').value.trim();
-                const option4 = document.getElementById('contrib-option-4').value.trim();
-                const correctIdx = document.getElementById('contrib-correct').value;
+                const tipo = app.contribTipo || 'test'; // test, ia, desarrollo
                 
-                // Validaciones
+                // Validaciones básicas
                 if (!asignaturaId) {
                     app.showToast('⚠️ Selecciona una asignatura');
                     return;
@@ -4553,28 +4656,50 @@
                     app.showToast('⚠️ Escribe una pregunta');
                     return;
                 }
-                if (!option1 || !option2 || !option3 || !option4) {
-                    app.showToast('⚠️ Completa las 4 opciones');
-                    return;
-                }
-                if (!correctIdx) {
-                    app.showToast('⚠️ Selecciona la respuesta correcta');
-                    return;
+                
+                let options = [];
+                let answer = '';
+                let respuestaDesarrollo = '';
+                
+                // Validaciones según tipo
+                if (tipo === 'desarrollo') {
+                    // Para desarrollo, validar respuesta modelo
+                    respuestaDesarrollo = document.getElementById('contrib-respuesta-desarrollo').value.trim();
+                    if (!respuestaDesarrollo) {
+                        app.showToast('⚠️ Escribe la respuesta modelo');
+                        document.getElementById('contrib-respuesta-desarrollo').focus();
+                        return;
+                    }
+                } else {
+                    // Para test y ia, validar opciones
+                    const option1 = document.getElementById('contrib-option-1').value.trim();
+                    const option2 = document.getElementById('contrib-option-2').value.trim();
+                    const option3 = document.getElementById('contrib-option-3').value.trim();
+                    const option4 = document.getElementById('contrib-option-4').value.trim();
+                    const correctIdx = document.getElementById('contrib-correct').value;
+                    
+                    if (!option1 || !option2 || !option3 || !option4) {
+                        app.showToast('⚠️ Completa las 4 opciones');
+                        return;
+                    }
+                    if (!correctIdx) {
+                        app.showToast('⚠️ Selecciona la respuesta correcta');
+                        return;
+                    }
+                    
+                    options = [option1, option2, option3, option4];
+                    answer = options[parseInt(correctIdx) - 1];
                 }
                 
-                // Buscar asignatura - primero en asignaturasDisponibles
+                // Buscar asignatura
                 let asignatura = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
                 let asignaturaNombre = '';
                 
-                // Si no se encuentra, puede ser una asignatura de especialidad (ID compuesto)
                 if (!asignatura && especialidadId) {
-                    // El ID es algo como "tecnologias-informatica-complementos-formacion-disciplinar"
-                    // Extraer el nombre de la asignatura base
                     const asignaturasEsp = especialidadId === 'orientacion-educativa' 
                         ? CONFIG.asignaturas.especialidadOrientacion 
                         : CONFIG.asignaturas.especialidad;
                     
-                    // Buscar en las asignaturas de especialidad
                     for (const asig of asignaturasEsp) {
                         const expectedId = `${especialidadId}-${asig.id}`;
                         if (expectedId === asignaturaId) {
@@ -4593,28 +4718,24 @@
                     asignaturaNombre = asignatura.nombre;
                 }
                 
-                const options = [option1, option2, option3, option4];
-                const answer = options[parseInt(correctIdx) - 1];
-                
-                // Verificar si estamos editando una pregunta existente
                 const isEditing = !!app.editingDbQuestionId;
-                
-                // Determinar si es asignatura obligatoria (no tiene especialidad en su ID)
                 const esObligatoria = asignatura && asignatura.tipo === 'obligatoria';
                 
                 // Crear objeto para guardar en la BD
-                // Para obligatorias, especialidad vacía para que sea compartida entre todas
                 const questionData = {
                     pregunta: question,
-                    opciones: JSON.stringify(options), // Guardar como JSON string
-                    respuesta_correcta: answer,
+                    opciones: tipo === 'desarrollo' ? JSON.stringify([]) : JSON.stringify(options),
+                    respuesta_correcta: tipo === 'desarrollo' ? respuestaDesarrollo : answer,
                     especialidad: esObligatoria ? '' : (especialidadId || ''),
                     asignatura: asignaturaId,
                     asignatura_nombre: asignaturaNombre,
                     tema: temaNum,
                     autor: app.getUserId(),
-                    fecha_creacion: isEditing ? undefined : new Date().toISOString(), // No cambiar fecha si editamos
-                    aprobada: true // Por defecto aprobada para que aparezca
+                    fecha_creacion: isEditing ? undefined : new Date().toISOString(),
+                    aprobada: true,
+                    // Nuevos campos para tipo
+                    tipo: tipo === 'desarrollo' ? 'desarrollo' : 'test', // test o desarrollo
+                    is_ai: tipo === 'ia' // true si es generada con IA
                 };
                 
                 // Mostrar estado de carga
@@ -4626,13 +4747,11 @@
                 
                 try {
                     if (isEditing) {
-                        // Actualizar pregunta existente con PATCH
+                        // Actualizar pregunta existente
                         const url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?id=eq.${app.editingDbQuestionId}`;
                         
-                        // Eliminar campos undefined
                         if (!questionData.fecha_creacion) delete questionData.fecha_creacion;
                         
-                        // Convertir opciones a array si es string
                         const dataToUpdate = {
                             ...questionData,
                             opciones: typeof questionData.opciones === 'string' 
@@ -4654,36 +4773,36 @@
                         if (!response.ok) throw new Error(`HTTP ${response.status}`);
                         
                         app.showToast('✅ ¡Pregunta actualizada correctamente!');
-                        app.editingDbQuestionId = null; // Limpiar modo edición
+                        app.editingDbQuestionId = null;
                     } else {
-                        // Guardar nueva pregunta
                         await app.saveQuestionToDb(questionData);
-                        app.showToast('✅ ¡Pregunta enviada correctamente!');
+                        const tipoLabel = tipo === 'ia' ? '🤖 Test IA' : tipo === 'desarrollo' ? '📄 Desarrollo' : '📝 Test';
+                        app.showToast(`✅ ¡Pregunta ${tipoLabel} enviada!`);
                     }
                     
                     // Guardar el tema para la próxima pregunta
                     app.contribState.tema = temaNum;
                     app.saveContribState();
                     
-                    // Limpiar solo pregunta y opciones, mantener tema
+                    // Limpiar campos
                     document.getElementById('contrib-question').value = '';
-                    document.getElementById('contrib-option-1').value = '';
-                    document.getElementById('contrib-option-2').value = '';
-                    document.getElementById('contrib-option-3').value = '';
-                    document.getElementById('contrib-option-4').value = '';
-                    document.getElementById('contrib-correct').value = '';
+                    if (tipo === 'desarrollo') {
+                        document.getElementById('contrib-respuesta-desarrollo').value = '';
+                    } else {
+                        document.getElementById('contrib-option-1').value = '';
+                        document.getElementById('contrib-option-2').value = '';
+                        document.getElementById('contrib-option-3').value = '';
+                        document.getElementById('contrib-option-4').value = '';
+                        document.getElementById('contrib-correct').value = '';
+                    }
                     
-                    // Focus en el campo de pregunta para continuar rápidamente
                     document.getElementById('contrib-question').focus();
-                    
-                    // Recargar la lista de contribuciones de la BD
                     app.renderDbContributionsList();
                     
                 } catch (error) {
                     console.error('Error enviando pregunta:', error);
                     app.showToast('❌ Error al enviar. Inténtalo de nuevo.');
                 } finally {
-                    // Restaurar botón
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = '➕ Añadir Pregunta';
@@ -4769,6 +4888,20 @@
                             try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
                         }
                         
+                        // Determinar tipo y badges
+                        const isDesarrollo = q.tipo === 'desarrollo';
+                        const isAI = q.is_ai === true;
+                        let tipoBadge = '';
+                        let borderColor = 'var(--border)';
+                        
+                        if (isDesarrollo) {
+                            tipoBadge = '<span style="background: #fef3c7; color: #92400e; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">📄 Desarrollo</span>';
+                            borderColor = '#f59e0b';
+                        } else if (isAI) {
+                            tipoBadge = '<span style="background: #ede9fe; color: #6d28d9; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">🤖 IA</span>';
+                            borderColor = '#8b5cf6';
+                        }
+                        
                         // Guardar datos para edición
                         const qDataStr = encodeURIComponent(JSON.stringify({
                             id: q.id,
@@ -4778,20 +4911,23 @@
                             tema: q.tema,
                             especialidad: q.especialidad,
                             asignatura: q.asignatura,
-                            asignatura_nombre: q.asignatura_nombre
+                            asignatura_nombre: q.asignatura_nombre,
+                            tipo: q.tipo,
+                            is_ai: q.is_ai
                         }));
                         
                         html += `
-                            <div class="bg-white-box" style="padding: 1rem; border-radius: 6px; border: 1px solid var(--border);">
+                            <div class="bg-white-box" style="padding: 1rem; border-radius: 6px; border: 1px solid var(--border); border-left: 3px solid ${borderColor};">
                                 <div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
                                     <div style="flex: 1;">
-                                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
-                                            ${q.asignatura_nombre || q.asignatura} - Tema ${q.tema}
+                                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+                                            <span>${q.asignatura_nombre || q.asignatura} - Tema ${q.tema}</span>
+                                            ${tipoBadge}
                                             ${q.especialidad ? `<span class="tag tag-especialidad">${CONFIG.especialidades[q.especialidad] || q.especialidad}</span>` : ''}
                                         </div>
                                         <div style="font-weight: 600; margin-bottom: 0.5rem;">${q.pregunta}</div>
-                                        <div style="font-size: 0.9rem; color: var(--success);">
-                                            ✅ ${q.respuesta_correcta}
+                                        <div style="font-size: 0.9rem; color: ${isDesarrollo ? 'var(--text-secondary)' : 'var(--success)'};">
+                                            ${isDesarrollo ? '📖 ' : '✅ '}${q.respuesta_correcta.substring(0, 150)}${q.respuesta_correcta.length > 150 ? '...' : ''}
                                         </div>
                                     </div>
                                     <div style="display: flex; gap: 0.5rem; flex-direction: column;">
@@ -4842,16 +4978,34 @@
                 setTimeout(() => {
                     if (asigSelect) asigSelect.value = qData.asignatura;
                     
+                    // Determinar tipo
+                    const isDesarrollo = qData.tipo === 'desarrollo';
+                    const isAI = qData.is_ai === true;
+                    
+                    // Activar tipo correcto
+                    if (isDesarrollo) {
+                        app.setContribTipo('desarrollo');
+                    } else if (isAI) {
+                        app.setContribTipo('ia');
+                    } else {
+                        app.setContribTipo('test');
+                    }
+                    
                     document.getElementById('contrib-tema').value = qData.tema;
                     document.getElementById('contrib-question').value = qData.pregunta;
-                    document.getElementById('contrib-option-1').value = qData.opciones[0] || '';
-                    document.getElementById('contrib-option-2').value = qData.opciones[1] || '';
-                    document.getElementById('contrib-option-3').value = qData.opciones[2] || '';
-                    document.getElementById('contrib-option-4').value = qData.opciones[3] || '';
                     
-                    // Seleccionar respuesta correcta
-                    const correctIdx = qData.opciones.indexOf(qData.respuesta_correcta) + 1;
-                    document.getElementById('contrib-correct').value = correctIdx > 0 ? correctIdx : '';
+                    if (isDesarrollo) {
+                        document.getElementById('contrib-respuesta-desarrollo').value = qData.respuesta_correcta;
+                    } else {
+                        document.getElementById('contrib-option-1').value = qData.opciones[0] || '';
+                        document.getElementById('contrib-option-2').value = qData.opciones[1] || '';
+                        document.getElementById('contrib-option-3').value = qData.opciones[2] || '';
+                        document.getElementById('contrib-option-4').value = qData.opciones[3] || '';
+                        
+                        // Seleccionar respuesta correcta
+                        const correctIdx = qData.opciones.indexOf(qData.respuesta_correcta) + 1;
+                        document.getElementById('contrib-correct').value = correctIdx > 0 ? correctIdx : '';
+                    }
                     
                     // Cambiar botón de enviar
                     const submitBtn = document.querySelector('#contrib-form-area button[onclick="app.submitContribution()"]');
@@ -5520,6 +5674,54 @@
                     }
                 }
             },
+            
+            // Actualizar filtros de tipo de pregunta (Test, IA, Desarrollo)
+            updateTipoFilters: () => {
+                const testCheck = document.getElementById('include-test-check');
+                const aiCheck = document.getElementById('include-ai-check');
+                const desarrolloCheck = document.getElementById('include-desarrollo-check');
+                const warning = document.getElementById('tipo-filter-warning');
+                
+                // Verificar si al menos uno está marcado
+                const anySelected = app.quizSettings.includeTest || app.quizSettings.includeAI || app.quizSettings.includeDesarrollo;
+                
+                // Mostrar/ocultar warning
+                if (warning) {
+                    warning.style.display = anySelected ? 'none' : 'block';
+                }
+                
+                // Actualizar estilos visuales de los botones
+                if (testCheck) {
+                    const label = testCheck.closest('label');
+                    if (label) {
+                        label.style.border = app.quizSettings.includeTest ? '2px solid var(--primary)' : '2px solid var(--border)';
+                        label.style.background = app.quizSettings.includeTest ? 'rgba(79, 70, 229, 0.1)' : 'transparent';
+                    }
+                }
+                if (aiCheck) {
+                    const label = aiCheck.closest('label');
+                    if (label) {
+                        label.style.border = app.quizSettings.includeAI ? '2px solid #8b5cf6' : '2px solid var(--border)';
+                        label.style.background = app.quizSettings.includeAI ? 'rgba(139, 92, 246, 0.1)' : 'transparent';
+                    }
+                }
+                if (desarrolloCheck) {
+                    const label = desarrolloCheck.closest('label');
+                    if (label) {
+                        label.style.border = app.quizSettings.includeDesarrollo ? '2px solid #f59e0b' : '2px solid var(--border)';
+                        label.style.background = app.quizSettings.includeDesarrollo ? 'rgba(245, 158, 11, 0.1)' : 'transparent';
+                    }
+                }
+            },
+            
+            // Aplicar filtros de tipo de pregunta (para refrescar)
+            applyQuestionFilters: () => {
+                app.updateTipoFilters();
+                // Refrescar la página de inicio para aplicar los nuevos filtros
+                if (window.location.hash === '#home' || window.location.hash === '') {
+                    app.navigate('home');
+                }
+            },
             checkAnswer: (btn) => {
                 const q = app.activeQuizQuestions[app.quiz.index];
                 const selectedOpt = btn.innerText.trim();
@@ -5694,6 +5896,12 @@
             },
             
             startQuiz: () => {
+                // Validar que al menos un tipo de pregunta esté seleccionado
+                if (!app.quizSettings.includeTest && !app.quizSettings.includeAI && !app.quizSettings.includeDesarrollo) {
+                    app.showToast("⚠️ Selecciona al menos un tipo de pregunta (Test, IA o Desarrollo)");
+                    return;
+                }
+                
                 // RESETEAR MODO EXAMEN - esto es un test normal
                 if (app.examMode.timer) {
                     clearInterval(app.examMode.timer);
@@ -5709,6 +5917,18 @@
                 
                 // Usar todas las preguntas de la asignatura actual
                 let questionsForQuiz = [...app.filteredQuestions];
+                
+                // Filtrar por tipo de pregunta (Test normal, IA, Desarrollo)
+                questionsForQuiz = questionsForQuiz.filter(q => {
+                    const isTestNormal = q.tipo !== 'desarrollo' && !q.is_ai;
+                    const isIA = q.is_ai === true;
+                    const isDesarrollo = q.tipo === 'desarrollo';
+                    
+                    if (isDesarrollo && app.quizSettings.includeDesarrollo) return true;
+                    if (isIA && app.quizSettings.includeAI) return true;
+                    if (isTestNormal && app.quizSettings.includeTest) return true;
+                    return false;
+                });
                 
                 // Filtrar solo preguntas marcadas si está activado
                 if (app.quizSettings.onlyMarked) {
@@ -5925,7 +6145,9 @@
                                 options: opciones || [],
                                 answer: q.respuesta_correcta,
                                 tipo: q.especialidad ? 'especialidad' : 'obligatoria',
-                                especialidad: q.especialidad
+                                especialidad: q.especialidad,
+                                is_ai: q.is_ai === true,
+                                question_tipo: q.tipo || 'test' // test o desarrollo
                             });
                         });
                     } catch(e) {
@@ -5993,13 +6215,23 @@
                         else if (q.tipo === 'optativa') tipoClass += ' tag-optativa';
                         else if (q.tipo === 'especialidad') tipoClass += ' tag-especialidad';
                         
+                        // Badges de tipo de pregunta
+                        let tipoBadges = '';
+                        if (q.is_ai) {
+                            tipoBadges += '<span style="background: #ede9fe; color: #6d28d9; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">🤖 IA</span> ';
+                        }
+                        if (q.question_tipo === 'desarrollo') {
+                            tipoBadges += '<span style="background: #fef3c7; color: #92400e; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">📄 Desarrollo</span> ';
+                        }
+                        
                         // FINAL RESULT CARD RENDERING
                         return `
-                            <div class="result-item" onclick="app.navigate('detail', '${q.id}')">
-                                <div style="margin-bottom: 8px;">
+                            <div class="result-item" onclick="app.navigate('detail', '${q.id}')" style="${q.is_ai ? 'border-left: 3px solid #8b5cf6;' : q.question_tipo === 'desarrollo' ? 'border-left: 3px solid #f59e0b;' : ''}">
+                                <div style="margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center;">
                                     <span class="${tipoClass}">${q.tipo}</span>
                                     <span class="tag tag-subject">${q.subject}</span>
                                     <span class="tag">Tema ${q.unit}</span>
+                                    ${tipoBadges}
                                 </div>
                                 <div style="font-weight: 500; margin-top: 5px; margin-bottom: 5px;">${highlightedQuestion}</div>
                                 ${snippetsHTML}
