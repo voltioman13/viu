@@ -7102,6 +7102,7 @@ Respuesta: b</pre>
                 
                 // Generar opciones de especialidades
                 let espOptions = '<option value="">Todas las especialidades</option>';
+                espOptions += '<option value="obligatorias"' + (app.adminFilters.especialidad === 'obligatorias' ? ' selected' : '') + '>📘 Obligatorias (sin especialidad)</option>';
                 Object.entries(CONFIG.especialidades).forEach(([id, nombre]) => {
                     const selected = app.adminFilters.especialidad === id ? 'selected' : '';
                     espOptions += `<option value="${id}" ${selected}>${nombre}</option>`;
@@ -7198,6 +7199,17 @@ Respuesta: b</pre>
             },
             
             loadAdminQuestions: async () => {
+                // Actualizar filtros desde el DOM antes de cargar
+                const espSelect = document.getElementById('admin-filter-esp');
+                const asigSelect = document.getElementById('admin-filter-asig');
+                const temaInput = document.getElementById('admin-filter-tema');
+                const searchInput = document.getElementById('admin-filter-search');
+                
+                if (espSelect) app.adminFilters.especialidad = espSelect.value;
+                if (asigSelect) app.adminFilters.asignatura = asigSelect.value;
+                if (temaInput) app.adminFilters.tema = temaInput.value;
+                if (searchInput) app.adminFilters.search = searchInput.value;
+                
                 const listContainer = document.getElementById('admin-questions-list');
                 listContainer.innerHTML = '<p style="text-align: center;">⏳ Cargando preguntas...</p>';
                 
@@ -7206,7 +7218,12 @@ Respuesta: b</pre>
                     let url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&order=id.desc&limit=100`;
                     
                     if (app.adminFilters.especialidad) {
-                        url += `&especialidad=eq.${app.adminFilters.especialidad}`;
+                        if (app.adminFilters.especialidad === 'obligatorias') {
+                            // Filtrar preguntas sin especialidad (obligatorias)
+                            url += `&or=(especialidad.eq.,especialidad.is.null)`;
+                        } else {
+                            url += `&especialidad=eq.${app.adminFilters.especialidad}`;
+                        }
                     }
                     if (app.adminFilters.asignatura) {
                         url += `&asignatura_nombre=eq.${encodeURIComponent(app.adminFilters.asignatura)}`;
@@ -7217,6 +7234,8 @@ Respuesta: b</pre>
                     if (app.adminFilters.search) {
                         url += `&pregunta=ilike.*${encodeURIComponent(app.adminFilters.search)}*`;
                     }
+                    
+                    console.log('Admin query URL:', url);
                     
                     const response = await fetch(url, {
                         headers: {
