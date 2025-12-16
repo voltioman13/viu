@@ -7042,7 +7042,7 @@ Respuesta: b</pre>
             adminClickTimer: null,
             isAdmin: false,
             adminPassword: 'VIU2024Admin!', // Cambiar esta contraseña
-            adminFilters: { especialidad: '', asignatura: '', tema: '', search: '' },
+            adminFilters: { especialidad: '', asignatura: '', tema: '', search: '', votosPositivos: '', votosNegativos: '' },
             adminQuestions: [],
             
             // Click secreto en el logo para acceder al admin
@@ -7143,7 +7143,7 @@ Respuesta: b</pre>
                         <!-- Filtros -->
                         <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
                             <h3 style="font-size: 1rem; margin: 0 0 1rem 0;">🔍 Filtros de Búsqueda</h3>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
                                 <div>
                                     <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Especialidad</label>
                                     <select id="admin-filter-esp" class="form-input" style="padding: 0.5rem;" onchange="app.updateAdminFilters()">
@@ -7158,11 +7158,19 @@ Respuesta: b</pre>
                                 </div>
                                 <div>
                                     <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Tema</label>
-                                    <input type="number" id="admin-filter-tema" class="form-input" style="padding: 0.5rem;" placeholder="Nº tema" min="1" max="50" value="${app.adminFilters.tema}" onchange="app.updateAdminFilters()">
+                                    <input type="number" id="admin-filter-tema" class="form-input" style="padding: 0.5rem;" placeholder="Nº tema" min="1" max="50" value="${app.adminFilters.tema || ''}" onchange="app.updateAdminFilters()">
                                 </div>
                                 <div>
                                     <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Buscar texto</label>
-                                    <input type="text" id="admin-filter-search" class="form-input" style="padding: 0.5rem;" placeholder="Buscar en pregunta..." value="${app.adminFilters.search}" oninput="app.updateAdminFilters()">
+                                    <input type="text" id="admin-filter-search" class="form-input" style="padding: 0.5rem;" placeholder="Buscar en pregunta..." value="${app.adminFilters.search || ''}" oninput="app.updateAdminFilters()">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">👍 Votos positivos mín.</label>
+                                    <input type="number" id="admin-filter-vpos" class="form-input" style="padding: 0.5rem;" placeholder="Mínimo" min="0" value="${app.adminFilters.votosPositivos || ''}" onchange="app.updateAdminFilters()">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">👎 Votos negativos mín.</label>
+                                    <input type="number" id="admin-filter-vneg" class="form-input" style="padding: 0.5rem;" placeholder="Mínimo" min="0" value="${app.adminFilters.votosNegativos || ''}" onchange="app.updateAdminFilters()">
                                 </div>
                             </div>
                             <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -7188,14 +7196,18 @@ Respuesta: b</pre>
                 app.adminFilters.asignatura = document.getElementById('admin-filter-asig').value;
                 app.adminFilters.tema = document.getElementById('admin-filter-tema').value;
                 app.adminFilters.search = document.getElementById('admin-filter-search').value;
+                app.adminFilters.votosPositivos = document.getElementById('admin-filter-vpos').value;
+                app.adminFilters.votosNegativos = document.getElementById('admin-filter-vneg').value;
             },
             
             clearAdminFilters: () => {
-                app.adminFilters = { especialidad: '', asignatura: '', tema: '', search: '' };
+                app.adminFilters = { especialidad: '', asignatura: '', tema: '', search: '', votosPositivos: '', votosNegativos: '' };
                 document.getElementById('admin-filter-esp').value = '';
                 document.getElementById('admin-filter-asig').value = '';
                 document.getElementById('admin-filter-tema').value = '';
                 document.getElementById('admin-filter-search').value = '';
+                document.getElementById('admin-filter-vpos').value = '';
+                document.getElementById('admin-filter-vneg').value = '';
             },
             
             loadAdminQuestions: async () => {
@@ -7204,11 +7216,15 @@ Respuesta: b</pre>
                 const asigSelect = document.getElementById('admin-filter-asig');
                 const temaInput = document.getElementById('admin-filter-tema');
                 const searchInput = document.getElementById('admin-filter-search');
+                const vposInput = document.getElementById('admin-filter-vpos');
+                const vnegInput = document.getElementById('admin-filter-vneg');
                 
                 if (espSelect) app.adminFilters.especialidad = espSelect.value;
                 if (asigSelect) app.adminFilters.asignatura = asigSelect.value;
                 if (temaInput) app.adminFilters.tema = temaInput.value;
                 if (searchInput) app.adminFilters.search = searchInput.value;
+                if (vposInput) app.adminFilters.votosPositivos = vposInput.value;
+                if (vnegInput) app.adminFilters.votosNegativos = vnegInput.value;
                 
                 const listContainer = document.getElementById('admin-questions-list');
                 listContainer.innerHTML = '<p style="text-align: center;">⏳ Cargando preguntas...</p>';
@@ -7233,6 +7249,13 @@ Respuesta: b</pre>
                     }
                     if (app.adminFilters.search) {
                         url += `&pregunta=ilike.*${encodeURIComponent(app.adminFilters.search)}*`;
+                    }
+                    // Filtros de votos
+                    if (app.adminFilters.votosPositivos) {
+                        url += `&votos_positivos=gte.${app.adminFilters.votosPositivos}`;
+                    }
+                    if (app.adminFilters.votosNegativos) {
+                        url += `&votos_negativos=gte.${app.adminFilters.votosNegativos}`;
                     }
                     
                     console.log('Admin query URL:', url);
@@ -7278,12 +7301,17 @@ Respuesta: b</pre>
                     const isDesarrollo = q.tipo === 'desarrollo';
                     const isAI = q.is_ai === true;
                     const isDisabled = q.aprobada === false;
+                    const votosPos = q.votos_positivos || 0;
+                    const votosNeg = q.votos_negativos || 0;
                     
                     // Badges
                     let badges = '';
                     if (isAI) badges += '<span style="background: #ede9fe; color: #6d28d9; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-right: 0.25rem;">🤖 IA</span>';
                     if (isDesarrollo) badges += '<span style="background: #fef3c7; color: #92400e; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-right: 0.25rem;">📄 Desarrollo</span>';
                     if (isDisabled) badges += '<span style="background: #fee2e2; color: #991b1b; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">🚫 Desactivada</span>';
+                    
+                    // Badge de votos
+                    const votosBadge = `<span style="background: ${votosNeg > votosPos ? '#fee2e2' : '#f3f4f6'}; color: ${votosNeg > votosPos ? '#991b1b' : '#374151'}; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-right: 0.25rem;">👍 ${votosPos} | 👎 ${votosNeg}</span>`;
                     
                     const espNombre = q.especialidad ? (CONFIG.especialidades[q.especialidad] || q.especialidad) : 'Obligatoria';
                     
@@ -7294,7 +7322,7 @@ Respuesta: b</pre>
                                     <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
                                         ID: ${q.id} | ${espNombre} | ${q.asignatura_nombre} | Tema ${q.tema} | Autor: ${q.autor || 'N/A'}
                                     </div>
-                                    <div style="margin-bottom: 0.5rem;">${badges}</div>
+                                    <div style="margin-bottom: 0.5rem;">${votosBadge}${badges}</div>
                                     <div style="font-weight: 600; margin-bottom: 0.5rem;">${q.pregunta}</div>
                                     ${!isDesarrollo ? `
                                     <div style="font-size: 0.85rem; color: var(--success);">✅ ${q.respuesta_correcta}</div>
