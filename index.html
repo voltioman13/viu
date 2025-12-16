@@ -2962,6 +2962,7 @@
                 
                 const q = questions[app.quiz.index];
                 const progress = ((app.quiz.index) / questions.length) * 100;
+                const isDesarrollo = q.tipo === 'desarrollo';
                 
                 // Verificar si esta pregunta ya fue respondida
                 const previousAnswer = app.quiz.answers[app.quiz.index];
@@ -2969,6 +2970,67 @@
                 
                 // Mezclar opciones solo si no hay respuesta previa (para mantener consistencia)
                 const shuffledOptions = previousAnswer ? q.options : app.shuffle([...q.options]);
+                
+                // Contenido de opciones según tipo de pregunta
+                let optionsHTML = '';
+                let feedbackHTML = '';
+                
+                if (isDesarrollo) {
+                    // Para preguntas de desarrollo, mostrar botón para ver respuesta
+                    const yaVista = previousAnswer && previousAnswer.vista;
+                    optionsHTML = `
+                        <div id="desarrollo-container" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                            <p style="color: #92400e; font-weight: 600; margin: 0 0 1rem 0; font-size: 1rem;">
+                                📄 Pregunta de Desarrollo
+                            </p>
+                            <p style="color: #78350f; font-size: 0.9rem; margin: 0 0 1.5rem 0;">
+                                Piensa en la respuesta y cuando estés listo, pulsa para ver la respuesta modelo.
+                            </p>
+                            <button id="ver-respuesta-btn" class="btn" onclick="app.showDesarrolloAnswer()" 
+                                    style="background: #f59e0b; border-color: #f59e0b; font-size: 1rem; padding: 0.75rem 2rem; ${yaVista ? 'display: none;' : ''}">
+                                👁️ Ver Respuesta Modelo
+                            </button>
+                            <div id="desarrollo-answer" style="${yaVista ? '' : 'display: none;'}">
+                                <div style="background: white; border-radius: 8px; padding: 1rem; text-align: left; margin-bottom: 1rem; border: 1px solid #fcd34d;">
+                                    <p style="font-weight: 600; color: #92400e; margin: 0 0 0.5rem 0;">📖 Respuesta Modelo:</p>
+                                    <div style="color: #1f2937; line-height: 1.6; white-space: pre-wrap;">${q.answer}</div>
+                                </div>
+                                <p style="color: #78350f; font-size: 0.9rem; margin: 0 0 1rem 0;">
+                                    ¿Cómo ha ido tu respuesta mental?
+                                </p>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                    <button class="btn desarrollo-eval-btn ${previousAnswer?.evaluation === 'sabia' ? 'selected' : ''}" 
+                                            onclick="app.evaluateDesarrollo('sabia')"
+                                            style="background: ${previousAnswer?.evaluation === 'sabia' ? '#22c55e' : '#dcfce7'}; 
+                                                   border: 2px solid #22c55e; 
+                                                   color: ${previousAnswer?.evaluation === 'sabia' ? 'white' : '#166534'}; 
+                                                   padding: 0.75rem;">
+                                        ✅ La sabía
+                                    </button>
+                                    <button class="btn desarrollo-eval-btn ${previousAnswer?.evaluation === 'no_sabia' ? 'selected' : ''}" 
+                                            onclick="app.evaluateDesarrollo('no_sabia')"
+                                            style="background: ${previousAnswer?.evaluation === 'no_sabia' ? '#ef4444' : '#fee2e2'}; 
+                                                   border: 2px solid #ef4444; 
+                                                   color: ${previousAnswer?.evaluation === 'no_sabia' ? 'white' : '#991b1b'}; 
+                                                   padding: 0.75rem;">
+                                        ❌ No la sabía
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Para preguntas de test, mostrar opciones normales
+                    optionsHTML = `
+                        <div id="options-container">
+                            ${shuffledOptions.map((opt, idx) => `
+                                <button class="option-btn" data-option="${idx}" onclick="app.checkAnswer(this)" ${previousAnswer ? 'disabled' : ''}>
+                                    ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                }
                 
                 container.innerHTML = `
                     <div class="card">
@@ -2994,7 +3056,7 @@
                             <span>Pregunta ${app.quiz.index + 1} de ${questions.length}</span>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
                                 ${q.is_ai ? '<span style="background: #ede9fe; color: #6d28d9; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">🤖 IA</span>' : ''}
-                                ${q.tipo === 'desarrollo' ? '<span style="background: #fef3c7; color: #92400e; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">📄 Desarrollo</span>' : ''}
+                                ${isDesarrollo ? '<span style="background: #fef3c7; color: #92400e; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">📄 Desarrollo</span>' : ''}
                                 <span class="tag tag-subject">${q.subject} - U${q.unit}</span>
                             </div>
                         </div>
@@ -3018,14 +3080,9 @@
                             </button>
                         </div>
                         
-                        <div id="options-container">
-                            ${shuffledOptions.map((opt, idx) => `
-                                <button class="option-btn" data-option="${idx}" onclick="app.checkAnswer(this)" ${previousAnswer ? 'disabled' : ''}>
-                                    ${opt}
-                                </button>
-                            `).join('')}
-                        </div>
-                        <div id="feedback-area" class="${previousAnswer ? '' : 'hidden'} bg-light-box" style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px;"></div>
+                        ${optionsHTML}
+                        
+                        ${!isDesarrollo ? `<div id="feedback-area" class="${previousAnswer ? '' : 'hidden'} bg-light-box" style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px;"></div>` : ''}
                         
                         ${!app.examMode.active ? `
                         <!-- Sistema de votación de preguntas -->
@@ -3073,7 +3130,7 @@
                             <div style="display: flex; gap: 10px;">
                                 ${app.examMode.active && app.quiz.index < questions.length - 1 ? `
                                 <button class="btn" style="width: auto;" onclick="app.nextQuestion()">Siguiente ➜</button>
-                                ` : !app.examMode.active && !previousAnswer ? `
+                                ` : !app.examMode.active && !previousAnswer && !isDesarrollo ? `
                                 <button class="btn btn-warning" style="width: auto;" onclick="app.skipQuestion()">Saltar ↷</button>
                                 ` : ''}
                                 ${!app.examMode.active && app.quiz.index < questions.length - 1 ? `
@@ -3088,7 +3145,7 @@
                 `;
                 
                 // Si ya fue respondida, mostrar el feedback guardado
-                if (previousAnswer) {
+                if (previousAnswer && !isDesarrollo) {
                     const feedback = document.getElementById('feedback-area');
                     const optionButtons = document.querySelectorAll('.option-btn');
                     
@@ -3137,6 +3194,58 @@
                         }, 1000);
                     });
                 }
+            },
+            
+            // Mostrar respuesta de pregunta de desarrollo
+            showDesarrolloAnswer: () => {
+                document.getElementById('ver-respuesta-btn').style.display = 'none';
+                document.getElementById('desarrollo-answer').style.display = 'block';
+            },
+            
+            // Evaluar pregunta de desarrollo (si la sabía o no)
+            evaluateDesarrollo: (evaluation) => {
+                const questions = app.activeQuizQuestions;
+                const q = questions[app.quiz.index];
+                const isCorrect = evaluation === 'sabia';
+                
+                // Guardar respuesta
+                app.quiz.answers[app.quiz.index] = {
+                    selectedOption: evaluation,
+                    isCorrect: isCorrect,
+                    vista: true,
+                    evaluation: evaluation
+                };
+                
+                // Actualizar contador
+                if (isCorrect) {
+                    app.quiz.score++;
+                }
+                
+                app.quiz.answered = true;
+                
+                // Actualizar botones visualmente
+                document.querySelectorAll('.desarrollo-eval-btn').forEach(btn => {
+                    btn.style.opacity = '0.5';
+                });
+                
+                // Resaltar el botón seleccionado
+                const selectedBtn = event.target;
+                selectedBtn.style.opacity = '1';
+                if (evaluation === 'sabia') {
+                    selectedBtn.style.background = '#22c55e';
+                    selectedBtn.style.color = 'white';
+                } else {
+                    selectedBtn.style.background = '#ef4444';
+                    selectedBtn.style.color = 'white';
+                }
+                
+                // Mostrar botón siguiente
+                const nextBtn = document.getElementById('next-btn');
+                if (nextBtn) {
+                    nextBtn.classList.remove('hidden');
+                }
+                
+                app.showToast(isCorrect ? '✅ ¡Bien! Marcada como correcta' : '❌ Marcada para repasar');
             },
             
             // Nueva página de estadísticas completa
@@ -4344,11 +4453,17 @@
                                 </select>
                             </div>
                             
-                            <button class="btn" onclick="app.startContributing()" style="width: 100%;">
-                                ➡️ Continuar
-                            </button>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                <button class="btn" onclick="app.startContributing()" style="width: 100%;">
+                                    ➡️ Individual
+                                </button>
+                                <button class="btn btn-outline" onclick="app.showBulkUpload()" style="width: 100%; border-color: #8b5cf6; color: #8b5cf6;">
+                                    📦 Carga Masiva
+                                </button>
+                            </div>
                         </div>
                         
+                        <div id="bulk-upload-area" style="display: none;"></div>
                         <div id="contrib-form-area" style="display: none;"></div>
                         <div id="contributions-list"></div>
                     </div>
@@ -4386,6 +4501,10 @@
                 app.contribState.especialidad = app.userEspecialidad;
                 app.contribState.asignatura = asignaturaId;
                 app.saveContribState();
+                
+                // Ocultar panel de carga masiva si está visible
+                const bulkArea = document.getElementById('bulk-upload-area');
+                if (bulkArea) bulkArea.style.display = 'none';
                 
                 const formArea = document.getElementById('contrib-form-area');
                 formArea.style.display = 'block';
@@ -4534,6 +4653,467 @@
                         tipoHint.textContent = 'Preguntas de test tipo examen con 4 opciones';
                     }
                 }
+            },
+            
+            // Mostrar formulario de carga masiva
+            showBulkUpload: () => {
+                const asignaturaId = document.getElementById('contrib-asignatura').value;
+                
+                if (!asignaturaId) {
+                    app.showToast('⚠️ Selecciona una asignatura primero');
+                    return;
+                }
+                
+                // Guardar estado
+                app.contribState.especialidad = app.userEspecialidad;
+                app.contribState.asignatura = asignaturaId;
+                app.saveContribState();
+                
+                // Ocultar formulario individual si está visible
+                const formArea = document.getElementById('contrib-form-area');
+                if (formArea) formArea.style.display = 'none';
+                
+                const bulkArea = document.getElementById('bulk-upload-area');
+                
+                // Obtener nombre de asignatura
+                const asig = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
+                const asigNombre = asig ? asig.nombre : asignaturaId;
+                
+                bulkArea.style.display = 'block';
+                bulkArea.innerHTML = `
+                    <div class="bg-light-box" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 2px solid #8b5cf6;">
+                        <h3 style="font-size: 1.1rem; margin-top: 0; color: #8b5cf6;">📦 Carga Masiva de Preguntas</h3>
+                        <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1rem;">
+                            Asignatura: <strong>${asigNombre}</strong>
+                        </p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">📚 Número de Tema para todas las preguntas:</label>
+                            <input type="number" id="bulk-tema" class="form-select" placeholder="Ej: 1, 2, 3..." min="1" max="50" value="${app.contribState.tema || 1}" style="font-size: 1.1rem; font-weight: 600;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">🎯 Tipo de preguntas:</label>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;" id="bulk-tipo-btns">
+                                <button type="button" class="bulk-tipo-btn active" data-tipo="test" onclick="app.setBulkTipo('test')" 
+                                    style="padding: 0.75rem; border: 2px solid var(--primary); background: var(--primary); color: white; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
+                                    📝 Test
+                                </button>
+                                <button type="button" class="bulk-tipo-btn" data-tipo="ia" onclick="app.setBulkTipo('ia')"
+                                    style="padding: 0.75rem; border: 2px solid #8b5cf6; background: transparent; color: #8b5cf6; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
+                                    🤖 Test IA
+                                </button>
+                                <button type="button" class="bulk-tipo-btn" data-tipo="desarrollo" onclick="app.setBulkTipo('desarrollo')"
+                                    style="padding: 0.75rem; border: 2px solid #f59e0b; background: transparent; color: #f59e0b; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
+                                    📄 Desarrollo
+                                </button>
+                            </div>
+                            <input type="hidden" id="bulk-tipo" value="test">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">📝 Formato del texto:</label>
+                            <div id="bulk-format-hint" style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 0.5rem;">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">📋 Pega aquí todas las preguntas:</label>
+                            <textarea id="bulk-text" class="form-select" rows="12" placeholder="Pega aquí el texto con las preguntas siguiendo el formato indicado..." style="resize: vertical; font-family: monospace; font-size: 0.85rem;"></textarea>
+                        </div>
+                        
+                        <div id="bulk-preview" style="display: none; margin-bottom: 1rem;"></div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem;">
+                            <button class="btn btn-outline" onclick="app.previewBulkUpload()" style="border-color: #8b5cf6; color: #8b5cf6;">
+                                👁️ Vista Previa
+                            </button>
+                            <button class="btn" onclick="app.processBulkUpload()" style="background: #8b5cf6; border-color: #8b5cf6;">
+                                📤 Subir Todo
+                            </button>
+                            <button class="btn btn-outline" onclick="app.cancelBulkUpload()">
+                                ❌ Cancelar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Inicializar tipo
+                app.bulkTipo = 'test';
+                
+                // Mostrar formato inicial
+                app.updateBulkFormatHint();
+                
+                bulkArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            },
+            
+            // Cambiar tipo de carga masiva
+            setBulkTipo: (tipo) => {
+                app.bulkTipo = tipo;
+                document.getElementById('bulk-tipo').value = tipo;
+                
+                // Actualizar botones
+                document.querySelectorAll('#bulk-tipo-btns .bulk-tipo-btn').forEach(btn => {
+                    const btnTipo = btn.dataset.tipo;
+                    if (btnTipo === tipo) {
+                        btn.classList.add('active');
+                        if (tipo === 'test') {
+                            btn.style.background = 'var(--primary)';
+                            btn.style.color = 'white';
+                        } else if (tipo === 'ia') {
+                            btn.style.background = '#8b5cf6';
+                            btn.style.color = 'white';
+                        } else {
+                            btn.style.background = '#f59e0b';
+                            btn.style.color = 'white';
+                        }
+                    } else {
+                        btn.classList.remove('active');
+                        btn.style.background = 'transparent';
+                        if (btnTipo === 'test') btn.style.color = 'var(--primary)';
+                        else if (btnTipo === 'ia') btn.style.color = '#8b5cf6';
+                        else btn.style.color = '#f59e0b';
+                    }
+                });
+                
+                // Actualizar hint de formato
+                app.updateBulkFormatHint();
+            },
+            
+            // Actualizar hint de formato según tipo seleccionado
+            updateBulkFormatHint: () => {
+                const tipo = app.bulkTipo || 'test';
+                const hintDiv = document.getElementById('bulk-format-hint');
+                
+                if (tipo === 'desarrollo') {
+                    hintDiv.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                            <span style="background: #fef3c7; color: #92400e; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">📄 Desarrollo</span>
+                            <span style="font-size: 0.85rem; color: var(--text-secondary);">Preguntas con respuesta larga</span>
+                        </div>
+                        <pre style="font-size: 0.75rem; background: var(--bg); padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0; border-left: 3px solid #f59e0b;">PREGUNTA: ¿Qué es la metacognición?
+RESPUESTA: La metacognición es el conocimiento sobre los propios procesos cognitivos...
+
+PREGUNTA: Explica el constructivismo
+RESPUESTA: El constructivismo es una teoría del aprendizaje que sostiene...</pre>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.5rem 0 0 0;">
+                            ⚡ Cada pregunta debe empezar con <code style="background: #fef3c7; padding: 0.1rem 0.3rem; border-radius: 3px;">PREGUNTA:</code> y su respuesta con <code style="background: #fef3c7; padding: 0.1rem 0.3rem; border-radius: 3px;">RESPUESTA:</code>
+                        </p>
+                    `;
+                } else {
+                    const isIA = tipo === 'ia';
+                    const badgeColor = isIA ? '#ede9fe' : '#dbeafe';
+                    const textColor = isIA ? '#6d28d9' : '#1e40af';
+                    const borderColor = isIA ? '#8b5cf6' : '#3b82f6';
+                    const icon = isIA ? '🤖' : '📝';
+                    const label = isIA ? 'Test IA' : 'Test';
+                    
+                    hintDiv.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                            <span style="background: ${badgeColor}; color: ${textColor}; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">${icon} ${label}</span>
+                            <span style="font-size: 0.85rem; color: var(--text-secondary);">Preguntas tipo test con 4 opciones</span>
+                        </div>
+                        <pre style="font-size: 0.75rem; background: var(--bg); padding: 0.75rem; border-radius: 4px; overflow-x: auto; margin: 0; border-left: 3px solid ${borderColor};">¿Cuál es la capital de Francia?
+a) Madrid
+b) París
+c) Londres
+d) Roma
+Respuesta: b
+
+¿Qué año comenzó la Segunda Guerra Mundial?
+a) 1935
+b) 1939
+c) 1941
+d) 1945
+Respuesta: b</pre>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.5rem 0 0 0;">
+                            ⚡ Cada pregunta necesita 4 opciones <code style="background: ${badgeColor}; padding: 0.1rem 0.3rem; border-radius: 3px;">a) b) c) d)</code> y una línea <code style="background: ${badgeColor}; padding: 0.1rem 0.3rem; border-radius: 3px;">Respuesta: x</code>
+                        </p>
+                    `;
+                }
+            },
+            
+            // Cancelar carga masiva
+            cancelBulkUpload: () => {
+                const bulkArea = document.getElementById('bulk-upload-area');
+                if (bulkArea) bulkArea.style.display = 'none';
+            },
+            
+            // Parsear texto de preguntas
+            parseBulkQuestions: (text, tipo) => {
+                const questions = [];
+                
+                if (tipo === 'desarrollo') {
+                    // Formato: PREGUNTA: ... RESPUESTA: ...
+                    const blocks = text.split(/(?=PREGUNTA:)/i).filter(b => b.trim());
+                    
+                    for (const block of blocks) {
+                        const preguntaMatch = block.match(/PREGUNTA:\s*(.+?)(?=RESPUESTA:|$)/is);
+                        const respuestaMatch = block.match(/RESPUESTA:\s*(.+?)(?=PREGUNTA:|$)/is);
+                        
+                        if (preguntaMatch && respuestaMatch) {
+                            questions.push({
+                                pregunta: preguntaMatch[1].trim(),
+                                respuesta: respuestaMatch[1].trim(),
+                                opciones: [],
+                                tipo: 'desarrollo'
+                            });
+                        }
+                    }
+                } else {
+                    // Formato TEST: Pregunta, a) b) c) d), Respuesta: x
+                    // Separar por líneas vacías o por "Respuesta:"
+                    const blocks = text.split(/\n\s*\n/).filter(b => b.trim());
+                    
+                    for (const block of blocks) {
+                        const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+                        
+                        if (lines.length < 5) continue; // Mínimo: pregunta + 4 opciones
+                        
+                        let pregunta = '';
+                        const opciones = [];
+                        let respuestaCorrecta = '';
+                        
+                        for (const line of lines) {
+                            // Detectar opciones a), b), c), d) o A), B), C), D)
+                            const opcionMatch = line.match(/^([a-dA-D])\)\s*(.+)$/);
+                            // Detectar respuesta
+                            const respuestaMatch = line.match(/^Respuesta:\s*([a-dA-D])/i);
+                            
+                            if (opcionMatch) {
+                                opciones.push(opcionMatch[2].trim());
+                            } else if (respuestaMatch) {
+                                const letra = respuestaMatch[1].toLowerCase();
+                                const idx = letra.charCodeAt(0) - 'a'.charCodeAt(0);
+                                if (idx >= 0 && idx < opciones.length) {
+                                    respuestaCorrecta = opciones[idx];
+                                }
+                            } else if (!pregunta && !line.match(/^[a-dA-D]\)/)) {
+                                pregunta = line;
+                            }
+                        }
+                        
+                        // Si hay exactamente 4 opciones y una respuesta
+                        if (pregunta && opciones.length === 4 && respuestaCorrecta) {
+                            questions.push({
+                                pregunta: pregunta,
+                                opciones: opciones,
+                                respuesta: respuestaCorrecta,
+                                tipo: tipo // 'test' o 'ia'
+                            });
+                        }
+                    }
+                }
+                
+                return questions;
+            },
+            
+            // Vista previa de carga masiva
+            previewBulkUpload: () => {
+                const text = document.getElementById('bulk-text').value;
+                const tipo = app.bulkTipo || 'test';
+                const previewDiv = document.getElementById('bulk-preview');
+                
+                if (!text.trim()) {
+                    app.showToast('⚠️ Pega las preguntas primero');
+                    return;
+                }
+                
+                const questions = app.parseBulkQuestions(text, tipo);
+                
+                if (questions.length === 0) {
+                    previewDiv.style.display = 'block';
+                    previewDiv.innerHTML = `
+                        <div style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 1rem;">
+                            <p style="color: #991b1b; font-weight: 600; margin: 0 0 0.5rem 0;">❌ No se detectaron preguntas válidas</p>
+                            <p style="color: #991b1b; font-size: 0.85rem; margin: 0;">Revisa que el formato sea correcto según el tipo seleccionado.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Determinar badge según tipo
+                let tipoBadge = '';
+                let tipoLabel = '';
+                if (tipo === 'ia') {
+                    tipoBadge = '<span style="background: #ede9fe; color: #6d28d9; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">🤖 Test IA</span>';
+                    tipoLabel = 'Test IA';
+                } else if (tipo === 'desarrollo') {
+                    tipoBadge = '<span style="background: #fef3c7; color: #92400e; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">📄 Desarrollo</span>';
+                    tipoLabel = 'Desarrollo';
+                } else {
+                    tipoBadge = '<span style="background: #dbeafe; color: #1e40af; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">📝 Test</span>';
+                    tipoLabel = 'Test';
+                }
+                
+                let html = `
+                    <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <p style="color: #166534; font-weight: 600; margin: 0;">✅ ${questions.length} pregunta(s) detectadas</p>
+                            ${tipoBadge}
+                        </div>
+                        <div style="max-height: 300px; overflow-y: auto;">
+                `;
+                
+                questions.forEach((q, idx) => {
+                    if (q.tipo === 'desarrollo') {
+                        html += `
+                            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; margin-bottom: 0.5rem; border-left: 3px solid #f59e0b;">
+                                <p style="font-weight: 600; margin: 0 0 0.5rem 0; font-size: 0.9rem;">${idx + 1}. ${q.pregunta.substring(0, 100)}${q.pregunta.length > 100 ? '...' : ''}</p>
+                                <p style="color: var(--success); font-size: 0.8rem; margin: 0;">📖 Respuesta: ${q.respuesta.substring(0, 80)}${q.respuesta.length > 80 ? '...' : ''}</p>
+                            </div>
+                        `;
+                    } else {
+                        const borderColor = tipo === 'ia' ? '#8b5cf6' : 'var(--border)';
+                        html += `
+                            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; margin-bottom: 0.5rem; border-left: 3px solid ${borderColor};">
+                                <p style="font-weight: 600; margin: 0 0 0.5rem 0; font-size: 0.9rem;">${idx + 1}. ${q.pregunta.substring(0, 100)}${q.pregunta.length > 100 ? '...' : ''}</p>
+                                <p style="color: var(--success); font-size: 0.8rem; margin: 0;">✅ ${q.respuesta}</p>
+                            </div>
+                        `;
+                    }
+                });
+                
+                html += '</div></div>';
+                previewDiv.style.display = 'block';
+                previewDiv.innerHTML = html;
+            },
+            
+            // Procesar y subir carga masiva
+            processBulkUpload: async () => {
+                const text = document.getElementById('bulk-text').value;
+                const tipo = app.bulkTipo || 'test';
+                const tema = parseInt(document.getElementById('bulk-tema').value);
+                const asignaturaId = document.getElementById('contrib-asignatura').value;
+                
+                if (!text.trim()) {
+                    app.showToast('⚠️ Pega las preguntas primero');
+                    return;
+                }
+                
+                if (!tema || tema < 1 || tema > 50) {
+                    app.showToast('⚠️ El tema debe ser un número entre 1 y 50');
+                    return;
+                }
+                
+                const questions = app.parseBulkQuestions(text, tipo);
+                
+                if (questions.length === 0) {
+                    app.showToast('❌ No se detectaron preguntas válidas');
+                    return;
+                }
+                
+                // Buscar asignatura
+                let asignatura = app.asignaturasDisponibles.find(a => a.id === asignaturaId);
+                let asignaturaNombre = asignatura ? asignatura.nombre : asignaturaId;
+                const esObligatoria = asignatura && asignatura.tipo === 'obligatoria';
+                
+                // Preparar todas las preguntas para subir
+                const questionsToUpload = questions.map(q => ({
+                    pregunta: q.pregunta,
+                    opciones: q.tipo === 'desarrollo' ? [] : q.opciones,
+                    respuesta_correcta: q.respuesta,
+                    especialidad: esObligatoria ? '' : (app.userEspecialidad || ''),
+                    asignatura: asignaturaId,
+                    asignatura_nombre: asignaturaNombre,
+                    tema: tema,
+                    autor: app.getUserId(),
+                    fecha_creacion: new Date().toISOString(),
+                    aprobada: true,
+                    tipo: q.tipo === 'desarrollo' ? 'desarrollo' : 'test',
+                    is_ai: tipo === 'ia'
+                }));
+                
+                // Mostrar progreso
+                const previewDiv = document.getElementById('bulk-preview');
+                previewDiv.style.display = 'block';
+                previewDiv.innerHTML = `
+                    <div style="background: #dbeafe; border: 1px solid #93c5fd; border-radius: 8px; padding: 1rem; text-align: center;">
+                        <p style="color: #1e40af; font-weight: 600; margin: 0;">⏳ Subiendo ${questionsToUpload.length} preguntas...</p>
+                        <div id="bulk-progress" style="margin-top: 0.5rem;">
+                            <div style="background: #e2e8f0; border-radius: 4px; height: 8px; overflow: hidden;">
+                                <div id="bulk-progress-bar" style="background: #3b82f6; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                            </div>
+                            <p id="bulk-progress-text" style="font-size: 0.8rem; color: #1e40af; margin: 0.5rem 0 0 0;">0/${questionsToUpload.length}</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Deshabilitar botones
+                const btns = document.querySelectorAll('#bulk-upload-area button');
+                btns.forEach(b => b.disabled = true);
+                
+                let uploaded = 0;
+                let failed = 0;
+                const errors = [];
+                
+                // Subir en lotes de 10 para no sobrecargar
+                const batchSize = 10;
+                for (let i = 0; i < questionsToUpload.length; i += batchSize) {
+                    const batch = questionsToUpload.slice(i, i + batchSize);
+                    
+                    try {
+                        const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_CONFIG.anonKey,
+                                'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(batch)
+                        });
+                        
+                        if (response.ok) {
+                            uploaded += batch.length;
+                        } else {
+                            failed += batch.length;
+                            errors.push(`Lote ${Math.floor(i/batchSize)+1}: HTTP ${response.status}`);
+                        }
+                    } catch (error) {
+                        failed += batch.length;
+                        errors.push(`Lote ${Math.floor(i/batchSize)+1}: ${error.message}`);
+                    }
+                    
+                    // Actualizar progreso
+                    const progress = Math.round(((i + batch.length) / questionsToUpload.length) * 100);
+                    document.getElementById('bulk-progress-bar').style.width = `${progress}%`;
+                    document.getElementById('bulk-progress-text').textContent = `${i + batch.length}/${questionsToUpload.length}`;
+                }
+                
+                // Mostrar resultado
+                const tipoLabel = tipo === 'ia' ? '🤖 Test IA' : tipo === 'desarrollo' ? '📄 Desarrollo' : '📝 Test';
+                
+                if (failed === 0) {
+                    previewDiv.innerHTML = `
+                        <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 1rem; text-align: center;">
+                            <p style="color: #166534; font-weight: 600; font-size: 1.1rem; margin: 0 0 0.5rem 0;">🎉 ¡Éxito!</p>
+                            <p style="color: #166534; margin: 0;">${uploaded} preguntas ${tipoLabel} subidas correctamente</p>
+                        </div>
+                    `;
+                    app.showToast(`✅ ${uploaded} preguntas ${tipoLabel} subidas`);
+                    
+                    // Limpiar y recargar
+                    document.getElementById('bulk-text').value = '';
+                    setTimeout(() => {
+                        app.cancelBulkUpload();
+                        app.renderDbContributionsList();
+                    }, 2000);
+                } else {
+                    previewDiv.innerHTML = `
+                        <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 1rem;">
+                            <p style="color: #92400e; font-weight: 600; margin: 0 0 0.5rem 0;">⚠️ Carga parcial</p>
+                            <p style="color: #166534; margin: 0 0 0.25rem 0;">✅ ${uploaded} subidas correctamente</p>
+                            <p style="color: #991b1b; margin: 0 0 0.5rem 0;">❌ ${failed} fallaron</p>
+                            ${errors.length > 0 ? `<p style="font-size: 0.8rem; color: #6b7280; margin: 0;">Errores: ${errors.join(', ')}</p>` : ''}
+                        </div>
+                    `;
+                    app.showToast(`⚠️ ${uploaded} subidas, ${failed} fallaron`);
+                    app.renderDbContributionsList();
+                }
+                
+                // Rehabilitar botones
+                btns.forEach(b => b.disabled = false);
             },
             
             // Finalizar contribuciones
