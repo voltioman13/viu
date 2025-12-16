@@ -7995,8 +7995,7 @@ Respuesta: b</pre>
             
             // Eliminar rápido desde el modal de duplicados
             quickDeleteFromModal: async (id, pairIdx, qNum) => {
-                if (!confirm('⚠️ ¿ELIMINAR esta pregunta permanentemente?')) return;
-                if (!confirm('¿Estás seguro? Esta acción NO se puede deshacer.')) return;
+                if (!confirm('⚠️ ¿ELIMINAR esta pregunta permanentemente? Esta acción NO se puede deshacer.')) return;
                 
                 try {
                     const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?id=eq.${id}`, {
