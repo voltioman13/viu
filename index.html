@@ -502,8 +502,8 @@
 <body>
     <nav>
         <div class="nav-content">
-            <!-- Título de navegación actualizado -->
-            <div class="logo">VIU - Master Profesor</div>
+            <!-- Título de navegación actualizado - Click secreto para admin -->
+            <div class="logo" onclick="app.secretAdminClick()" style="cursor: default;">VIU - Master Profesor</div>
             <div class="nav-buttons">
                 <button class="menu-btn active" onclick="app.navigate('home')">Inicio</button>
                 <button class="menu-btn" onclick="app.navigate('stats')">📊</button>
@@ -518,6 +518,19 @@
             </div>
         </div>
     </nav>
+    
+    <!-- Modal de Login Admin -->
+    <div id="admin-login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;">
+        <div class="card" style="max-width: 350px; margin: 20px; text-align: center;">
+            <h3 style="margin-bottom: 1rem;">🔐 Acceso Administrador</h3>
+            <input type="password" id="admin-password" class="form-input" placeholder="Contraseña" style="margin-bottom: 1rem;" onkeypress="if(event.key==='Enter') app.verifyAdminPassword()">
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn" onclick="app.verifyAdminPassword()" style="flex: 1;">Entrar</button>
+                <button class="btn btn-outline" onclick="app.hideAdminLogin()" style="flex: 1;">Cancelar</button>
+            </div>
+            <p id="admin-login-error" style="color: var(--error); font-size: 0.85rem; margin-top: 0.5rem; display: none;">Contraseña incorrecta</p>
+        </div>
+    </div>
     
     <!-- Modal de Ayuda -->
     <div id="help-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
@@ -7022,6 +7035,494 @@ Respuesta: b</pre>
                 toast.innerText = text;
                 toast.className = "show";
                 setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+            },
+            
+            // ========== PANEL DE ADMINISTRACIÓN ==========
+            adminClickCount: 0,
+            adminClickTimer: null,
+            isAdmin: false,
+            adminPassword: 'VIU2024Admin!', // Cambiar esta contraseña
+            adminFilters: { especialidad: '', asignatura: '', tema: '', search: '' },
+            adminQuestions: [],
+            
+            // Click secreto en el logo para acceder al admin
+            secretAdminClick: () => {
+                app.adminClickCount++;
+                
+                if (app.adminClickTimer) clearTimeout(app.adminClickTimer);
+                
+                // Si ya es admin, ir directo
+                if (app.isAdmin) {
+                    app.navigate('admin');
+                    return;
+                }
+                
+                // Necesita 5 clicks en 2 segundos
+                if (app.adminClickCount >= 5) {
+                    app.adminClickCount = 0;
+                    app.showAdminLogin();
+                } else {
+                    app.adminClickTimer = setTimeout(() => {
+                        app.adminClickCount = 0;
+                    }, 2000);
+                }
+            },
+            
+            showAdminLogin: () => {
+                document.getElementById('admin-login-modal').style.display = 'flex';
+                document.getElementById('admin-password').value = '';
+                document.getElementById('admin-password').focus();
+                document.getElementById('admin-login-error').style.display = 'none';
+            },
+            
+            hideAdminLogin: () => {
+                document.getElementById('admin-login-modal').style.display = 'none';
+            },
+            
+            verifyAdminPassword: () => {
+                const password = document.getElementById('admin-password').value;
+                if (password === app.adminPassword) {
+                    app.isAdmin = true;
+                    app.hideAdminLogin();
+                    app.showToast('🔓 Acceso de administrador activado');
+                    app.navigate('admin');
+                } else {
+                    document.getElementById('admin-login-error').style.display = 'block';
+                    document.getElementById('admin-password').value = '';
+                    document.getElementById('admin-password').focus();
+                }
+            },
+            
+            // Renderizar panel de administración
+            renderAdmin: async (container) => {
+                if (!app.isAdmin) {
+                    container.innerHTML = '<div class="card text-center"><h3>🔒 Acceso denegado</h3><p>No tienes permisos de administrador.</p><button class="btn" onclick="app.navigate(\'home\')">Volver al inicio</button></div>';
+                    return;
+                }
+                
+                // Generar opciones de especialidades
+                let espOptions = '<option value="">Todas las especialidades</option>';
+                Object.entries(CONFIG.especialidades).forEach(([id, nombre]) => {
+                    const selected = app.adminFilters.especialidad === id ? 'selected' : '';
+                    espOptions += `<option value="${id}" ${selected}>${nombre}</option>`;
+                });
+                
+                // Generar opciones de asignaturas
+                let asigOptions = '<option value="">Todas las asignaturas</option>';
+                CONFIG.asignaturas.obligatorias.forEach(a => {
+                    const selected = app.adminFilters.asignatura === a.nombre ? 'selected' : '';
+                    asigOptions += `<option value="${a.nombre}" ${selected}>${a.nombre}</option>`;
+                });
+                CONFIG.asignaturas.optativas.forEach(a => {
+                    const selected = app.adminFilters.asignatura === a.nombre ? 'selected' : '';
+                    asigOptions += `<option value="${a.nombre}" ${selected}>${a.nombre}</option>`;
+                });
+                CONFIG.asignaturas.especialidad.forEach(a => {
+                    const selected = app.adminFilters.asignatura === a.nombre ? 'selected' : '';
+                    asigOptions += `<option value="${a.nombre}" ${selected}>${a.nombre}</option>`;
+                });
+                CONFIG.asignaturas.especialidadOrientacion.forEach(a => {
+                    const selected = app.adminFilters.asignatura === a.nombre ? 'selected' : '';
+                    asigOptions += `<option value="${a.nombre}" ${selected}>${a.nombre}</option>`;
+                });
+                
+                container.innerHTML = `
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h2 style="margin: 0;">🛠️ Panel de Administración</h2>
+                            <button class="btn btn-outline" onclick="app.isAdmin = false; app.navigate('home');" style="padding: 0.5rem 1rem;">
+                                🚪 Cerrar Sesión Admin
+                            </button>
+                        </div>
+                        
+                        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                            <p style="margin: 0; color: #92400e; font-weight: 600;">⚠️ Panel de administración. Los cambios afectan a todos los usuarios.</p>
+                        </div>
+                        
+                        <!-- Filtros -->
+                        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                            <h3 style="font-size: 1rem; margin: 0 0 1rem 0;">🔍 Filtros de Búsqueda</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+                                <div>
+                                    <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Especialidad</label>
+                                    <select id="admin-filter-esp" class="form-input" style="padding: 0.5rem;" onchange="app.updateAdminFilters()">
+                                        ${espOptions}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Asignatura</label>
+                                    <select id="admin-filter-asig" class="form-input" style="padding: 0.5rem;" onchange="app.updateAdminFilters()">
+                                        ${asigOptions}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Tema</label>
+                                    <input type="number" id="admin-filter-tema" class="form-input" style="padding: 0.5rem;" placeholder="Nº tema" min="1" max="50" value="${app.adminFilters.tema}" onchange="app.updateAdminFilters()">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Buscar texto</label>
+                                    <input type="text" id="admin-filter-search" class="form-input" style="padding: 0.5rem;" placeholder="Buscar en pregunta..." value="${app.adminFilters.search}" oninput="app.updateAdminFilters()">
+                                </div>
+                            </div>
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <button class="btn" onclick="app.loadAdminQuestions()" style="padding: 0.5rem 1rem;">
+                                    🔄 Cargar Preguntas
+                                </button>
+                                <button class="btn btn-outline" onclick="app.clearAdminFilters()" style="padding: 0.5rem 1rem;">
+                                    🗑️ Limpiar Filtros
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Lista de preguntas -->
+                        <div id="admin-questions-list">
+                            <p style="color: var(--text-secondary); text-align: center;">Usa los filtros y pulsa "Cargar Preguntas" para ver las preguntas.</p>
+                        </div>
+                    </div>
+                `;
+            },
+            
+            updateAdminFilters: () => {
+                app.adminFilters.especialidad = document.getElementById('admin-filter-esp').value;
+                app.adminFilters.asignatura = document.getElementById('admin-filter-asig').value;
+                app.adminFilters.tema = document.getElementById('admin-filter-tema').value;
+                app.adminFilters.search = document.getElementById('admin-filter-search').value;
+            },
+            
+            clearAdminFilters: () => {
+                app.adminFilters = { especialidad: '', asignatura: '', tema: '', search: '' };
+                document.getElementById('admin-filter-esp').value = '';
+                document.getElementById('admin-filter-asig').value = '';
+                document.getElementById('admin-filter-tema').value = '';
+                document.getElementById('admin-filter-search').value = '';
+            },
+            
+            loadAdminQuestions: async () => {
+                const listContainer = document.getElementById('admin-questions-list');
+                listContainer.innerHTML = '<p style="text-align: center;">⏳ Cargando preguntas...</p>';
+                
+                try {
+                    // Construir query
+                    let url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&order=id.desc&limit=100`;
+                    
+                    if (app.adminFilters.especialidad) {
+                        url += `&especialidad=eq.${app.adminFilters.especialidad}`;
+                    }
+                    if (app.adminFilters.asignatura) {
+                        url += `&asignatura_nombre=eq.${encodeURIComponent(app.adminFilters.asignatura)}`;
+                    }
+                    if (app.adminFilters.tema) {
+                        url += `&tema=eq.${app.adminFilters.tema}`;
+                    }
+                    if (app.adminFilters.search) {
+                        url += `&pregunta=ilike.*${encodeURIComponent(app.adminFilters.search)}*`;
+                    }
+                    
+                    const response = await fetch(url, {
+                        headers: {
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
+                        }
+                    });
+                    
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    app.adminQuestions = await response.json();
+                    app.renderAdminQuestionsList();
+                    
+                } catch (error) {
+                    console.error('Error cargando preguntas admin:', error);
+                    listContainer.innerHTML = `<p style="color: var(--error); text-align: center;">❌ Error al cargar: ${error.message}</p>`;
+                }
+            },
+            
+            renderAdminQuestionsList: () => {
+                const listContainer = document.getElementById('admin-questions-list');
+                
+                if (app.adminQuestions.length === 0) {
+                    listContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No se encontraron preguntas con estos filtros.</p>';
+                    return;
+                }
+                
+                let html = `
+                    <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600;">${app.adminQuestions.length} preguntas encontradas</span>
+                    </div>
+                `;
+                
+                app.adminQuestions.forEach(q => {
+                    let opciones = q.opciones;
+                    if (typeof opciones === 'string') {
+                        try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                    }
+                    
+                    const isDesarrollo = q.tipo === 'desarrollo';
+                    const isAI = q.is_ai === true;
+                    const isDisabled = q.aprobada === false;
+                    
+                    // Badges
+                    let badges = '';
+                    if (isAI) badges += '<span style="background: #ede9fe; color: #6d28d9; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-right: 0.25rem;">🤖 IA</span>';
+                    if (isDesarrollo) badges += '<span style="background: #fef3c7; color: #92400e; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-right: 0.25rem;">📄 Desarrollo</span>';
+                    if (isDisabled) badges += '<span style="background: #fee2e2; color: #991b1b; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">🚫 Desactivada</span>';
+                    
+                    const espNombre = q.especialidad ? (CONFIG.especialidades[q.especialidad] || q.especialidad) : 'Obligatoria';
+                    
+                    html += `
+                        <div id="admin-q-${q.id}" style="background: var(--card); border: 1px solid ${isDisabled ? '#fca5a5' : 'var(--border)'}; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; ${isDisabled ? 'opacity: 0.7;' : ''}">
+                            <div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem; margin-bottom: 0.5rem;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
+                                        ID: ${q.id} | ${espNombre} | ${q.asignatura_nombre} | Tema ${q.tema} | Autor: ${q.autor || 'N/A'}
+                                    </div>
+                                    <div style="margin-bottom: 0.5rem;">${badges}</div>
+                                    <div style="font-weight: 600; margin-bottom: 0.5rem;">${q.pregunta}</div>
+                                    ${!isDesarrollo ? `
+                                    <div style="font-size: 0.85rem; color: var(--success);">✅ ${q.respuesta_correcta}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                                        Opciones: ${(opciones || []).join(' | ')}
+                                    </div>
+                                    ` : `
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">📖 Respuesta: ${q.respuesta_correcta.substring(0, 100)}${q.respuesta_correcta.length > 100 ? '...' : ''}</div>
+                                    `}
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 0.25rem; flex-shrink: 0;">
+                                    <button onclick="app.editAdminQuestion(${q.id})" style="background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; border-radius: 4px; padding: 0.4rem 0.6rem; cursor: pointer; font-size: 0.8rem;">
+                                        ✏️ Editar
+                                    </button>
+                                    <button onclick="app.toggleAdminQuestion(${q.id}, ${!isDisabled})" style="background: ${isDisabled ? '#dcfce7' : '#fee2e2'}; color: ${isDisabled ? '#166534' : '#991b1b'}; border: 1px solid ${isDisabled ? '#86efac' : '#fca5a5'}; border-radius: 4px; padding: 0.4rem 0.6rem; cursor: pointer; font-size: 0.8rem;">
+                                        ${isDisabled ? '✅ Activar' : '🚫 Desactivar'}
+                                    </button>
+                                    <button onclick="app.deleteAdminQuestion(${q.id})" style="background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 4px; padding: 0.4rem 0.6rem; cursor: pointer; font-size: 0.8rem;">
+                                        🗑️ Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                listContainer.innerHTML = html;
+            },
+            
+            // Activar/Desactivar pregunta
+            toggleAdminQuestion: async (id, disable) => {
+                if (!confirm(disable ? '¿Desactivar esta pregunta? No aparecerá en los tests.' : '¿Activar esta pregunta?')) return;
+                
+                try {
+                    const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?id=eq.${id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
+                        },
+                        body: JSON.stringify({ aprobada: !disable })
+                    });
+                    
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    app.showToast(disable ? '🚫 Pregunta desactivada' : '✅ Pregunta activada');
+                    
+                    // Actualizar en la lista local
+                    const q = app.adminQuestions.find(q => q.id === id);
+                    if (q) q.aprobada = !disable;
+                    app.renderAdminQuestionsList();
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    app.showToast('❌ Error al actualizar');
+                }
+            },
+            
+            // Eliminar pregunta
+            deleteAdminQuestion: async (id) => {
+                if (!confirm('⚠️ ¿ELIMINAR esta pregunta permanentemente? Esta acción no se puede deshacer.')) return;
+                if (!confirm('¿Estás seguro? Se eliminará para siempre.')) return;
+                
+                try {
+                    const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?id=eq.${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
+                        }
+                    });
+                    
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    app.showToast('🗑️ Pregunta eliminada');
+                    
+                    // Quitar de la lista local
+                    app.adminQuestions = app.adminQuestions.filter(q => q.id !== id);
+                    app.renderAdminQuestionsList();
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    app.showToast('❌ Error al eliminar');
+                }
+            },
+            
+            // Editar pregunta
+            editAdminQuestion: (id) => {
+                const q = app.adminQuestions.find(q => q.id === id);
+                if (!q) return;
+                
+                let opciones = q.opciones;
+                if (typeof opciones === 'string') {
+                    try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                }
+                
+                const isDesarrollo = q.tipo === 'desarrollo';
+                
+                // Crear formulario de edición inline
+                const container = document.getElementById(`admin-q-${id}`);
+                
+                container.innerHTML = `
+                    <div style="background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 1rem;">
+                        <h4 style="margin: 0 0 1rem 0; color: #0369a1;">✏️ Editando Pregunta #${id}</h4>
+                        
+                        <div style="display: grid; gap: 0.75rem;">
+                            <div>
+                                <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.25rem;">Pregunta:</label>
+                                <textarea id="edit-pregunta-${id}" class="form-input" rows="2" style="width: 100%;">${q.pregunta}</textarea>
+                            </div>
+                            
+                            ${!isDesarrollo ? `
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                <div>
+                                    <label style="font-size: 0.8rem; font-weight: 600;">Opción 1:</label>
+                                    <input type="text" id="edit-opt1-${id}" class="form-input" value="${opciones[0] || ''}">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; font-weight: 600;">Opción 2:</label>
+                                    <input type="text" id="edit-opt2-${id}" class="form-input" value="${opciones[1] || ''}">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; font-weight: 600;">Opción 3:</label>
+                                    <input type="text" id="edit-opt3-${id}" class="form-input" value="${opciones[2] || ''}">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; font-weight: 600;">Opción 4:</label>
+                                    <input type="text" id="edit-opt4-${id}" class="form-input" value="${opciones[3] || ''}">
+                                </div>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.8rem; font-weight: 600;">Respuesta correcta:</label>
+                                <select id="edit-correcta-${id}" class="form-input">
+                                    ${opciones.map((opt, i) => `<option value="${i}" ${opt === q.respuesta_correcta ? 'selected' : ''}>Opción ${i+1}: ${opt.substring(0, 50)}</option>`).join('')}
+                                </select>
+                            </div>
+                            ` : `
+                            <div>
+                                <label style="font-size: 0.8rem; font-weight: 600;">Respuesta modelo:</label>
+                                <textarea id="edit-respuesta-${id}" class="form-input" rows="4" style="width: 100%;">${q.respuesta_correcta}</textarea>
+                            </div>
+                            `}
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem;">
+                                <div>
+                                    <label style="font-size: 0.8rem; font-weight: 600;">Tema:</label>
+                                    <input type="number" id="edit-tema-${id}" class="form-input" value="${q.tema}" min="1" max="50">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; font-weight: 600;">Tipo:</label>
+                                    <select id="edit-tipo-${id}" class="form-input">
+                                        <option value="test" ${q.tipo === 'test' || !q.tipo ? 'selected' : ''}>Test</option>
+                                        <option value="desarrollo" ${q.tipo === 'desarrollo' ? 'selected' : ''}>Desarrollo</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.8rem; font-weight: 600;">¿Es IA?</label>
+                                    <select id="edit-ia-${id}" class="form-input">
+                                        <option value="false" ${!q.is_ai ? 'selected' : ''}>No</option>
+                                        <option value="true" ${q.is_ai ? 'selected' : ''}>Sí 🤖</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                            <button class="btn" onclick="app.saveAdminQuestion(${id}, ${isDesarrollo})" style="padding: 0.5rem 1rem;">
+                                💾 Guardar Cambios
+                            </button>
+                            <button class="btn btn-outline" onclick="app.renderAdminQuestionsList()" style="padding: 0.5rem 1rem;">
+                                ❌ Cancelar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            },
+            
+            // Guardar cambios de pregunta
+            saveAdminQuestion: async (id, isDesarrollo) => {
+                const pregunta = document.getElementById(`edit-pregunta-${id}`).value.trim();
+                const tema = parseInt(document.getElementById(`edit-tema-${id}`).value);
+                const tipo = document.getElementById(`edit-tipo-${id}`).value;
+                const isAI = document.getElementById(`edit-ia-${id}`).value === 'true';
+                
+                let opciones = [];
+                let respuestaCorrecta = '';
+                
+                if (!isDesarrollo && tipo !== 'desarrollo') {
+                    opciones = [
+                        document.getElementById(`edit-opt1-${id}`).value.trim(),
+                        document.getElementById(`edit-opt2-${id}`).value.trim(),
+                        document.getElementById(`edit-opt3-${id}`).value.trim(),
+                        document.getElementById(`edit-opt4-${id}`).value.trim()
+                    ];
+                    const correctaIdx = parseInt(document.getElementById(`edit-correcta-${id}`).value);
+                    respuestaCorrecta = opciones[correctaIdx];
+                } else {
+                    respuestaCorrecta = document.getElementById(`edit-respuesta-${id}`).value.trim();
+                }
+                
+                if (!pregunta || (!respuestaCorrecta && tipo !== 'desarrollo')) {
+                    app.showToast('⚠️ Completa los campos obligatorios');
+                    return;
+                }
+                
+                try {
+                    const updateData = {
+                        pregunta: pregunta,
+                        tema: tema,
+                        tipo: tipo,
+                        is_ai: isAI,
+                        respuesta_correcta: respuestaCorrecta
+                    };
+                    
+                    if (tipo !== 'desarrollo') {
+                        updateData.opciones = opciones;
+                    }
+                    
+                    const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?id=eq.${id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+                            'Prefer': 'return=representation'
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+                    
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    const updated = await response.json();
+                    
+                    // Actualizar en la lista local
+                    const idx = app.adminQuestions.findIndex(q => q.id === id);
+                    if (idx !== -1 && updated[0]) {
+                        app.adminQuestions[idx] = updated[0];
+                    }
+                    
+                    app.showToast('✅ Pregunta actualizada');
+                    app.renderAdminQuestionsList();
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    app.showToast('❌ Error al guardar');
+                }
             }
         };
 
