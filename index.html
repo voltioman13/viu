@@ -2866,63 +2866,83 @@
                             </p>
                         </div>
                         
-                        <div style="display: grid; gap: 1rem; max-width: 400px; margin: 0 auto;">
-                            <button class="btn ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.startQuiz()" ${!canStartQuiz ? 'disabled' : ''}>
-                                📝 Comenzar Test Normal
-                            </button>
-                            <button class="btn ${!canStartQuiz ? 'btn-secondary' : ''}" style="background: ${canStartQuiz ? '#dc2626' : ''}; border-color: ${canStartQuiz ? '#dc2626' : ''};" onclick="app.navigate('exam-mode')" ${!canStartQuiz ? 'disabled' : ''}>
-                                📝 Modo Examen (con tiempo)
-                            </button>
-                            <button class="btn ${(() => {
-                                const asigNombre = app.currentAsignatura?.nombre || '';
-                                const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
-                                return failedForAsig === 0 ? 'btn-secondary' : '';
-                            })()}" style="background: ${(() => {
-                                const asigNombre = app.currentAsignatura?.nombre || '';
-                                const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
-                                return failedForAsig > 0 ? '#0891b2' : '';
-                            })()}; border-color: ${(() => {
-                                const asigNombre = app.currentAsignatura?.nombre || '';
-                                const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
-                                return failedForAsig > 0 ? '#0891b2' : '';
-                            })()};" onclick="app.navigate('review-mode')" ${(() => {
-                                const asigNombre = app.currentAsignatura?.nombre || '';
-                                const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
-                                return failedForAsig === 0 ? 'disabled' : '';
-                            })()}>
-                                🔄 Repasar Preguntas Falladas (${(() => {
+                        <!-- Botones principales de estudio -->
+                        <div style="max-width: 500px; margin: 0 auto;">
+                            <!-- Fila 1: Modos de Test (PRINCIPALES) -->
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem;">
+                                <button class="btn ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.startQuiz()" ${!canStartQuiz ? 'disabled' : ''} style="padding: 1.25rem 0.5rem; font-size: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; min-height: 70px;">
+                                    <span style="font-size: 1.5rem;">📝</span>
+                                    <span>Test Normal</span>
+                                </button>
+                                <button class="btn ${!canStartQuiz ? 'btn-secondary' : ''}" style="background: ${canStartQuiz ? '#dc2626' : ''}; border-color: ${canStartQuiz ? '#dc2626' : ''}; padding: 1.25rem 0.5rem; font-size: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; min-height: 70px;" onclick="app.navigate('exam-mode')" ${!canStartQuiz ? 'disabled' : ''}>
+                                    <span style="font-size: 1.5rem;">⏱️</span>
+                                    <span>Modo Examen</span>
+                                </button>
+                                <button class="btn ${(() => {
                                     const asigNombre = app.currentAsignatura?.nombre || '';
-                                    return app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
-                                })()})
-                            </button>
-                            <button class="btn btn-outline ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.navigate('summary')" ${!canStartQuiz ? 'disabled' : ''}>
-                                📖 Ver Resumen del Tema
-                            </button>
-                            <button class="btn btn-outline ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.exportToPDF()" style="background: #fef3c7; color: #92400e; border-color: #fcd34d;" ${!canStartQuiz ? 'disabled' : ''}>
-                                📄 Exportar a PDF
-                            </button>
-                            <button id="refresh-btn" class="btn btn-outline" onclick="app.refreshAndReload()" style="background: #f0fdf4; color: #15803d; border-color: #86efac;" ${app.isRefreshOnCooldown() ? 'disabled' : ''}>
-                                🔄 Actualizar Preguntas ${app.isRefreshOnCooldown() ? `(espera ${app.getCooldownRemaining()}s)` : ''}
-                            </button>
+                                    const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
+                                    return failedForAsig === 0 ? 'btn-secondary' : '';
+                                })()}" style="background: ${(() => {
+                                    const asigNombre = app.currentAsignatura?.nombre || '';
+                                    const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
+                                    return failedForAsig > 0 ? '#0891b2' : '';
+                                })()}; border-color: ${(() => {
+                                    const asigNombre = app.currentAsignatura?.nombre || '';
+                                    const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
+                                    return failedForAsig > 0 ? '#0891b2' : '';
+                                })()}; padding: 1.25rem 0.5rem; font-size: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; min-height: 70px;" onclick="app.navigate('review-mode')" ${(() => {
+                                    const asigNombre = app.currentAsignatura?.nombre || '';
+                                    const failedForAsig = app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
+                                    return failedForAsig === 0 ? 'disabled' : '';
+                                })()}>
+                                    <span style="font-size: 1.5rem;">🔄</span>
+                                    <span>Repaso (${(() => {
+                                        const asigNombre = app.currentAsignatura?.nombre || '';
+                                        return app.failedQuestionsHistory.filter(q => q.subject === asigNombre).length;
+                                    })()})</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Fila 2: Resumen y Exportar -->
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1rem;">
+                                <button class="btn btn-outline ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.navigate('summary')" ${!canStartQuiz ? 'disabled' : ''} style="padding: 1rem 0.5rem; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 50px;">
+                                    <span style="font-size: 1.25rem;">📖</span>
+                                    <span>Ver Resumen</span>
+                                </button>
+                                <button class="btn btn-outline ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.exportToPDF()" style="background: #fef3c7; color: #92400e; border-color: #fcd34d; padding: 1rem 0.5rem; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 50px;" ${!canStartQuiz ? 'disabled' : ''}>
+                                    <span style="font-size: 1.25rem;">📄</span>
+                                    <span>Exportar PDF</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Separador -->
+                            <div style="border-top: 1px solid var(--border); margin: 1rem 0;"></div>
+                            
+                            <!-- Fila 3: Actualizar + Info cache -->
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <button id="refresh-btn" class="btn btn-outline" onclick="app.refreshAndReload()" style="width: 100%; background: #f0fdf4; color: #15803d; border-color: #86efac; padding: 0.75rem; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;" ${app.isRefreshOnCooldown() ? 'disabled' : ''}>
+                                    <span>🔄</span>
+                                    <span>Actualizar Preguntas ${app.isRefreshOnCooldown() ? `(espera ${app.getCooldownRemaining()}s)` : ''}</span>
+                                </button>
+                                ${(() => {
+                                    const cacheInfo = app.getCacheInfo();
+                                    if (cacheInfo.hasCache) {
+                                        const bgColor = cacheInfo.isExpired ? '#fef3c7' : '#e0f2fe';
+                                        const borderColor = cacheInfo.isExpired ? '#fcd34d' : '#7dd3fc';
+                                        const textColor = cacheInfo.isExpired ? '#92400e' : '#0369a1';
+                                        const icon = cacheInfo.isExpired ? '⚠️' : '📦';
+                                        const status = cacheInfo.isExpired ? '(expirado)' : '';
+                                        return `
+                                        <div style="background:${bgColor}; padding:0.5rem 0.75rem; border-radius:6px; border: 1px solid ${borderColor};">
+                                            <p style="margin:0; font-size:0.8rem; color: ${textColor}; text-align: center;">
+                                                ${icon} ${allDbQuestions.length} preguntas · Actualizado ${cacheInfo.ageText} ${status}
+                                            </p>
+                                        </div>`;
+                                    }
+                                    return '';
+                                })()}
+                            </div>
                         </div>
-                        
-                        ${(() => {
-                            const cacheInfo = app.getCacheInfo();
-                            if (cacheInfo.hasCache) {
-                                const bgColor = cacheInfo.isExpired ? '#fef3c7' : '#e0f2fe';
-                                const borderColor = cacheInfo.isExpired ? '#fcd34d' : '#7dd3fc';
-                                const textColor = cacheInfo.isExpired ? '#92400e' : '#0369a1';
-                                const icon = cacheInfo.isExpired ? '⚠️' : '📦';
-                                const status = cacheInfo.isExpired ? '(expirado - se actualizará)' : '(datos locales)';
-                                return `
-                                <div style="background:${bgColor}; padding:0.75rem; border-radius:6px; margin-top:1rem; border: 1px solid ${borderColor}; max-width: 400px; margin-left: auto; margin-right: auto;">
-                                    <p style="margin:0; font-size:0.85rem; color: ${textColor}; text-align: center;">
-                                        ${icon} ${allDbQuestions.length} preguntas · Actualizado ${cacheInfo.ageText} ${status}
-                                    </p>
-                                </div>`;
-                            }
-                            return '';
-                        })()}
                     </div>
                 `;
                 
