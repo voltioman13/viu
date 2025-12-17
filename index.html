@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIU estudio examenes</title>
+    <!-- jsPDF para exportar a PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         :root {
             --primary: #4f46e5;
@@ -2890,6 +2892,9 @@
                             </button>
                             <button class="btn btn-outline ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.navigate('summary')" ${!canStartQuiz ? 'disabled' : ''}>
                                 📖 Ver Resumen del Tema
+                            </button>
+                            <button class="btn btn-outline ${!canStartQuiz ? 'btn-secondary' : ''}" onclick="app.exportToPDF()" style="background: #fef3c7; color: #92400e; border-color: #fcd34d;" ${!canStartQuiz ? 'disabled' : ''}>
+                                📄 Exportar a PDF
                             </button>
                             <button id="refresh-btn" class="btn btn-outline" onclick="app.refreshAndReload()" style="background: #f0fdf4; color: #15803d; border-color: #86efac;" ${app.isRefreshOnCooldown() ? 'disabled' : ''}>
                                 🔄 Actualizar Preguntas ${app.isRefreshOnCooldown() ? `(espera ${app.getCooldownRemaining()}s)` : ''}
@@ -8053,6 +8058,185 @@ Respuesta: b</pre>
                     
                 } catch (error) {
                     app.showToast('❌ ' + error.message);
+                }
+            },
+            
+            // Exportar preguntas a PDF según filtros actuales
+            exportToPDF: async () => {
+                try {
+                    // Verificar que jsPDF esté disponible
+                    if (!window.jspdf || !window.jspdf.jsPDF) {
+                        app.showToast('❌ Error: Librería PDF no cargada');
+                        return;
+                    }
+                    
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    // Obtener preguntas filtradas actuales
+                    const questions = app.filteredQuestions;
+                    
+                    if (questions.length === 0) {
+                        app.showToast('⚠️ No hay preguntas para exportar');
+                        return;
+                    }
+                    
+                    // Información del documento
+                    const asignaturaNombre = app.currentAsignatura?.nombre || 'Asignatura';
+                    const especialidadNombre = app.userEspecialidad ? CONFIG.especialidades[app.userEspecialidad] : '';
+                    const temaInfo = app.currentTema === 'all' ? 'Todos los temas' : 'Tema ' + app.currentTema;
+                    
+                    // Agrupar preguntas por tema (usar 'unit' que es el campo correcto)
+                    const preguntasPorTema = {};
+                    questions.forEach(q => {
+                        const tema = q.unit || 1;
+                        if (!preguntasPorTema[tema]) {
+                            preguntasPorTema[tema] = [];
+                        }
+                        preguntasPorTema[tema].push(q);
+                    });
+                    
+                    const temas = Object.keys(preguntasPorTema).sort((a, b) => parseInt(a) - parseInt(b));
+                    
+                    let y = 20;
+                    const pageHeight = 280;
+                    const marginLeft = 15;
+                    const maxWidth = 180;
+                    const lineHeight = 6;
+                    
+                    // Título del documento
+                    doc.setFontSize(16);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(asignaturaNombre || 'Preguntas', marginLeft, y);
+                    y += 8;
+                    
+                    doc.setFontSize(11);
+                    doc.setFont('helvetica', 'normal');
+                    if (especialidadNombre) {
+                        doc.text(especialidadNombre, marginLeft, y);
+                        y += 6;
+                    }
+                    doc.text(temaInfo, marginLeft, y);
+                    y += 6;
+                    doc.text('Total: ' + questions.length + ' preguntas', marginLeft, y);
+                    y += 8;
+                    
+                    // Línea divisora
+                    doc.setDrawColor(180);
+                    doc.line(marginLeft, y, marginLeft + maxWidth, y);
+                    y += 10;
+                    
+                    // Iterar por cada tema
+                    for (const tema of temas) {
+                        const preguntasTema = preguntasPorTema[tema];
+                        
+                        // Título del tema - SIEMPRE mostrar
+                        if (y > pageHeight - 30) {
+                            doc.addPage();
+                            y = 20;
+                        }
+                        
+                        // Línea separadora antes del tema
+                        doc.setDrawColor(100);
+                        doc.setLineWidth(0.5);
+                        doc.line(marginLeft, y, marginLeft + maxWidth, y);
+                        y += 8;
+                        
+                        doc.setFontSize(13);
+                        doc.setFont('helvetica', 'bold');
+                        doc.text('TEMA ' + tema + ' (' + preguntasTema.length + ' preguntas)', marginLeft, y);
+                        y += 10;
+                        
+                        doc.setLineWidth(0.2);
+                        
+                        // Iterar por cada pregunta del tema
+                        let numPregTema = 1;
+                        for (const q of preguntasTema) {
+                            // Verificar espacio en página
+                            if (y > pageHeight - 50) {
+                                doc.addPage();
+                                y = 20;
+                            }
+                            
+                            // Texto de pregunta (usar 'question' que es el campo correcto)
+                            const preguntaTexto = q.question || 'Sin texto';
+                            
+                            // Número y pregunta
+                            doc.setFontSize(10);
+                            doc.setFont('helvetica', 'bold');
+                            const preguntaCompleta = numPregTema + '. ' + preguntaTexto;
+                            const preguntaLines = doc.splitTextToSize(preguntaCompleta, maxWidth);
+                            doc.text(preguntaLines, marginLeft, y);
+                            y += preguntaLines.length * lineHeight + 2;
+                            
+                            doc.setFontSize(9);
+                            
+                            if (q.tipo === 'desarrollo') {
+                                // Pregunta de desarrollo (usar 'answer' que es el campo correcto)
+                                doc.setFont('helvetica', 'italic');
+                                doc.text('Respuesta:', marginLeft + 5, y);
+                                y += 5;
+                                doc.setFont('helvetica', 'normal');
+                                const respuesta = q.answer || 'Sin respuesta';
+                                const respuestaLines = doc.splitTextToSize(respuesta, maxWidth - 10);
+                                doc.text(respuestaLines, marginLeft + 5, y);
+                                y += respuestaLines.length * 5 + 3;
+                            } else {
+                                // Pregunta tipo test - mostrar TODAS las opciones (usar 'options' y 'answer')
+                                let opciones = q.options;
+                                if (typeof opciones === 'string') {
+                                    try { opciones = JSON.parse(opciones); } catch(e) { opciones = []; }
+                                }
+                                if (!opciones || !Array.isArray(opciones)) opciones = [];
+                                
+                                const respCorrecta = q.answer || '';
+                                
+                                for (let idx = 0; idx < opciones.length; idx++) {
+                                    const letra = String.fromCharCode(65 + idx);
+                                    const opcionTexto = opciones[idx] || '';
+                                    const esCorrecta = opcionTexto === respCorrecta;
+                                    
+                                    // Verificar si necesitamos nueva página
+                                    if (y > pageHeight - 10) {
+                                        doc.addPage();
+                                        y = 20;
+                                    }
+                                    
+                                    if (esCorrecta) {
+                                        doc.setFont('helvetica', 'bold');
+                                        const textoOpcion = letra + ') ' + opcionTexto + ' [CORRECTA]';
+                                        const opcionLines = doc.splitTextToSize(textoOpcion, maxWidth - 10);
+                                        doc.text(opcionLines, marginLeft + 5, y);
+                                        y += opcionLines.length * 5;
+                                    } else {
+                                        doc.setFont('helvetica', 'normal');
+                                        const textoOpcion = letra + ') ' + opcionTexto;
+                                        const opcionLines = doc.splitTextToSize(textoOpcion, maxWidth - 10);
+                                        doc.text(opcionLines, marginLeft + 5, y);
+                                        y += opcionLines.length * 5;
+                                    }
+                                }
+                            }
+                            
+                            y += 8;
+                            numPregTema++;
+                        }
+                        
+                        y += 5;
+                    }
+                    
+                    // Generar nombre de archivo
+                    const safeAsig = (asignaturaNombre || 'preguntas').replace(/[^a-z0-9]/gi, '_');
+                    const safeTema = temaInfo.replace(/[^a-z0-9]/gi, '_');
+                    const fileName = safeAsig + '_' + safeTema + '.pdf';
+                    
+                    // Descargar PDF
+                    doc.save(fileName);
+                    app.showToast('PDF exportado correctamente');
+                    
+                } catch (error) {
+                    console.error('Error exportando PDF:', error);
+                    app.showToast('Error al exportar PDF: ' + (error.message || 'desconocido'));
                 }
             }
         };
