@@ -1655,7 +1655,7 @@
             // Refrescar cache de preguntas manualmente
             refreshDbCache: async () => {
                 try {
-                    const url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&limit=1000`;
+                    const url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&or=(aprobada.is.null,aprobada.eq.true)&limit=1000`;
                     const response = await fetch(url, {
                         method: 'GET',
                         headers: {
@@ -1694,6 +1694,8 @@
                 if (cachedData && cacheTime && (now - parseInt(cacheTime)) < app.CACHE_DURATION) {
                     try {
                         let allQuestions = JSON.parse(cachedData);
+                        // Nunca devolver preguntas desactivadas
+                        allQuestions = allQuestions.filter(q => q.aprobada !== false);
                         // Filtrar por especialidad y asignatura si se especifica
                         // IMPORTANTE: Incluir también preguntas sin especialidad (obligatorias/comunes)
                         if (especialidad) {
@@ -1712,11 +1714,17 @@
                 // Si no hay cache, cargar de la BD
                 try {
                     let url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*`;
+                    const andParts = [];
+                    // Excluir desactivadas
+                    andParts.push('or(aprobada.is.null,aprobada.eq.true)');
                     
                     // Construir filtros Supabase
                     // Para especialidad, usar OR para incluir preguntas comunes (especialidad vacía)
                     if (especialidad) {
-                        url += `&or=(especialidad.eq.${especialidad},especialidad.eq.,especialidad.is.null)`;
+                        andParts.push(`or(especialidad.eq.${especialidad},especialidad.eq.,especialidad.is.null)`);
+                    }
+                    if (andParts.length) {
+                        url += `&and=(${andParts.join(',')})`;
                     }
                     if (asignatura) {
                         url += `&asignatura=eq.${asignatura}`;
@@ -1804,15 +1812,18 @@
                 }
             },
             
-            // Eliminar pregunta de la base de datos (solo el autor puede)
+            // Desactivar pregunta en la base de datos (opción A: no se borra desde usuario)
+            // Nota: Para que esto sea realmente seguro contra abuso, debe protegerse con RLS + Auth o vía Edge Function.
             deleteQuestionFromDb: async (questionId) => {
                 try {
                     const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?id=eq.${questionId}`, {
-                        method: 'DELETE',
+                        method: 'PATCH',
                         headers: {
+                            'Content-Type': 'application/json',
                             'apikey': SUPABASE_CONFIG.anonKey,
                             'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
-                        }
+                        },
+                        body: JSON.stringify({ aprobada: false })
                     });
                     
                     if (response.status === 429) {
@@ -1839,7 +1850,7 @@
                     app.failedQuestionsHistory = app.failedQuestionsHistory.filter(q => q.id !== questionId);
                     app.saveFailedHistory();
                     
-                    console.log('✅ Pregunta eliminada de BD:', questionId);
+                    console.log('🚫 Pregunta desactivada en BD:', questionId);
                     return true;
                 } catch (error) {
                     console.error('Error eliminando pregunta:', error);
@@ -5420,12 +5431,17 @@ Respuesta: b</pre>
                     const userId = app.getUserId();
                     const query = { autor: userId };
                     
+                    // Construir URL evitando múltiples `or=` (se pisan entre sí en PostgREST)
                     let url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&autor=eq.${userId}`;
-                    
-                    // Añadir filtros si están seleccionados
+                    const andParts = [];
+                    // Solo mostrar preguntas activas (las desactivadas desaparecen de esta lista)
+                    andParts.push('or(aprobada.is.null,aprobada.eq.true)');
                     // Para especialidad, incluir también preguntas sin especialidad (obligatorias)
                     if (especialidadFilter) {
-                        url += `&or=(especialidad.eq.${especialidadFilter},especialidad.eq.,especialidad.is.null)`;
+                        andParts.push(`or(especialidad.eq.${especialidadFilter},especialidad.eq.,especialidad.is.null)`);
+                    }
+                    if (andParts.length) {
+                        url += `&and=(${andParts.join(',')})`;
                     }
                     if (asignaturaFilter) url += `&asignatura=eq.${asignaturaFilter}`;
                     
@@ -5529,10 +5545,10 @@ Respuesta: b</pre>
                                                 title="Editar pregunta">
                                             ✏️
                                         </button>
-                                        <button onclick="app.deleteMyQuestion('${q.id}')" 
+                                        <button onclick="app.deactivateMyQuestion('${q.id}')" 
                                                 style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 4px; padding: 0.5rem; cursor: pointer;"
-                                                title="Eliminar pregunta">
-                                            🗑️
+                                                title="Desactivar pregunta">
+                                            🚫
                                         </button>
                                     </div>
                                 </div>
@@ -5611,16 +5627,16 @@ Respuesta: b</pre>
                 }, 150);
             },
             
-            // Eliminar pregunta propia
-            deleteMyQuestion: async (questionId) => {
-                if (!confirm('¿Eliminar esta pregunta? Esta acción no se puede deshacer.')) return;
+            // Desactivar pregunta propia (opción A: usuarios NO borran, solo desactivan)
+            deactivateMyQuestion: async (questionId) => {
+                if (!confirm('¿Desactivar esta pregunta? Dejará de aparecer en los tests.')) return;
                 
                 try {
                     await app.deleteQuestionFromDb(questionId);
-                    app.showToast('✅ Pregunta eliminada');
+                    app.showToast('🚫 Pregunta desactivada');
                     app.renderDbContributionsList();
                 } catch (error) {
-                    app.showToast('❌ Error al eliminar');
+                    app.showToast('❌ Error al desactivar');
                 }
             },
             
@@ -7083,6 +7099,7 @@ Respuesta: b</pre>
                 const password = document.getElementById('admin-password').value;
                 if (password === app.adminPassword) {
                     app.isAdmin = true;
+                    app.adminPasswordInput = password; // Guardar para Edge Function
                     app.hideAdminLogin();
                     app.showToast('🔓 Acceso de administrador activado');
                     app.navigate('admin');
@@ -7388,21 +7405,29 @@ Respuesta: b</pre>
                 }
             },
             
-            // Eliminar pregunta
+            // Eliminar pregunta (usa Edge Function segura)
             deleteAdminQuestion: async (id) => {
                 if (!confirm('⚠️ ¿ELIMINAR esta pregunta permanentemente? Esta acción no se puede deshacer.')) return;
-                if (!confirm('¿Estás seguro? Se eliminará para siempre.')) return;
                 
                 try {
-                    const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?id=eq.${id}`, {
-                        method: 'DELETE',
+                    const response = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/admin-delete`, {
+                        method: 'POST',
                         headers: {
-                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Content-Type': 'application/json',
                             'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
-                        }
+                        },
+                        body: JSON.stringify({
+                            password: app.adminPasswordInput,
+                            questionId: id,
+                            action: 'delete'
+                        })
                     });
                     
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const result = await response.json();
+                    
+                    if (!response.ok || result.error) {
+                        throw new Error(result.error || 'Error al eliminar');
+                    }
                     
                     app.showToast('🗑️ Pregunta eliminada');
                     
@@ -7412,7 +7437,7 @@ Respuesta: b</pre>
                     
                 } catch (error) {
                     console.error('Error:', error);
-                    app.showToast('❌ Error al eliminar');
+                    app.showToast('❌ ' + error.message);
                 }
             },
             
@@ -7993,20 +8018,29 @@ Respuesta: b</pre>
                 }
             },
             
-            // Eliminar rápido desde el modal de duplicados
+            // Eliminar rápido desde el modal de duplicados (usa Edge Function segura)
             quickDeleteFromModal: async (id, pairIdx, qNum) => {
                 if (!confirm('⚠️ ¿ELIMINAR esta pregunta permanentemente? Esta acción NO se puede deshacer.')) return;
                 
                 try {
-                    const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?id=eq.${id}`, {
-                        method: 'DELETE',
+                    const response = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/admin-delete`, {
+                        method: 'POST',
                         headers: {
-                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Content-Type': 'application/json',
                             'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
-                        }
+                        },
+                        body: JSON.stringify({
+                            password: app.adminPasswordInput,
+                            questionId: id,
+                            action: 'delete'
+                        })
                     });
                     
-                    if (!response.ok) throw new Error('Error');
+                    const result = await response.json();
+                    
+                    if (!response.ok || result.error) {
+                        throw new Error(result.error || 'Error al eliminar');
+                    }
                     
                     app.showToast('🗑️ Pregunta eliminada');
                     
@@ -8018,7 +8052,7 @@ Respuesta: b</pre>
                     }
                     
                 } catch (error) {
-                    app.showToast('❌ Error al eliminar');
+                    app.showToast('❌ ' + error.message);
                 }
             }
         };
