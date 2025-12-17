@@ -2670,9 +2670,13 @@
                     return Object.values(temasMap).sort((a, b) => a.numero - b.numero);
                 };
                 
-                // Función para contar preguntas por tipo de toda la asignatura
-                const countByTipo = (asignaturaId) => {
-                    const questions = allDbQuestions.filter(q => q.asignatura === asignaturaId);
+                // Función para contar preguntas por tipo (asignatura y opcionalmente tema)
+                const countByTipo = (asignaturaId, temaNum = null) => {
+                    let questions = allDbQuestions.filter(q => q.asignatura === asignaturaId);
+                    // Si hay tema específico, filtrar también por tema
+                    if (temaNum !== null && temaNum !== 'all') {
+                        questions = questions.filter(q => q.tema === parseInt(temaNum));
+                    }
                     let countTest = 0, countIA = 0, countDesarrollo = 0;
                     questions.forEach(q => {
                         if (q.tipo === 'desarrollo') countDesarrollo++;
@@ -2730,7 +2734,8 @@
                 if (app.currentAsignatura) {
                     temasDisponibles = getTemasForAsignatura(app.currentAsignatura.id);
                     totalPreguntasAsignatura = countByAsignatura(app.currentAsignatura.id);
-                    tiposCounts = countByTipo(app.currentAsignatura.id);
+                    // Contar por tipo según el tema seleccionado
+                    tiposCounts = countByTipo(app.currentAsignatura.id, app.currentTema);
                 }
                 
                 // Opciones de temas con detalle de tipos
@@ -8100,11 +8105,27 @@ Respuesta: b</pre>
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
                     
-                    // Obtener preguntas filtradas actuales
-                    const questions = app.filteredQuestions;
+                    // Leer filtros de tipo directamente de los checkboxes
+                    const includeTest = document.getElementById('include-test-check')?.checked !== false;
+                    const includeAI = document.getElementById('include-ai-check')?.checked !== false;
+                    const includeDesarrollo = document.getElementById('include-desarrollo-check')?.checked !== false;
+                    
+                    // Obtener preguntas filtradas actuales y aplicar filtro de tipo
+                    let questions = app.filteredQuestions.filter(q => {
+                        const isDesarrollo = q.tipo === 'desarrollo';
+                        const isAI = q.is_ai === true;
+                        const isTestNormal = q.tipo !== 'desarrollo' && !q.is_ai;
+                        
+                        // Aplicar filtros de tipo
+                        if (isDesarrollo && includeDesarrollo) return true;
+                        if (isAI && includeAI) return true;
+                        if (isTestNormal && includeTest) return true;
+                        
+                        return false;
+                    });
                     
                     if (questions.length === 0) {
-                        app.showToast('⚠️ No hay preguntas para exportar');
+                        app.showToast('⚠️ No hay preguntas para exportar con los filtros seleccionados');
                         return;
                     }
                     
