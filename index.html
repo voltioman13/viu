@@ -7062,7 +7062,6 @@ Respuesta: b</pre>
             adminClickCount: 0,
             adminClickTimer: null,
             isAdmin: false,
-            adminPassword: 'VIU2024Admin!', // Cambiar esta contraseña
             adminFilters: { especialidad: '', asignatura: '', tema: '', search: '', votosPositivos: '', votosNegativos: '' },
             adminQuestions: [],
             
@@ -7100,18 +7099,46 @@ Respuesta: b</pre>
                 document.getElementById('admin-login-modal').style.display = 'none';
             },
             
-            verifyAdminPassword: () => {
+            verifyAdminPassword: async () => {
                 const password = document.getElementById('admin-password').value;
-                if (password === app.adminPassword) {
-                    app.isAdmin = true;
-                    app.adminPasswordInput = password; // Guardar para Edge Function
-                    app.hideAdminLogin();
-                    app.showToast('🔓 Acceso de administrador activado');
-                    app.navigate('admin');
-                } else {
-                    document.getElementById('admin-login-error').style.display = 'block';
-                    document.getElementById('admin-password').value = '';
-                    document.getElementById('admin-password').focus();
+                const loginBtn = document.querySelector('#admin-login-modal .btn');
+                const originalText = loginBtn.textContent;
+                
+                try {
+                    loginBtn.textContent = 'Verificando...';
+                    loginBtn.disabled = true;
+                    
+                    // Verificar contraseña contra el servidor (Edge Function)
+                    const response = await fetch(SUPABASE_CONFIG.url + '/functions/v1/admin-auth', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + SUPABASE_CONFIG.anonKey
+                        },
+                        body: JSON.stringify({ password: password })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    console.log('Admin auth response:', response.status, result);
+                    
+                    if (response.ok && result.success) {
+                        app.isAdmin = true;
+                        app.adminPasswordInput = password; // Guardar para operaciones posteriores
+                        app.hideAdminLogin();
+                        app.showToast('🔓 Acceso de administrador activado');
+                        app.navigate('admin');
+                    } else {
+                        document.getElementById('admin-login-error').style.display = 'block';
+                        document.getElementById('admin-password').value = '';
+                        document.getElementById('admin-password').focus();
+                    }
+                } catch (error) {
+                    console.error('Error verificando admin:', error);
+                    app.showToast('❌ Error de conexión');
+                } finally {
+                    loginBtn.textContent = originalText;
+                    loginBtn.disabled = false;
                 }
             },
             
