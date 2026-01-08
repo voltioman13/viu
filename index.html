@@ -870,10 +870,51 @@
             // Constantes de cache
             CACHE_DURATION: 24 * 60 * 60 * 1000, // 24 horas en ms
             REFRESH_COOLDOWN: 60 * 1000, // 1 minuto en ms
+            PAGE_SIZE: 1000, // Tamaño de página para paginación de BD
             CACHE_KEYS: {
                 questions: 'viu_db_questions_cache',
                 cacheTime: 'viu_db_questions_cache_time',
                 lastRefresh: 'viu_db_last_manual_refresh'
+            },
+            
+            // Función auxiliar para cargar TODAS las preguntas con paginación
+            fetchAllQuestionsWithPagination: async (baseUrl, filterQuery = '') => {
+                let allQuestions = [];
+                let offset = 0;
+                let hasMore = true;
+                
+                while (hasMore) {
+                    const paginatedUrl = `${baseUrl}${filterQuery}&order=id&offset=${offset}&limit=${app.PAGE_SIZE}`;
+                    const response = await fetch(paginatedUrl, {
+                        method: 'GET',
+                        headers: {
+                            'apikey': SUPABASE_CONFIG.anonKey,
+                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+                            'Prefer': 'count=exact'
+                        }
+                    });
+                    
+                    if (response.status === 429) {
+                        throw new Error('RATE_LIMIT');
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    allQuestions = allQuestions.concat(data);
+                    
+                    // Si recibimos menos registros que PAGE_SIZE, ya no hay más
+                    if (data.length < app.PAGE_SIZE) {
+                        hasMore = false;
+                    } else {
+                        offset += app.PAGE_SIZE;
+                        console.log(`📥 Cargadas ${allQuestions.length} preguntas... continuando paginación`);
+                    }
+                }
+                
+                return allQuestions;
             },
             
             // Verificar si el cooldown del botón está activo
@@ -1654,33 +1695,25 @@
                 return stored;
             },
             
-            // Refrescar cache de preguntas manualmente
+            // Refrescar cache de preguntas manualmente (con paginación para >1000 preguntas)
             refreshDbCache: async () => {
                 try {
-                    const url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&or=(aprobada.is.null,aprobada.eq.true)&limit=1000`;
-                    const response = await fetch(url, {
-                        method: 'GET',
-                        headers: {
-                            'apikey': SUPABASE_CONFIG.anonKey,
-                            'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
-                        }
-                    });
+                    const baseUrl = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*`;
+                    const filterQuery = '&or=(aprobada.is.null,aprobada.eq.true)';
                     
-                    if (response.status === 429) {
-                        app.showToast('⚠️ Límite de BD alcanzado. Intenta más tarde.');
-                        return false;
-                    }
+                    const questions = await app.fetchAllQuestionsWithPagination(baseUrl, filterQuery);
                     
-                    if (response.ok) {
-                        const questions = await response.json();
-                        localStorage.setItem(app.CACHE_KEYS.questions, JSON.stringify(questions));
-                        localStorage.setItem(app.CACHE_KEYS.cacheTime, Date.now().toString());
-                        console.log('✅ Cache actualizado:', questions.length, 'preguntas');
-                        return true;
-                    }
+                    localStorage.setItem(app.CACHE_KEYS.questions, JSON.stringify(questions));
+                    localStorage.setItem(app.CACHE_KEYS.cacheTime, Date.now().toString());
+                    console.log('✅ Cache actualizado:', questions.length, 'preguntas (con paginación)');
+                    return true;
                 } catch (error) {
-                    console.error('Error actualizando cache:', error);
-                    app.showToast('❌ Error actualizando preguntas');
+                    if (error.message === 'RATE_LIMIT') {
+                        app.showToast('⚠️ Límite de BD alcanzado. Intenta más tarde.');
+                    } else {
+                        console.error('Error actualizando cache:', error);
+                        app.showToast('❌ Error actualizando preguntas');
+                    }
                 }
                 return false;
             },
@@ -2612,32 +2645,25 @@
                     }
                 }
                 
-                // Si no hay cache válido, cargar de la BD
+                // Si no hay cache válido, cargar de la BD (con paginación para >1000 preguntas)
                 if (allDbQuestions.length === 0) {
                     try {
-                        const url = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*&limit=1000`;
-                        const response = await fetch(url, {
-                            method: 'GET',
-                            headers: {
-                                'apikey': SUPABASE_CONFIG.anonKey,
-                                'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
-                            }
-                        });
-                        if (response.ok) {
-                            allDbQuestions = await response.json();
-                            console.log('📚 Total preguntas en BD:', allDbQuestions.length);
-                            // Guardar en cache
-                            localStorage.setItem(app.CACHE_KEYS.questions, JSON.stringify(allDbQuestions));
-                            localStorage.setItem(app.CACHE_KEYS.cacheTime, now.toString());
-                            // Debug: mostrar las asignaturas únicas en BD
-                            const asignaturasEnBD = [...new Set(allDbQuestions.map(q => q.asignatura))];
-                            console.log('📋 Asignaturas en BD:', asignaturasEnBD);
-                        } else if (response.status === 429) {
+                        const baseUrl = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*`;
+                        allDbQuestions = await app.fetchAllQuestionsWithPagination(baseUrl, '');
+                        console.log('📚 Total preguntas en BD:', allDbQuestions.length, '(con paginación)');
+                        // Guardar en cache
+                        localStorage.setItem(app.CACHE_KEYS.questions, JSON.stringify(allDbQuestions));
+                        localStorage.setItem(app.CACHE_KEYS.cacheTime, now.toString());
+                        // Debug: mostrar las asignaturas únicas en BD
+                        const asignaturasEnBD = [...new Set(allDbQuestions.map(q => q.asignatura))];
+                        console.log('📋 Asignaturas en BD:', asignaturasEnBD);
+                    } catch (e) {
+                        if (e.message === 'RATE_LIMIT') {
                             console.warn('⚠️ Límite de peticiones alcanzado (429). Usando datos locales.');
                             app.showToast('⚠️ Límite de BD alcanzado. Espera unos minutos.');
+                        } else {
+                            console.warn('Error cargando preguntas de BD:', e);
                         }
-                    } catch (e) {
-                        console.warn('Error cargando preguntas de BD:', e);
                     }
                 }
                 
